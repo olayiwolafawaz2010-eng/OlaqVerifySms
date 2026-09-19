@@ -1,0 +1,3766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta name="theme-color" content="#5b21b6">
+<title>OlaqVerify</title>
+
+<style>
+:root{
+  --purple:#5b21b6;
+  --purple2:#3b0764;
+  --purpleLight:#f0e7ff;
+  --bg:#f5f3f8;
+  --card:#fff;
+  --text:#20152e;
+  --muted:#786b86;
+  --border:#e7e1ed;
+  --green:#13a56b;
+  --red:#e5484d;
+  --shadow:0 8px 28px rgba(60,20,90,.08);
+}
+
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Arial,
+    sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+}
+
+button,
+input,
+select{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+}
+
+.hidden{
+  display:none!important;
+}
+
+/* =========================
+   TOP BAR
+========================= */
+
+.topbar{
+  height:64px;
+  background:#fff;
+  border-bottom:1px solid var(--border);
+  position:sticky;
+  top:0;
+  z-index:100;
+}
+
+.topbar-inner{
+  height:100%;
+  width:min(1050px,100%);
+  margin:auto;
+  padding:0 20px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight:800;
+  font-size:18px;
+  letter-spacing:-.3px;
+}
+
+.logo{
+  width:39px;
+  height:39px;
+  border-radius:12px;
+  background:linear-gradient(135deg,var(--purple),var(--purple2));
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:900;
+  box-shadow:0 5px 15px rgba(91,33,182,.25);
+}
+
+.top-actions{
+  display:flex;
+  gap:8px;
+}
+
+.icon-btn{
+  width:40px;
+  height:40px;
+  border:1px solid var(--border);
+  background:#fff;
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--text);
+  font-size:18px;
+  transition:.2s;
+}
+
+.icon-btn:hover{
+  background:var(--purpleLight);
+  color:var(--purple);
+}
+
+/* =========================
+   CONTAINER
+========================= */
+
+.container{
+  width:min(1050px,100%);
+  margin:auto;
+  padding:20px;
+}
+
+.page{
+  display:none;
+}
+
+.page.active{
+  display:block;
+  animation:fade .2s ease;
+}
+
+@keyframes fade{
+  from{
+    opacity:0;
+    transform:translateY(4px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+/* =========================
+   HERO
+========================= */
+
+.hero{
+  padding:8px 0 18px;
+}
+
+.hero h1{
+  font-size:28px;
+  line-height:1.15;
+  letter-spacing:-.8px;
+  margin-bottom:8px;
+}
+
+.hero p{
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.6;
+}
+
+/* =========================
+   BALANCE
+========================= */
+
+.balance-card{
+  background:linear-gradient(135deg,var(--purple),var(--purple2));
+  color:#fff;
+  border-radius:20px;
+  padding:22px;
+  box-shadow:0 12px 30px rgba(91,33,182,.22);
+  margin-bottom:20px;
+}
+
+.balance-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+}
+
+.balance-label{
+  font-size:13px;
+  opacity:.8;
+  margin-bottom:7px;
+}
+
+.balance-value{
+  font-size:30px;
+  font-weight:900;
+  letter-spacing:-1px;
+}
+
+.balance-add{
+  border:0;
+  background:#fff;
+  color:var(--purple);
+  padding:10px 14px;
+  border-radius:12px;
+  font-weight:800;
+  font-size:13px;
+}
+
+.balance-bottom{
+  margin-top:18px;
+  font-size:12px;
+  opacity:.75;
+}
+
+/* =========================
+   SECTION HEADER
+========================= */
+
+.section-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin:22px 0 12px;
+}
+
+.section-head h2{
+  font-size:17px;
+  letter-spacing:-.2px;
+}
+
+.section-head button{
+  border:0;
+  background:transparent;
+  color:var(--purple);
+  font-weight:800;
+  font-size:13px;
+}
+
+/* =========================
+   QUICK ACCESS
+========================= */
+
+.quick-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+}
+
+.quick-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:17px 14px;
+  box-shadow:var(--shadow);
+  transition:.2s;
+  cursor:pointer;
+}
+
+.quick-card:hover{
+  transform:translateY(-2px);
+  border-color:#d8c8ed;
+}
+
+.quick-icon{
+  width:40px;
+  height:40px;
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:var(--purpleLight);
+  color:var(--purple);
+  font-size:19px;
+  margin-bottom:12px;
+}
+
+.quick-title{
+  font-weight:800;
+  font-size:14px;
+  margin-bottom:4px;
+}
+
+.quick-text{
+  color:var(--muted);
+  font-size:12px;
+}
+
+/* =========================
+   CARD
+========================= */
+
+.card{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:18px;
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
+
+.card-body{
+  padding:18px;
+}
+
+/* =========================
+   ACTIVITY
+========================= */
+
+.activity{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:14px 18px;
+  border-bottom:1px solid var(--border);
+}
+
+.activity:last-child{
+  border-bottom:0;
+}
+
+.activity-icon{
+  width:38px;
+  height:38px;
+  border-radius:11px;
+  background:var(--purpleLight);
+  color:var(--purple);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+}
+
+.activity-main{
+  flex:1;
+  min-width:0;
+}
+
+.activity-title{
+  font-weight:750;
+  font-size:13px;
+}
+
+.activity-sub{
+  color:var(--muted);
+  font-size:12px;
+  margin-top:3px;
+}
+
+.activity-time{
+  color:var(--muted);
+  font-size:11px;
+}
+
+/* =========================
+   TOOLBAR
+========================= */
+
+.toolbar{
+  display:flex;
+  gap:10px;
+  margin-bottom:15px;
+}
+
+.search{
+  flex:1;
+  position:relative;
+}
+
+.search input{
+  width:100%;
+  height:44px;
+  border:1px solid var(--border);
+  background:#fff;
+  border-radius:12px;
+  outline:none;
+  padding:0 14px 0 42px;
+  color:var(--text);
+}
+
+.search input:focus{
+  border-color:var(--purple);
+  box-shadow:0 0 0 3px rgba(91,33,182,.1);
+}
+
+.search span{
+  position:absolute;
+  left:14px;
+  top:50%;
+  transform:translateY(-50%);
+  color:var(--muted);
+}
+
+select{
+  height:44px;
+  border:1px solid var(--border);
+  background:#fff;
+  border-radius:12px;
+  padding:0 12px;
+  color:var(--text);
+  outline:none;
+}
+
+select:focus{
+  border-color:var(--purple);
+}
+
+/* =========================
+   NUMBER CARDS
+========================= */
+
+.number-list{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+}
+
+.number-card{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:17px;
+  padding:17px;
+  box-shadow:var(--shadow);
+}
+
+.number-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:10px;
+}
+
+.country{
+  display:flex;
+  align-items:center;
+  gap:9px;
+}
+
+.flag{
+  font-size:23px;
+}
+
+.country-name{
+  font-size:13px;
+  color:var(--muted);
+}
+
+.phone{
+  font-size:16px;
+  font-weight:850;
+  margin-top:2px;
+}
+
+.number-price{
+  font-size:15px;
+  font-weight:900;
+  color:var(--purple);
+  white-space:nowrap;
+}
+
+.number-bottom{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-top:16px;
+}
+
+.status{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:11px;
+  color:var(--green);
+  font-weight:750;
+}
+
+.dot{
+  width:7px;
+  height:7px;
+  background:var(--green);
+  border-radius:50%;
+}
+
+.primary-btn{
+  border:0;
+  background:var(--purple);
+  color:#fff;
+  height:38px;
+  padding:0 14px;
+  border-radius:11px;
+  font-weight:800;
+  font-size:12px;
+}
+
+.primary-btn:hover{
+  background:var(--purple2);
+}
+
+.secondary-btn{
+  border:1px solid var(--border);
+  background:#fff;
+  color:var(--text);
+  height:38px;
+  padding:0 14px;
+  border-radius:11px;
+  font-weight:750;
+  font-size:12px;
+}
+
+.secondary-btn:hover{
+  background:var(--purpleLight);
+  color:var(--purple);
+}
+
+/* =========================
+   INBOX
+========================= */
+
+.inbox-layout{
+  display:grid;
+  grid-template-columns:310px 1fr;
+  gap:14px;
+}
+
+.number-selector{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:17px;
+  overflow:hidden;
+}
+
+.number-selector-head{
+  padding:15px;
+  border-bottom:1px solid var(--border);
+  font-size:13px;
+  font-weight:850;
+}
+
+.test-number{
+  padding:15px;
+  border-bottom:1px solid var(--border);
+  cursor:pointer;
+}
+
+.test-number.active{
+  background:var(--purpleLight);
+}
+
+.test-number strong{
+  display:block;
+  font-size:13px;
+}
+
+.test-number span{
+  display:block;
+  color:var(--muted);
+  font-size:11px;
+  margin-top:4px;
+}
+
+.inbox-main{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:17px;
+  overflow:hidden;
+  min-height:380px;
+}
+
+.inbox-head{
+  padding:15px;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.inbox-head strong{
+  font-size:14px;
+}
+
+.inbox-content{
+  padding:15px;
+}
+
+.sms{
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:14px;
+  margin-bottom:10px;
+}
+
+.sms-top{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.sms-sender{
+  font-weight:850;
+  font-size:13px;
+}
+
+.sms-time{
+  color:var(--muted);
+  font-size:11px;
+}
+
+.sms-number{
+  color:var(--muted);
+  font-size:11px;
+  margin-top:3px;
+}
+
+.sms-text{
+  margin-top:10px;
+  font-size:13px;
+  line-height:1.5;
+}
+
+.otp{
+  display:inline-flex;
+  margin-top:10px;
+  padding:7px 10px;
+  background:var(--purpleLight);
+  color:var(--purple);
+  border-radius:9px;
+  font-size:13px;
+  font-weight:900;
+  letter-spacing:1px;
+}
+
+/* =========================
+   PROJECTS
+========================= */
+
+.project-list{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+}
+
+.project-card{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:17px;
+  padding:17px;
+  box-shadow:var(--shadow);
+}
+
+.project-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:10px;
+}
+
+.project-name{
+  font-weight:850;
+  font-size:15px;
+}
+
+.project-description{
+  color:var(--muted);
+  font-size:12px;
+  margin-top:5px;
+  line-height:1.5;
+}
+
+.project-key{
+  margin-top:15px;
+  padding:10px;
+  background:#f8f6fa;
+  border-radius:10px;
+  font-size:11px;
+  color:var(--muted);
+  word-break:break-all;
+}
+
+.project-actions{
+  display:flex;
+  gap:8px;
+  margin-top:14px;
+}
+
+/* =========================
+   ORDERS
+========================= */
+
+.order-row{
+  padding:16px 18px;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+}
+
+.order-row:last-child{
+  border-bottom:0;
+}
+
+.order-info strong{
+  display:block;
+  font-size:13px;
+}
+
+.order-info span{
+  color:var(--muted);
+  font-size:11px;
+  display:block;
+  margin-top:4px;
+}
+
+.order-right{
+  text-align:right;
+}
+
+.order-price{
+  font-weight:850;
+  font-size:13px;
+}
+
+.order-status{
+  font-size:10px;
+  color:var(--green);
+  margin-top:4px;
+}
+
+/* =========================
+   PROFILE
+========================= */
+
+.profile-card{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:20px;
+  box-shadow:var(--shadow);
+}
+
+.profile-avatar{
+  width:72px;
+  height:72px;
+  border-radius:22px;
+  background:linear-gradient(135deg,var(--purple),var(--purple2));
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:28px;
+  font-weight:900;
+  margin-bottom:14px;
+}
+
+.profile-name{
+  font-size:20px;
+  font-weight:900;
+}
+
+.profile-email{
+  color:var(--muted);
+  font-size:13px;
+  margin-top:4px;
+}
+
+.form-group{
+  margin-top:16px;
+}
+
+.form-group label{
+  display:block;
+  font-size:12px;
+  font-weight:800;
+  margin-bottom:7px;
+}
+
+.form-group input,
+.form-group textarea{
+  width:100%;
+  border:1px solid var(--border);
+  border-radius:11px;
+  min-height:43px;
+  padding:10px 12px;
+  outline:none;
+  background:#fff;
+  color:var(--text);
+}
+
+.form-group textarea{
+  resize:vertical;
+  min-height:100px;
+}
+
+.form-group input:focus,
+.form-group textarea:focus{
+  border-color:var(--purple);
+  box-shadow:0 0 0 3px rgba(91,33,182,.1);
+}
+
+.profile-actions{
+  display:flex;
+  gap:10px;
+  margin-top:18px;
+}
+
+/* =========================
+   EMPTY
+========================= */
+
+.empty{
+  padding:45px 20px;
+  text-align:center;
+  color:var(--muted);
+}
+
+.empty-icon{
+  font-size:32px;
+  margin-bottom:10px;
+}
+
+.empty-title{
+  color:var(--text);
+  font-weight:850;
+  margin-bottom:5px;
+}
+
+.empty-text{
+  font-size:12px;
+  line-height:1.5;
+}
+
+/* =========================
+   BOTTOM NAV
+========================= */
+
+.bottom-nav{
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  height:68px;
+  background:rgba(255,255,255,.97);
+  border-top:1px solid var(--border);
+  z-index:90;
+}
+
+.bottom-inner{
+  width:min(600px,100%);
+  margin:auto;
+  height:100%;
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+}
+
+.nav-btn{
+  border:0;
+  background:transparent;
+  color:var(--muted);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  font-size:10px;
+  font-weight:700;
+}
+
+.nav-icon{
+  font-size:19px;
+  line-height:1;
+}
+
+.nav-btn.active{
+  color:var(--purple);
+}
+
+/* =========================
+   MODALS
+========================= */
+
+.modal-backdrop{
+  position:fixed;
+  inset:0;
+  background:rgba(20,10,30,.48);
+  z-index:200;
+  display:none;
+  align-items:flex-end;
+  justify-content:center;
+  padding:15px;
+}
+
+.modal-backdrop.show{
+  display:flex;
+}
+
+.modal{
+  width:min(520px,100%);
+  background:#fff;
+  border-radius:22px;
+  padding:20px;
+  box-shadow:0 25px 70px rgba(0,0,0,.2);
+  animation:modalUp .2s ease;
+  max-height:90vh;
+  overflow:auto;
+}
+
+@keyframes modalUp{
+  from{
+    transform:translateY(20px);
+    opacity:0;
+  }
+  to{
+    transform:translateY(0);
+    opacity:1;
+  }
+}
+
+.modal-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:18px;
+}
+
+.modal-title{
+  font-size:18px;
+  font-weight:900;
+}
+
+.close-btn{
+  border:0;
+  background:#f5f3f8;
+  width:35px;
+  height:35px;
+  border-radius:10px;
+  font-size:18px;
+}
+
+.modal-text{
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.6;
+}
+
+.modal-actions{
+  display:flex;
+  gap:10px;
+  margin-top:18px;
+}
+
+.modal-actions button{
+  flex:1;
+}
+
+/* =========================
+   AUTH
+========================= */
+
+.auth-screen{
+  min-height:100vh;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:
+    radial-gradient(circle at top right,#e9ddff 0,#f5f3f8 35%,#f5f3f8 100%);
+}
+
+.auth-screen.show{
+  display:flex;
+}
+
+.auth-box{
+  width:min(420px,100%);
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:22px;
+  padding:25px;
+  box-shadow:var(--shadow);
+}
+
+.auth-logo{
+  width:55px;
+  height:55px;
+  border-radius:17px;
+  background:linear-gradient(135deg,var(--purple),var(--purple2));
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:22px;
+  font-weight:900;
+  margin-bottom:15px;
+}
+
+.auth-box h1{
+  font-size:24px;
+  margin-bottom:7px;
+}
+
+.auth-box p{
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.5;
+}
+
+.auth-form{
+  margin-top:18px;
+}
+
+.auth-switch{
+  margin-top:15px;
+  text-align:center;
+  color:var(--muted);
+  font-size:12px;
+}
+
+.auth-switch button{
+  border:0;
+  background:none;
+  color:var(--purple);
+  font-weight:800;
+}
+
+/* =========================
+   TOAST
+========================= */
+
+.toast{
+  position:fixed;
+  left:50%;
+  bottom:84px;
+  transform:translateX(-50%) translateY(20px);
+  background:#20152e;
+  color:#fff;
+  padding:11px 15px;
+  border-radius:11px;
+  font-size:12px;
+  z-index:500;
+  opacity:0;
+  pointer-events:none;
+  transition:.25s;
+  max-width:90%;
+  text-align:center;
+}
+
+.toast.show{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media(max-width:760px){
+
+  .quick-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .number-list{
+    grid-template-columns:1fr;
+  }
+
+  .project-list{
+    grid-template-columns:1fr;
+  }
+
+  .inbox-layout{
+    grid-template-columns:1fr;
+  }
+
+  .number-selector{
+    display:flex;
+    overflow:auto;
+  }
+
+  .number-selector-head{
+    min-width:130px;
+  }
+
+  .test-number{
+    min-width:180px;
+  }
+
+}
+
+@media(max-width:480px){
+
+  .container{
+    padding:16px;
+    padding-bottom:85px;
+  }
+
+  .hero h1{
+    font-size:25px;
+  }
+
+  .balance-value{
+    font-size:27px;
+  }
+
+  .toolbar{
+    flex-direction:column;
+  }
+
+  .toolbar select{
+    width:100%;
+  }
+
+  .topbar-inner{
+    padding:0 16px;
+  }
+
+  .quick-card{
+    padding:14px 12px;
+  }
+
+}
+</style>
+</head>
+
+<body>
+
+<!-- =========================
+     AUTH SCREEN
+========================= -->
+
+<div class="auth-screen" id="authScreen">
+
+  <div class="auth-box">
+
+    <div class="auth-logo">O</div>
+
+    <h1 id="authTitle">Welcome to OlaqVerify</h1>
+
+    <p id="authDescription">
+      Manage authorized SMS testing numbers, projects and development messages.
+    </p>
+
+    <form class="auth-form" id="authForm">
+
+      <div class="form-group">
+        <label>Email</label>
+        <input
+          id="authEmail"
+          type="email"
+          placeholder="you@example.com"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label>Password</label>
+        <input
+          id="authPassword"
+          type="password"
+          placeholder="Password"
+          minlength="6"
+          required
+        >
+      </div>
+
+      <button
+        class="primary-btn"
+        style="width:100%;height:45px;margin-top:18px"
+        type="submit"
+      >
+        Continue
+      </button>
+
+    </form>
+
+    <div class="auth-switch">
+      <span id="authSwitchText">Don't have an account?</span>
+      <button id="authSwitchBtn" onclick="toggleAuthMode()">
+        Create account
+      </button>
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- =========================
+     MAIN APP
+========================= -->
+
+<div id="app">
+
+  <!-- TOP BAR -->
+
+  <header class="topbar">
+
+    <div class="topbar-inner">
+
+      <div class="brand">
+        <div class="logo">O</div>
+        <span>OlaqVerify</span>
+      </div>
+
+      <div class="top-actions">
+
+        <button
+          class="icon-btn"
+          onclick="showToast('Notifications are currently clear')"
+          aria-label="Notifications"
+        >
+          🔔
+        </button>
+
+        <button
+          class="icon-btn"
+          onclick="go('profile')"
+          aria-label="Profile"
+        >
+          👤
+        </button>
+
+      </div>
+
+    </div>
+
+  </header>
+
+
+  <main class="container">
+
+    <!-- =====================
+         HOME
+    ====================== -->
+
+    <section class="page active" id="page-home">
+
+      <div class="hero">
+
+        <h1>Number & SMS workspace</h1>
+
+        <p>
+          Manage authorized SMS testing numbers, development messages,
+          projects and account activity from one place.
+        </p>
+
+      </div>
+
+
+      <!-- BALANCE -->
+
+      <div class="balance-card">
+
+        <div class="balance-top">
+
+          <div>
+
+            <div class="balance-label">
+              Available balance
+            </div>
+
+            <div
+              class="balance-value"
+              id="homeBalance"
+            >
+              ₦25,000.00
+            </div>
+
+          </div>
+
+          <button
+            class="balance-add"
+            onclick="openModal('fundModal')"
+          >
+            + Add funds
+          </button>
+
+        </div>
+
+        <div class="balance-bottom">
+          Use your balance for authorized testing services.
+        </div>
+
+      </div>
+
+
+      <!-- QUICK ACCESS -->
+
+      <div class="section-head">
+        <h2>Quick access</h2>
+      </div>
+
+      <div class="quick-grid">
+
+        <div
+          class="quick-card"
+          onclick="go('numbers')"
+        >
+          <div class="quick-icon">☎</div>
+
+          <div class="quick-title">
+            Numbers
+          </div>
+
+          <div class="quick-text">
+            Browse testing inventory
+          </div>
+        </div>
+
+
+        <div
+          class="quick-card"
+          onclick="go('inbox')"
+        >
+          <div class="quick-icon">✉</div>
+
+          <div class="quick-title">
+            SMS Inbox
+          </div>
+
+          <div class="quick-text">
+            View development messages
+          </div>
+        </div>
+
+
+        <div
+          class="quick-card"
+          onclick="go('projects')"
+        >
+          <div class="quick-icon">▣</div>
+
+          <div class="quick-title">
+            Projects
+          </div>
+
+          <div class="quick-text">
+            Manage test projects
+          </div>
+        </div>
+
+
+        <div
+          class="quick-card"
+          onclick="go('orders')"
+        >
+          <div class="quick-icon">▤</div>
+
+          <div class="quick-title">
+            Orders
+          </div>
+
+          <div class="quick-text">
+            View account history
+          </div>
+        </div>
+
+      </div>
+
+
+      <!-- RECENT ACTIVITY -->
+
+      <div class="section-head">
+
+        <h2>Recent activity</h2>
+
+        <button onclick="go('orders')">
+          View all
+        </button>
+
+      </div>
+
+      <div class="card" id="activityList"></div>
+
+    </section>
+
+
+    <!-- =====================
+         NUMBERS
+    ====================== -->
+
+    <section class="page" id="page-numbers">
+
+      <div class="hero">
+
+        <h1>Numbers</h1>
+
+        <p>
+          Browse available numbers for authorized development and SMS testing.
+        </p>
+
+      </div>
+
+
+      <div class="toolbar">
+
+        <div class="search">
+
+          <span>⌕</span>
+
+          <input
+            id="numberSearch"
+            type="search"
+            placeholder="Search number or country..."
+            oninput="renderNumbers()"
+          >
+
+        </div>
+
+        <select
+          id="countryFilter"
+          onchange="renderNumbers()"
+        >
+
+          <option value="all">
+            All countries
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <div
+        class="number-list"
+        id="numberList"
+      ></div>
+
+    </section>
+
+
+    <!-- =====================
+         INBOX
+    ====================== -->
+
+    <section class="page" id="page-inbox">
+
+      <div class="hero">
+
+        <h1>SMS Inbox</h1>
+
+        <p>
+          Messages received by your authorized development test numbers.
+        </p>
+
+      </div>
+
+
+      <div class="inbox-layout">
+
+        <div class="number-selector">
+
+          <div class="number-selector-head">
+            Test numbers
+          </div>
+
+          <div id="inboxNumbers"></div>
+
+        </div>
+
+
+        <div class="inbox-main">
+
+          <div class="inbox-head">
+
+            <div>
+              <strong id="selectedInboxNumber">
+                Select a number
+              </strong>
+            </div>
+
+            <button
+              class="primary-btn"
+              onclick="simulateSMS()"
+            >
+              + Test SMS
+            </button>
+
+          </div>
+
+          <div
+            class="inbox-content"
+            id="messageList"
+          ></div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================
+         PROJECTS
+    ====================== -->
+
+    <section class="page" id="page-projects">
+
+      <div class="hero">
+
+        <h1>Projects</h1>
+
+        <p>
+          Organize your authorized SMS testing environments.
+        </p>
+
+      </div>
+
+
+      <div class="section-head">
+
+        <h2>Your projects</h2>
+
+        <button onclick="openModal('projectModal')">
+          + New project
+        </button>
+
+      </div>
+
+
+      <div
+        class="project-list"
+        id="projectList"
+      ></div>
+
+    </section>
+
+
+    <!-- =====================
+         ORDERS
+    ====================== -->
+
+    <section class="page" id="page-orders">
+
+      <div class="hero">
+
+        <h1>Orders & history</h1>
+
+        <p>
+          View your account activity and testing-service purchases.
+        </p>
+
+      </div>
+
+
+      <div
+        class="card"
+        id="orderList"
+      ></div>
+
+    </section>
+
+
+    <!-- =====================
+         PROFILE
+    ====================== -->
+
+    <section class="page" id="page-profile">
+
+      <div class="hero">
+
+        <h1>Profile & settings</h1>
+
+        <p>
+          Manage your OlaqVerify account information.
+        </p>
+
+      </div>
+
+
+      <div class="profile-card">
+
+        <div
+          class="profile-avatar"
+          id="profileAvatar"
+        >
+          O
+        </div>
+
+        <div
+          class="profile-name"
+          id="profileNameDisplay"
+        >
+          Olaq User
+        </div>
+
+        <div
+          class="profile-email"
+          id="profileEmailDisplay"
+        >
+          Not signed in
+        </div>
+
+
+        <div class="form-group">
+
+          <label>
+            Display name
+          </label>
+
+          <input
+            id="profileName"
+            placeholder="Your name"
+          >
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label>
+            Email
+          </label>
+
+          <input
+            id="profileEmail"
+            type="email"
+            placeholder="you@example.com"
+          >
+
+        </div>
+
+
+        <div class="profile-actions">
+
+          <button
+            class="primary-btn"
+            onclick="saveProfile()"
+          >
+            Save changes
+          </button>
+
+          <button
+            class="secondary-btn"
+            onclick="logout()"
+          >
+            Log out
+          </button>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- =========================
+       BOTTOM NAV
+  ========================== -->
+
+  <nav class="bottom-nav">
+
+    <div class="bottom-inner">
+
+      <button
+        class="nav-btn active"
+        data-page="home"
+        onclick="go('home')"
+      >
+        <span class="nav-icon">⌂</span>
+        <span>Home</span>
+      </button>
+
+
+      <button
+        class="nav-btn"
+        data-page="numbers"
+        onclick="go('numbers')"
+      >
+        <span class="nav-icon">☎</span>
+        <span>Numbers</span>
+      </button>
+
+
+      <button
+        class="nav-btn"
+        data-page="inbox"
+        onclick="go('inbox')"
+      >
+        <span class="nav-icon">✉</span>
+        <span>Inbox</span>
+      </button>
+
+
+      <button
+        class="nav-btn"
+        data-page="orders"
+        onclick="go('orders')"
+      >
+        <span class="nav-icon">▤</span>
+        <span>Orders</span>
+      </button>
+
+
+      <button
+        class="nav-btn"
+        data-page="profile"
+        onclick="go('profile')"
+      >
+        <span class="nav-icon">👤</span>
+        <span>Profile</span>
+      </button>
+
+    </div>
+
+  </nav>
+
+</div>
+
+
+<!-- =========================
+     ADD FUNDS MODAL
+========================= -->
+
+<div
+  class="modal-backdrop"
+  id="fundModal"
+  onclick="closeBackdrop(event,'fundModal')"
+>
+
+  <div class="modal">
+
+    <div class="modal-head">
+
+      <div class="modal-title">
+        Add funds
+      </div>
+
+      <button
+        class="close-btn"
+        onclick="closeModal('fundModal')"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <p class="modal-text">
+      Real payments require a secure payment provider and backend
+      configuration. Your payment keys should never be placed inside
+      this HTML file.
+    </p>
+
+
+    <div class="form-group">
+
+      <label>
+        Amount
+      </label>
+
+      <input
+        id="fundAmount"
+        type="number"
+        min="100"
+        placeholder="₦1,000"
+      >
+
+    </div>
+
+
+    <div class="modal-actions">
+
+      <button
+        class="secondary-btn"
+        onclick="closeModal('fundModal')"
+      >
+        Cancel
+      </button>
+
+      <button
+        class="primary-btn"
+        onclick="requestFunding()"
+      >
+        Continue
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- =========================
+     PROJECT MODAL
+========================= -->
+
+<div
+  class="modal-backdrop"
+  id="projectModal"
+  onclick="closeBackdrop(event,'projectModal')"
+>
+
+  <div class="modal">
+
+    <div class="modal-head">
+
+      <div class="modal-title">
+        Create project
+      </div>
+
+      <button
+        class="close-btn"
+        onclick="closeModal('projectModal')"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label>
+        Project name
+      </label>
+
+      <input
+        id="projectNameInput"
+        placeholder="My SMS testing app"
+      >
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label>
+        Description
+      </label>
+
+      <textarea
+        id="projectDescriptionInput"
+        placeholder="What are you testing?"
+      ></textarea>
+
+    </div>
+
+
+    <div class="modal-actions">
+
+      <button
+        class="secondary-btn"
+        onclick="closeModal('projectModal')"
+      >
+        Cancel
+      </button>
+
+      <button
+        class="primary-btn"
+        onclick="createProject()"
+      >
+        Create project
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- =========================
+     NUMBER DETAILS MODAL
+========================= -->
+
+<div
+  class="modal-backdrop"
+  id="numberModal"
+  onclick="closeBackdrop(event,'numberModal')"
+>
+
+  <div class="modal">
+
+    <div class="modal-head">
+
+      <div class="modal-title">
+        Number details
+      </div>
+
+      <button
+        class="close-btn"
+        onclick="closeModal('numberModal')"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <div id="numberDetails"></div>
+
+
+    <div class="modal-actions">
+
+      <button
+        class="secondary-btn"
+        onclick="closeModal('numberModal')"
+      >
+        Close
+      </button>
+
+      <button
+        class="primary-btn"
+        id="numberPurchaseBtn"
+      >
+        Purchase
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- TOAST -->
+
+<div
+  class="toast"
+  id="toast"
+></div>
+
+
+<script>
+/* =========================================================
+   OLAQVERIFY FRONTEND
+   ========================================================= */
+
+const STORAGE_KEY = "olaqverify_state_v1";
+
+
+const countries = [
+
+  {name:"United States",code:"+1",flag:"🇺🇸"},
+  {name:"Nigeria",code:"+234",flag:"🇳🇬"},
+  {name:"United Kingdom",code:"+44",flag:"🇬🇧"},
+  {name:"Canada",code:"+1",flag:"🇨🇦"},
+  {name:"Australia",code:"+61",flag:"🇦🇺"},
+  {name:"Germany",code:"+49",flag:"🇩🇪"},
+  {name:"South Africa",code:"+27",flag:"🇿🇦"},
+  {name:"Ghana",code:"+233",flag:"🇬🇭"},
+  {name:"France",code:"+33",flag:"🇫🇷"},
+  {name:"Netherlands",code:"+31",flag:"🇳🇱"},
+  {name:"Spain",code:"+34",flag:"🇪🇸"},
+  {name:"Italy",code:"+39",flag:"🇮🇹"},
+  {name:"Sweden",code:"+46",flag:"🇸🇪"},
+  {name:"Norway",code:"+47",flag:"🇳🇴"},
+  {name:"Finland",code:"+358",flag:"🇫🇮"},
+  {name:"Ireland",code:"+353",flag:"🇮🇪"},
+  {name:"New Zealand",code:"+64",flag:"🇳🇿"},
+  {name:"Japan",code:"+81",flag:"🇯🇵"},
+  {name:"Singapore",code:"+65",flag:"🇸🇬"},
+  {name:"India",code:"+91",flag:"🇮🇳"}
+
+];
+
+
+const numbers = [
+
+  {
+    id:"num_us_001",
+    country:"United States",
+    code:"+1",
+    flag:"🇺🇸",
+    number:"+1 555 010 2048",
+    price:800
+  },
+
+  {
+    id:"num_ng_001",
+    country:"Nigeria",
+    code:"+234",
+    flag:"🇳🇬",
+    number:"+234 810 000 1024",
+    price:500
+  },
+
+  {
+    id:"num_uk_001",
+    country:"United Kingdom",
+    code:"+44",
+    flag:"🇬🇧",
+    number:"+44 7700 900123",
+    price:950
+  },
+
+  {
+    id:"num_ca_001",
+    country:"Canada",
+    code:"+1",
+    flag:"🇨🇦",
+    number:"+1 555 010 3099",
+    price:850
+  },
+
+  {
+    id:"num_au_001",
+    country:"Australia",
+    code:"+61",
+    flag:"🇦🇺",
+    number:"+61 490 000 321",
+    price:1100
+  },
+
+  {
+    id:"num_de_001",
+    country:"Germany",
+    code:"+49",
+    flag:"🇩🇪",
+    number:"+49 151 000 4567",
+    price:1000
+  },
+
+  {
+    id:"num_za_001",
+    country:"South Africa",
+    code:"+27",
+    flag:"🇿🇦",
+    number:"+27 710 000 888",
+    price:650
+  },
+
+  {
+    id:"num_gh_001",
+    country:"Ghana",
+    code:"+233",
+    flag:"🇬🇭",
+    number:"+233 240 000 777",
+    price:600
+  }
+
+];
+
+
+const defaultState = {
+
+  loggedIn:true,
+
+  user:{
+    name:"Olaq User",
+    email:""
+  },
+
+  balance:25000,
+
+  projects:[
+    {
+      id:"project_001",
+      name:"Olaq Demo App",
+      description:"SMS testing",
+      key:"oq_demo_8H2K7P4L"
+    },
+    {
+      id:"project_002",
+      name:"Login Flow",
+      description:"OTP interface testing",
+      key:"oq_login_4J9Q2M7X"
+    }
+  ],
+
+  messages:[
+    {
+      id:"msg_001",
+      numberId:"num_us_001",
+      sender:"OlaqVerify Test",
+      number:"+1 555 010 2048",
+      text:"Your development verification code is 482913.",
+      code:"482913",
+      time:"Just now"
+    }
+  ],
+
+  orders:[]
+
+};
+
+
+let state = loadState();
+
+let selectedNumberId = "num_us_001";
+
+let authMode = "login";
+
+
+/* =========================================================
+   STORAGE
+   ========================================================= */
+
+function loadState(){
+
+  try{
+
+    const saved =
+      localStorage.getItem(STORAGE_KEY);
+
+    if(!saved){
+
+      return structuredClone
+        ? structuredClone(defaultState)
+        : JSON.parse(JSON.stringify(defaultState));
+
+    }
+
+    const parsed = JSON.parse(saved);
+
+    return {
+      ...defaultState,
+      ...parsed,
+      user:{
+        ...defaultState.user,
+        ...(parsed.user || {})
+      },
+      projects:Array.isArray(parsed.projects)
+        ? parsed.projects
+        : defaultState.projects,
+      messages:Array.isArray(parsed.messages)
+        ? parsed.messages
+        : defaultState.messages,
+      orders:Array.isArray(parsed.orders)
+        ? parsed.orders
+        : defaultState.orders
+    };
+
+  }catch(error){
+
+    console.error(error);
+
+    return JSON.parse(
+      JSON.stringify(defaultState)
+    );
+
+  }
+
+}
+
+
+function saveState(){
+
+  localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify(state)
+  );
+
+}
+
+
+/* =========================================================
+   HELPERS
+   ========================================================= */
+
+function money(value){
+
+  return "₦" + Number(value || 0).toLocaleString(
+    "en-NG",
+    {
+      minimumFractionDigits:2,
+      maximumFractionDigits:2
+    }
+  );
+
+}
+
+
+function escapeHTML(value){
+
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
+}
+
+
+function showToast(message){
+
+  const toast =
+    document.getElementById("toast");
+
+  toast.textContent = message;
+
+  toast.classList.add("show");
+
+  clearTimeout(
+    showToast.timer
+  );
+
+  showToast.timer =
+    setTimeout(
+      () => toast.classList.remove("show"),
+      2800
+    );
+
+}
+
+
+function openModal(id){
+
+  const modal =
+    document.getElementById(id);
+
+  if(modal){
+    modal.classList.add("show");
+  }
+
+}
+
+
+function closeModal(id){
+
+  const modal =
+    document.getElementById(id);
+
+  if(modal){
+    modal.classList.remove("show");
+  }
+
+}
+
+
+function closeBackdrop(event,id){
+
+  if(event.target.id === id){
+
+    closeModal(id);
+
+  }
+
+}
+
+
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
+
+function go(page){
+
+  document
+    .querySelectorAll(".page")
+    .forEach(element => {
+
+      element.classList.remove("active");
+
+    });
+
+
+  const target =
+    document.getElementById(
+      "page-" + page
+    );
+
+
+  if(!target){
+    return;
+  }
+
+
+  target.classList.add("active");
+
+
+  document
+    .querySelectorAll(".nav-btn")
+    .forEach(button => {
+
+      button.classList.toggle(
+        "active",
+        button.dataset.page === page
+      );
+
+    });
+
+
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
+
+
+  if(page === "home"){
+    renderActivity();
+  }
+
+  if(page === "numbers"){
+    renderNumbers();
+  }
+
+  if(page === "inbox"){
+    renderInbox();
+  }
+
+  if(page === "projects"){
+    renderProjects();
+  }
+
+  if(page === "orders"){
+    renderOrders();
+  }
+
+  if(page === "profile"){
+    renderProfile();
+  }
+
+}
+
+
+/* =========================================================
+   BALANCE
+   ========================================================= */
+
+function renderBalance(){
+
+  const element =
+    document.getElementById("homeBalance");
+
+  if(element){
+
+    element.textContent =
+      money(state.balance);
+
+  }
+
+}
+
+
+/* =========================================================
+   COUNTRIES
+   ========================================================= */
+
+function renderCountryFilter(){
+
+  const select =
+    document.getElementById(
+      "countryFilter"
+    );
+
+  if(!select){
+    return;
+  }
+
+  const current =
+    select.value || "all";
+
+  select.innerHTML = `
+    <option value="all">All countries</option>
+    ${countries.map(country => `
+      <option value="${escapeHTML(country.name)}">
+        ${escapeHTML(country.flag)}
+        ${escapeHTML(country.name)}
+      </option>
+    `).join("")}
+  `;
+
+  select.value = current;
+
+}
+
+
+/* =========================================================
+   NUMBERS
+   ========================================================= */
+
+function renderNumbers(){
+
+  const list =
+    document.getElementById("numberList");
+
+  if(!list){
+    return;
+  }
+
+
+  const search =
+    (
+      document.getElementById(
+        "numberSearch"
+      )?.value || ""
+    )
+    .trim()
+    .toLowerCase();
+
+
+  const country =
+    document.getElementById(
+      "countryFilter"
+    )?.value || "all";
+
+
+  const filtered =
+    numbers.filter(item => {
+
+      const matchesSearch =
+        !search ||
+        item.number.toLowerCase().includes(search) ||
+        item.country.toLowerCase().includes(search);
+
+
+      const matchesCountry =
+        country === "all" ||
+        item.country === country;
+
+
+      return matchesSearch &&
+             matchesCountry;
+
+    });
+
+
+  if(!filtered.length){
+
+    list.innerHTML = `
+      <div class="card" style="grid-column:1/-1">
+        <div class="empty">
+          <div class="empty-icon">⌕</div>
+          <div class="empty-title">
+            No numbers found
+          </div>
+          <div class="empty-text">
+            Try another country or search term.
+          </div>
+        </div>
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  list.innerHTML =
+    filtered.map(item => `
+
+      <div class="number-card">
+
+        <div class="number-top">
+
+          <div class="country">
+
+            <div class="flag">
+              ${escapeHTML(item.flag)}
+            </div>
+
+            <div>
+
+              <div class="country-name">
+                ${escapeHTML(item.country)}
+              </div>
+
+              <div class="phone">
+                ${escapeHTML(item.number)}
+              </div>
+
+            </div>
+
+          </div>
+
+          <div class="number-price">
+            ${money(item.price)}
+          </div>
+
+        </div>
+
+
+        <div class="number-bottom">
+
+          <div class="status">
+            <span class="dot"></span>
+            Available
+          </div>
+
+          <button
+            class="primary-btn"
+            onclick="showNumberDetails('${item.id}')"
+          >
+            View
+          </button>
+
+        </div>
+
+      </div>
+
+    `).join("");
+
+}
+
+
+function showNumberDetails(id){
+
+  const item =
+    numbers.find(
+      number => number.id === id
+    );
+
+  if(!item){
+    return;
+  }
+
+
+  const alreadyOwned =
+    state.orders.some(
+      order => order.numberId === id
+    );
+
+
+  document.getElementById(
+    "numberDetails"
+  ).innerHTML = `
+
+    <div style="
+      background:var(--purpleLight);
+      padding:16px;
+      border-radius:14px;
+    ">
+
+      <div style="font-size:28px">
+        ${escapeHTML(item.flag)}
+      </div>
+
+      <div style="
+        color:var(--muted);
+        font-size:12px;
+        margin-top:8px;
+      ">
+        ${escapeHTML(item.country)}
+      </div>
+
+      <div style="
+        font-size:20px;
+        font-weight:900;
+        margin-top:3px;
+      ">
+        ${escapeHTML(item.number)}
+      </div>
+
+      <div style="
+        color:var(--purple);
+        font-weight:900;
+        margin-top:10px;
+      ">
+        ${money(item.price)}
+      </div>
+
+    </div>
+
+    <p class="modal-text" style="margin-top:14px">
+      This inventory is intended for authorized development
+      and SMS testing. Availability and real SMS delivery require
+      a configured backend provider.
+    </p>
+
+  `;
+
+
+  const purchaseButton =
+    document.getElementById(
+      "numberPurchaseBtn"
+    );
+
+
+  purchaseButton.textContent =
+    alreadyOwned
+      ? "Already purchased"
+      : "Purchase";
+
+
+  purchaseButton.disabled =
+    alreadyOwned;
+
+
+  purchaseButton.onclick =
+    () => purchaseNumber(id);
+
+
+  openModal("numberModal");
+
+}
+
+
+/* =========================================================
+   PURCHASE
+   ========================================================= */
+
+function purchaseNumber(id){
+
+  const item =
+    numbers.find(
+      number => number.id === id
+    );
+
+  if(!item){
+    return;
+  }
+
+
+  if(
+    state.orders.some(
+      order => order.numberId === id
+    )
+  ){
+
+    showToast(
+      "You already have this number."
+    );
+
+    return;
+
+  }
+
+
+  if(state.balance < item.price){
+
+    showToast(
+      "Insufficient balance."
+    );
+
+    closeModal("numberModal");
+
+    openModal("fundModal");
+
+    return;
+
+  }
+
+
+  state.balance -= item.price;
+
+
+  const order = {
+
+    id:
+      "ord_" +
+      Date.now(),
+
+    numberId:item.id,
+
+    number:item.number,
+
+    country:item.country,
+
+    price:item.price,
+
+    status:"Completed",
+
+    time:new Date().toLocaleString(
+      "en-NG",
+      {
+        dateStyle:"medium",
+        timeStyle:"short"
+      }
+    )
+
+  };
+
+
+  state.orders.unshift(order);
+
+  saveState();
+
+  renderBalance();
+
+  renderOrders();
+
+  renderActivity();
+
+  renderInbox();
+
+  closeModal("numberModal");
+
+  showToast(
+    "Number added to your testing workspace."
+  );
+
+}
+
+
+/* =========================================================
+   INBOX
+   ========================================================= */
+
+function renderInbox(){
+
+  renderInboxNumbers();
+
+  renderMessages();
+
+}
+
+
+function renderInboxNumbers(){
+
+  const box =
+    document.getElementById(
+      "inboxNumbers"
+    );
+
+  if(!box){
+    return;
+  }
+
+
+  const owned =
+    state.orders
+      .map(order =>
+        numbers.find(
+          item =>
+            item.id === order.numberId
+        )
+      )
+      .filter(Boolean);
+
+
+  if(!owned.length){
+
+    box.innerHTML = `
+      <div class="empty" style="padding:25px 15px">
+        <div class="empty-icon">☎</div>
+        <div class="empty-title">
+          No testing numbers
+        </div>
+        <div class="empty-text">
+          Purchase an authorized testing number first.
+        </div>
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  if(
+    !owned.some(
+      item => item.id === selectedNumberId
+    )
+  ){
+
+    selectedNumberId =
+      owned[0].id;
+
+  }
+
+
+  box.innerHTML =
+    owned.map(item => `
+
+      <div
+        class="test-number ${
+          item.id === selectedNumberId
+            ? "active"
+            : ""
+        }"
+        onclick="selectInboxNumber('${item.id}')"
+      >
+
+        <strong>
+          ${escapeHTML(item.number)}
+        </strong>
+
+        <span>
+          ${escapeHTML(item.country)}
+        </span>
+
+      </div>
+
+    `).join("");
+
+}
+
+
+function selectInboxNumber(id){
+
+  selectedNumberId = id;
+
+  renderInbox();
+
+}
+
+
+function renderMessages(){
+
+  const list =
+    document.getElementById(
+      "messageList"
+    );
+
+  const selected =
+    numbers.find(
+      item => item.id === selectedNumberId
+    );
+
+
+  const title =
+    document.getElementById(
+      "selectedInboxNumber"
+    );
+
+
+  if(title){
+
+    title.textContent =
+      selected
+        ? selected.number
+        : "Select a number";
+
+  }
+
+
+  if(!list){
+    return;
+  }
+
+
+  const messages =
+    state.messages.filter(
+      message =>
+        message.numberId === selectedNumberId
+    );
+
+
+  if(!messages.length){
+
+    list.innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">✉</div>
+        <div class="empty-title">
+          No messages yet
+        </div>
+        <div class="empty-text">
+          Authorized test messages will appear here.
+        </div>
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  list.innerHTML =
+    messages.map(message => `
+
+      <div class="sms">
+
+        <div class="sms-top">
+
+          <div>
+
+            <div class="sms-sender">
+              ${escapeHTML(message.sender)}
+            </div>
+
+            <div class="sms-number">
+              ${escapeHTML(message.number)}
+            </div>
+
+          </div>
+
+          <div class="sms-time">
+            ${escapeHTML(message.time)}
+          </div>
+
+        </div>
+
+
+        <div class="sms-text">
+          ${escapeHTML(message.text)}
+        </div>
+
+
+        ${
+          message.code
+            ? `
+              <div class="otp">
+                ${escapeHTML(message.code)}
+              </div>
+            `
+            : ""
+        }
+
+      </div>
+
+    `).join("");
+
+}
+
+
+/*
+  This is an authorized development-test simulator.
+  It does NOT connect to or retrieve verification codes
+  from third-party platforms.
+*/
+
+function simulateSMS(){
+
+  const owned =
+    state.orders.find(
+      order =>
+        order.numberId === selectedNumberId
+    );
+
+
+  if(!owned){
+
+    showToast(
+      "Purchase an authorized testing number first."
+    );
+
+    go("numbers");
+
+    return;
+
+  }
+
+
+  const code =
+    String(
+      Math.floor(
+        100000 +
+        Math.random() * 900000
+      )
+    );
+
+
+  const message = {
+
+    id:
+      "msg_" +
+      Date.now(),
+
+    numberId:selectedNumberId,
+
+    sender:"OlaqVerify Test",
+
+    number:owned.number,
+
+    text:
+      "Your OlaqVerify development test code is " +
+      code +
+      ".",
+
+    code,
+
+    time:"Just now"
+
+  };
+
+
+  state.messages.unshift(message);
+
+  saveState();
+
+  renderInbox();
+
+  renderActivity();
+
+  showToast(
+    "Development test SMS received."
+  );
+
+}
+
+
+/* =========================================================
+   PROJECTS
+   ========================================================= */
+
+function renderProjects(){
+
+  const list =
+    document.getElementById(
+      "projectList"
+    );
+
+  if(!list){
+    return;
+  }
+
+
+  if(!state.projects.length){
+
+    list.innerHTML = `
+      <div class="card" style="grid-column:1/-1">
+        <div class="empty">
+          <div class="empty-icon">▣</div>
+          <div class="empty-title">
+            No projects
+          </div>
+          <div class="empty-text">
+            Create your first SMS testing project.
+          </div>
+        </div>
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  list.innerHTML =
+    state.projects.map(project => `
+
+      <div class="project-card">
+
+        <div class="project-head">
+
+          <div>
+
+            <div class="project-name">
+              ${escapeHTML(project.name)}
+            </div>
+
+            <div class="project-description">
+              ${escapeHTML(project.description)}
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="project-key">
+          Project key:
+          <br>
+          ${escapeHTML(project.key)}
+        </div>
+
+
+        <div class="project-actions">
+
+          <button
+            class="secondary-btn"
+            onclick="copyProjectKey('${project.key}')"
+          >
+            Copy key
+          </button>
+
+          <button
+            class="secondary-btn"
+            onclick="deleteProject('${project.id}')"
+          >
+            Delete
+          </button>
+
+        </div>
+
+      </div>
+
+    `).join("");
+
+}
+
+
+function createProject(){
+
+  const name =
+    document
+      .getElementById(
+        "projectNameInput"
+      )
+      .value
+      .trim();
+
+
+  const description =
+    document
+      .getElementById(
+        "projectDescriptionInput"
+      )
+      .value
+      .trim();
+
+
+  if(!name){
+
+    showToast(
+      "Enter a project name."
+    );
+
+    return;
+
+  }
+
+
+  const project = {
+
+    id:
+      "project_" +
+      Date.now(),
+
+    name,
+
+    description:
+      description ||
+      "SMS testing project",
+
+    key:
+      "oq_" +
+      Math.random()
+        .toString(36)
+        .substring(2,10)
+        .toUpperCase()
+
+  };
+
+
+  state.projects.unshift(project);
+
+  saveState();
+
+  renderProjects();
+
+  document.getElementById(
+    "projectNameInput"
+  ).value = "";
+
+  document.getElementById(
+    "projectDescriptionInput"
+  ).value = "";
+
+  closeModal("projectModal");
+
+  showToast(
+    "Project created."
+  );
+
+}
+
+
+function deleteProject(id){
+
+  const confirmed =
+    confirm(
+      "Delete this project?"
+    );
+
+
+  if(!confirmed){
+    return;
+  }
+
+
+  state.projects =
+    state.projects.filter(
+      project =>
+        project.id !== id
+    );
+
+
+  saveState();
+
+  renderProjects();
+
+  showToast(
+    "Project deleted."
+  );
+
+}
+
+
+async function copyProjectKey(key){
+
+  try{
+
+    await navigator.clipboard.writeText(
+      key
+    );
+
+    showToast(
+      "Project key copied."
+    );
+
+  }catch(error){
+
+    showToast(
+      "Copy is unavailable on this browser."
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   ORDERS
+   ========================================================= */
+
+function renderOrders(){
+
+  const list =
+    document.getElementById(
+      "orderList"
+    );
+
+  if(!list){
+    return;
+  }
+
+
+  if(!state.orders.length){
+
+    list.innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">▤</div>
+        <div class="empty-title">
+          No orders yet
+        </div>
+        <div class="empty-text">
+          Your testing-service purchases will appear here.
+        </div>
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  list.innerHTML =
+    state.orders.map(order => `
+
+      <div class="order-row">
+
+        <div class="order-info">
+
+          <strong>
+            ${escapeHTML(order.number)}
+          </strong>
+
+          <span>
+            ${escapeHTML(order.country)}
+            ·
+            ${escapeHTML(order.time)}
+          </span>
+
+        </div>
+
+
+        <div class="order-right">
+
+          <div class="order-price">
+            ${money(order.price)}
+          </div>
+
+          <div class="order-status">
+            ${escapeHTML(order.status)}
+          </div>
+
+        </div>
+
+      </div>
+
+    `).join("");
+
+}
+
+
+/* =========================================================
+   ACTIVITY
+   ========================================================= */
+
+function renderActivity(){
+
+  const list =
+    document.getElementById(
+      "activityList"
+    );
+
+  if(!list){
+    return;
+  }
+
+
+  const activity = [];
+
+
+  state.orders
+    .slice(0,5)
+    .forEach(order => {
+
+      activity.push({
+
+        icon:"☎",
+
+        title:
+          "Testing number purchased",
+
+        sub:
+          order.number,
+
+        time:
+          order.time
+
+      });
+
+    });
+
+
+  state.messages
+    .slice(0,5)
+    .forEach(message => {
+
+      activity.push({
+
+        icon:"✉",
+
+        title:
+          "Development SMS received",
+
+        sub:
+          message.number,
+
+        time:
+          message.time
+
+      });
+
+    });
+
+
+  if(!activity.length){
+
+    list.innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">◷</div>
+        <div class="empty-title">
+          No recent activity
+        </div>
+        <div class="empty-text">
+          Your activity will appear here.
+        </div>
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  list.innerHTML =
+    activity
+      .slice(0,6)
+      .map(item => `
+
+        <div class="activity">
+
+          <div class="activity-icon">
+            ${item.icon}
+          </div>
+
+          <div class="activity-main">
+
+            <div class="activity-title">
+              ${escapeHTML(item.title)}
+            </div>
+
+            <div class="activity-sub">
+              ${escapeHTML(item.sub)}
+            </div>
+
+          </div>
+
+          <div class="activity-time">
+            ${escapeHTML(item.time)}
+          </div>
+
+        </div>
+
+      `)
+      .join("");
+
+}
+
+
+/* =========================================================
+   PROFILE
+   ========================================================= */
+
+function renderProfile(){
+
+  const name =
+    state.user.name ||
+    "Olaq User";
+
+
+  const email =
+    state.user.email ||
+    "Not signed in";
+
+
+  document.getElementById(
+    "profileNameDisplay"
+  ).textContent = name;
+
+
+  document.getElementById(
+    "profileEmailDisplay"
+  ).textContent = email;
+
+
+  document.getElementById(
+    "profileAvatar"
+  ).textContent =
+    name.charAt(0).toUpperCase();
+
+
+  document.getElementById(
+    "profileName"
+  ).value =
+    state.user.name || "";
+
+
+  document.getElementById(
+    "profileEmail"
+  ).value =
+    state.user.email || "";
+
+}
+
+
+function saveProfile(){
+
+  const name =
+    document
+      .getElementById(
+        "profileName"
+      )
+      .value
+      .trim();
+
+
+  const email =
+    document
+      .getElementById(
+        "profileEmail"
+      )
+      .value
+      .trim();
+
+
+  if(!name){
+
+    showToast(
+      "Enter your display name."
+    );
+
+    return;
+
+  }
+
+
+  state.user.name = name;
+
+  state.user.email = email;
+
+  saveState();
+
+  renderProfile();
+
+  showToast(
+    "Profile saved."
+  );
+
+}
+
+
+/* =========================================================
+   AUTH
+   ========================================================= */
+
+function toggleAuthMode(){
+
+  authMode =
+    authMode === "login"
+      ? "signup"
+      : "login";
+
+
+  const title =
+    document.getElementById(
+      "authTitle"
+    );
+
+
+  const description =
+    document.getElementById(
+      "authDescription"
+    );
+
+
+  const switchText =
+    document.getElementById(
+      "authSwitchText"
+    );
+
+
+  const switchButton =
+    document.getElementById(
+      "authSwitchBtn"
+    );
+
+
+  if(authMode === "login"){
+
+    title.textContent =
+      "Welcome to OlaqVerify";
+
+    description.textContent =
+      "Manage authorized SMS testing numbers, projects and development messages.";
+
+    switchText.textContent =
+      "Don't have an account?";
+
+    switchButton.textContent =
+      "Create account";
+
+  }else{
+
+    title.textContent =
+      "Create your account";
+
+    description.textContent =
+      "Create an account for your authorized SMS development workspace.";
+
+    switchText.textContent =
+      "Already have an account?";
+
+    switchButton.textContent =
+      "Sign in";
+
+  }
+
+}
+
+
+document.getElementById(
+  "authForm"
+).addEventListener(
+  "submit",
+  function(event){
+
+    event.preventDefault();
+
+
+    const email =
+      document
+        .getElementById(
+          "authEmail"
+        )
+        .value
+        .trim();
+
+
+    const password =
+      document
+        .getElementById(
+          "authPassword"
+        )
+        .value;
+
+
+    if(!email || !password){
+
+      showToast(
+        "Enter your email and password."
+      );
+
+      return;
+
+    }
+
+
+    /*
+      This client-only authentication is only for
+      the local frontend.
+
+      A production deployment should use the
+      backend authentication API instead.
+    */
+
+    state.loggedIn = true;
+
+    state.user.email = email;
+
+
+    if(!state.user.name){
+
+      state.user.name =
+        email.split("@")[0] ||
+        "Olaq User";
+
+    }
+
+
+    saveState();
+
+    hideAuth();
+
+    renderAll();
+
+    showToast(
+      authMode === "signup"
+        ? "Account created locally."
+        : "Welcome back."
+    );
+
+  }
+);
+
+
+function logout(){
+
+  state.loggedIn = false;
+
+  saveState();
+
+  showAuth();
+
+}
+
+
+function showAuth(){
+
+  document
+    .getElementById(
+      "app"
+    )
+    .classList.add("hidden");
+
+
+  document
+    .getElementById(
+      "authScreen"
+    )
+    .classList.add("show");
+
+}
+
+
+function hideAuth(){
+
+  document
+    .getElementById(
+      "authScreen"
+    )
+    .classList.remove("show");
+
+
+  document
+    .getElementById(
+      "app"
+    )
+    .classList.remove("hidden");
+
+}
+
+
+/* =========================================================
+   FUNDING
+   ========================================================= */
+
+function requestFunding(){
+
+  const input =
+    document.getElementById(
+      "fundAmount"
+    );
+
+
+  const amount =
+    Number(input.value);
+
+
+  if(!amount || amount < 100){
+
+    showToast(
+      "Enter an amount of at least ₦100."
+    );
+
+    return;
+
+  }
+
+
+  /*
+    Real payment processing must happen
+    through a secure backend/payment provider.
+  */
+
+  closeModal("fundModal");
+
+  showToast(
+    "Payment setup is required before real deposits can be processed."
+  );
+
+}
+
+
+/* =========================================================
+   RENDER EVERYTHING
+   ========================================================= */
+
+function renderAll(){
+
+  renderBalance();
+
+  renderCountryFilter();
+
+  renderNumbers();
+
+  renderInbox();
+
+  renderProjects();
+
+  renderOrders();
+
+  renderActivity();
+
+  renderProfile();
+
+}
+
+
+/* =========================================================
+   STARTUP
+   ========================================================= */
+
+function startup(){
+
+  renderAll();
+
+
+  /*
+    The original design opens the workspace
+    directly. Keep that behavior.
+  */
+
+  hideAuth();
+
+
+  go("home");
+
+}
+
+
+startup();
+
+</script>
+
+</body>
+</html>
