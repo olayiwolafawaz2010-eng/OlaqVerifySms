@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OlaqVerify — SMS Testing Platform</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #f5f8ff;
+  color: #172033;
+}
+
+button {
+  border: none;
+  cursor: pointer;
+}
+
+.header {
+  background: #0866ff;
+  color: white;
+  padding: 18px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 23px;
+  font-weight: 800;
+}
+
+.logo span {
+  opacity: .75;
+}
+
+.menu {
+  font-size: 25px;
+}
+
+.hero {
+  padding: 45px 22px;
+  background: linear-gradient(135deg, #0866ff, #1746c7);
+  color: white;
+}
+
+.hero h1 {
+  font-size: 36px;
+  line-height: 1.1;
+  margin-bottom: 15px;
+}
+
+.hero p {
+  line-height: 1.6;
+  opacity: .9;
+  margin-bottom: 25px;
+}
+
+.btn {
+  background: white;
+  color: #0866ff;
+  padding: 13px 20px;
+  border-radius: 12px;
+  font-weight: bold;
+}
+
+.container {
+  padding: 20px;
+  max-width: 900px;
+  margin: auto;
+}
+
+.section-title {
+  margin: 25px 0 15px;
+  font-size: 21px;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 13px;
+}
+
+.card {
+  background: white;
+  border-radius: 17px;
+  padding: 18px;
+  box-shadow: 0 5px 20px rgba(20,50,100,.07);
+}
+
+.card h3 {
+  margin: 8px 0;
+}
+
+.icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: #eaf2ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 21px;
+}
+
+.balance {
+  background: linear-gradient(135deg, #0866ff, #1746c7);
+  color: white;
+  border-radius: 20px;
+  padding: 22px;
+  margin-top: 20px;
+}
+
+.balance small {
+  opacity: .8;
+}
+
+.balance h2 {
+  font-size: 32px;
+  margin: 8px 0 18px;
+}
+
+.white-btn {
+  background: white;
+  color: #0866ff;
+  padding: 11px 17px;
+  border-radius: 10px;
+  font-weight: bold;
+}
+
+.project {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 0;
+  border-bottom: 1px solid #edf0f5;
+}
+
+.status {
+  color: #168b4b;
+  background: #e8f8ef;
+  padding: 6px 9px;
+  border-radius: 20px;
+  font-size: 12px;
+}
+
+.nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 5px;
+  border-top: 1px solid #e8eaf0;
+  box-shadow: 0 -4px 20px rgba(0,0,0,.06);
+}
+
+.nav button {
+  background: none;
+  color: #687
