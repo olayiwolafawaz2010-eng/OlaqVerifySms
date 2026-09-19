@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OlaqVerify — SMS Testing Platform</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #f5f8ff;
+  color: #172033;
+}
+
+button {
+  border: none;
+  cursor: pointer;
+}
+
+.header {
+  background: #0866ff;
+  color: white;
+  padding: 18px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 23px;
+  font-weight: 800;
+}
+
+.logo span {
+  opacity: .75;
+}
+
+.menu {
+  font-size: 25px;
+}
+
+.hero {
+  padding: 45px 22px;
+  background: linear-gradient(135deg, #0866ff, #1746c7);
+  color: white;
+}
+
+.hero h1 {
+  font-size: 36px;
+  line-height: 1.1;
+  margin-bottom: 15px;
+}
+
+.hero p {
+  line-height: 1.6;
+  opacity: .9;
+  margin-bottom: 25px;
+}
+
+.btn {
+  background: white;
+  color: #0866ff;
+  padding: 13px 20px;
+  border-radius: 12px;
+  font-weight: bold;
+}
+
+.container {
+  padding: 20px;
+  max-width: 900px;
+  margin: auto;
+}
+
+.section-title {
+  margin: 25px 0 15px;
+  font-size: 21px;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 13px;
+}
+
+.card {
+  background: white;
+  border-radius: 17px;
+  padding: 18px;
+  box-shadow: 0 5px 20px rgba(20,50,100,.07);
+}
+
+.card h3 {
+  margin: 8px 0;
+}
+
+.icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: #eaf2ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 21px;
+}
+
+.balance {
+  background: linear-gradient(135deg, #0866ff, #1746c7);
+  color: white;
+  border-radius: 20px;
+  padding: 22px;
+  margin-top: 20px;
+}
+
+.balance small {
+  opacity: .8;
+}
+
+.balance h2 {
+  font-size: 32px;
+  margin: 8px 0 18px;
+}
+
+.white-btn {
+  background: white;
+  color: #0866ff;
+  padding: 11px 17px;
+  border-radius: 10px;
+  font-weight: bold;
+}
+
+.project {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 0;
+  border-bottom: 1px solid #edf0f5;
+}
+
+.status {
+  color: #168b4b;
+  background: #e8f8ef;
+  padding: 6px 9px;
+  border-radius: 20px;
+  font-size: 12px;
+}
+
+.nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 5px;
+  border-top: 1px solid #e8eaf0;
+  box-shadow: 0 -4px 20px rgba(0,0,0,.06);
+}
+
+.nav button {
+  background: none;
+  color: #687286;
+  font-size: 11px;
+}
+
+.nav button.active {
+  color: #0866ff;
+  font-weight: bold;
+}
+
+.page {
+  display: none;
+  padding-bottom: 80px;
+}
+
+.page.active {
+  display: block;
+}
+
+.login-box {
+  max-width: 420px;
+  margin: 40px auto;
+  background: white;
+  padding: 25px;
+  border-radius: 20px;
+  box-shadow: 0 8px 30px rgba(0,0,0,.08);
+}
+
+input {
+  width: 100%;
+  padding: 14px;
+  margin: 8px 0 15px;
+  border: 1px solid #dce2ec;
+  border-radius: 11px;
+  outline: none;
+}
+
+.primary {
+  width: 100%;
+  background: #0866ff;
+  color: white;
+  padding: 14px;
+  border-radius: 11px;
+  font-weight: bold;
+}
+
+.message {
+  padding: 16px;
+  background: white;
+  margin-bottom: 12px;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0,0,0,.05);
+}
+
+.otp {
+  color: #0866ff;
+  font-weight: bold;
+  font-size: 19px;
+}
+
+@media(max-width:600px) {
+  .cards {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+  <div class="logo">Olaq<span>Verify</span></div>
+  <div class="menu">☰</div>
+</header>
+
+<!-- HOME -->
+<section id="home" class="page active">
+  <div class="hero">
+    <h1>Test SMS verification with confidence.</h1>
+    <p>
+      A modern development platform for testing SMS flows,
+      OTP interfaces and verification experiences using simulated data.
+    </p>
+    <button class="btn" onclick="showPage('dashboard')">
+      Open Dashboard
+    </button>
+  </div>
+
+  <div class="container">
+    <h2 class="section-title">Everything you need</h2>
+
+    <div class="cards">
+      <div class="card">
+        <div class="icon">📱</div>
+        <h3>Test Numbers</h3>
+        <p>Use simulated numbers for development.</p>
+      </div>
+
+      <div class="card">
+        <div class="icon">💬</div>
+        <h3>SMS Inbox</h3>
+        <p>View simulated test messages.</p>
+      </div>
+
+      <div class="card">
+        <div class="icon">🧪</div>
+        <h3>Projects</h3>
+        <p>Organize your testing projects.</p>
+      </div>
+
+      <div class="card">
+        <div class="icon">📊</div>
+        <h3>History</h3>
+        <p>Track your testing activity.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DASHBOARD -->
+<section id="dashboard" class="page">
+  <div class="container">
+
+    <h2>Dashboard</h2>
+
+    <div class="balance">
+      <small>Demo wallet balance</small>
+      <h2>₦25,000.00</h2>
+      <button class="white-btn" onclick="alert('Demo add-funds screen')">
+        + Add Funds
+      </button>
+    </div>
+
+    <h2 class="section-title">Quick actions</h2>
+
+    <div class="cards">
+      <div class="card" onclick="showPage('projects')">
+        <div class="icon">🧪</div>
+        <h3>Projects</h3>
+        <p>3 active projects</p>
+      </div>
+
+      <div class="card" onclick="showPage('inbox')">
+        <div class="icon">💬</div>
+        <h3>SMS Inbox</h3>
+        <p>2 simulated messages</p>
+      </div>
+    </div>
+
+    <h2 class="section-title">Recent activity</h2>
+
+    <div class="card">
+      <p><b>Login Flow Test</b></p>
+      <small>Simulated OTP received • Today</small>
+    </div>
+
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects" class="page">
+  <div class="container">
+    <h2>Test Projects</h2>
+
+    <div class="card" style="margin-top:20px">
+
+      <div class="project">
+        <div>
+          <b>Olaq Demo App</b><br>
+          <small>SMS Login Testing</small>
+        </div>
+        <span class="status">Active</span>
+      </div>
+
+      <div class="project">
+        <div>
+          <b>Checkout Flow</b><br>
+          <small>OTP UI Testing</small>
+        </div>
+        <span class="status">Active</span>
+      </div>
+
+      <div class="project">
+        <div>
+          <b>Account Recovery</b><br>
+          <small>SMS Testing</small>
+        </div>
+        <span class="status">Active</span>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- INBOX -->
+<section id="inbox" class="page">
+  <div class="container">
+
+    <h2>SMS Testing Inbox</h2>
+
+    <div class="card" style="margin-top:20px">
+      <p><b>Simulated number</b></p>
+      <h3>+1 555 010 2048</h3>
+      <small>Development test number</small>
+    </div>
+
+    <h2 class="section-title">Messages</h2>
+
+    <div class="message">
+      <b>OlaqVerify Demo</b>
+      <p>Your simulated verification code is:</p>
+      <div class="otp">482913</div>
+      <small>Just now</small>
+    </div>
+
+    <div class="message">
+      <b>OlaqVerify Demo</b>
+      <p>Your simulated login code is:</p>
+      <div class="otp">731205</div>
+      <small>5 minutes ago</small>
+    </div>
+
+  </div>
+</section>
+
+<!-- HISTORY -->
+<section id="history" class="page">
+  <div class="container">
+    <h2>Order & History</h2>
+
+    <div class="card" style="margin-top:20px">
+
+      <div class="project">
+        <div>
+          <b>SMS Test #1004</b><br>
+          <small>Simulated OTP</small>
+        </div>
+        <b>₦200</b>
+      </div>
+
+      <div class="project">
+        <div>
+          <b>SMS Test #1003</b><br>
+          <small>Development test</small>
+        </div>
+        <b>₦150</b>
+      </div>
+
+      <div class="project">
+        <div>
+          <b>SMS Test #1002</b><br>
+          <small>Simulated message</small>
+        </div>
+        <b>₦100</b>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- PROFILE -->
+<section id="profile" class="page">
+  <div class="container">
+
+    <h2>Profile & Settings</h2>
+
+    <div class="card" style="margin-top:20px">
+
+      <label>Name</label>
+      <input value="Olaq User">
+
+      <label>Email</label>
+      <input value="demo@example.com">
+
+      <button class="primary" onclick="alert('Demo profile saved')">
+        Save Changes
+      </button>
+
+    </div>
+
+    <div class="card" style="margin-top:15px">
+      <h3>Security</h3>
+      <p style="margin-top:8px">Two-factor authentication</p>
+      <p style="color:#168b4b;margin-top:5px">Enabled for demo</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- NAVIGATION -->
+<nav class="nav">
+  <button class="active" onclick="showPage('home')">⌂<br>Home</button>
+  <button onclick="showPage('dashboard')">▣<br>Dashboard</button>
+  <button onclick="showPage('projects')">□<br>Projects</button>
+  <button onclick="showPage('inbox')">✉<br>Inbox</button>
+  <button onclick="showPage('profile')">●<br>Profile</button>
+</nav>
+
+<script>
+
+function showPage(page) {
+
+  document.querySelectorAll('.page').forEach(function(p) {
+    p.classList.remove('active');
+  });
+
+  document.getElementById(page).classList.add('active');
+
+  document.querySelectorAll('.nav button').forEach(function(btn) {
+    btn.classList.remove('active');
+  });
+
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
+}
+
+</script>
+
+</body>
+</html>
