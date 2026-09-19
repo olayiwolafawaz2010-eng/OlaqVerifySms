@@ -764,6 +764,1903 @@ a{
 }
 
 /* =========================
+   PALMPAY PAYMENT
+   ONLY PAYMENT SECTION
+========================= */
+
+.palmPayBox{
+  background:linear-gradient(135deg,#5b21b6,#3b0764);
+  color:#fff;
+  border-radius:16px;
+  padding:18px;
+  margin-top:15px;
+  box-shadow:0 10px 25px rgba(59,7,100,.18);
+}
+
+.palmPayBadge{
+  display:inline-block;
+  background:rgba(255,255,255,.15);
+  border:1px solid rgba(255,255,255,.22);
+  padding:6px 9px;
+  border-radius:8px;
+  font-size:10px;
+  font-weight:900;
+  margin-bottom:10px;
+}
+
+.palmPayTitle{
+  font-size:18px;
+  font-weight:900;
+  margin-bottom:6px;
+}
+
+.palmPayText{
+  font-size:12px;
+  line-height:1.5;
+  opacity:.88;
+  margin-bottom:15px;
+}
+
+.palmAccount{
+  background:rgba(255,255,255,.12);
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:12px;
+  padding:13px;
+  margin-bottom:12px;
+}
+
+.palmAccountLabel{
+  font-size:10px;
+  opacity:.75;
+  margin-bottom:4px;
+}
+
+.palmAccountValue{
+  font-size:16px;
+  font-weight:900;
+}
+
+.palmCopyBtn{
+  width:100%;
+  border:0;
+  background:#fff;
+  color:#3b0764;
+  padding:11px;
+  border-radius:10px;
+  font-weight:900;
+  margin-top:10px;
+}
+
+.palmPayInput{
+  width:100%;
+  border:0;
+  outline:none;
+  background:#fff;
+  color:#20152e;
+  border-radius:10px;
+  padding:13px;
+  margin-top:8px;
+}
+
+.palmPayInput:focus{
+  box-shadow:0 0 0 3px rgba(255,255,255,.25);
+}
+
+.palmPaySubmit{
+  width:100%;
+  border:0;
+  background:#13a56b;
+  color:#fff;
+  padding:13px;
+  border-radius:10px;
+  font-weight:900;
+  margin-top:10px;
+}
+
+.palmPaySubmit:active{
+  transform:scale(.98);
+}
+
+.palmPayStatus{
+  font-size:11px;
+  line-height:1.5;
+  margin-top:12px;
+  text-align:center;
+  min-height:17px;
+}
+
+/* =========================
+   TOAST
+========================= */
+
+#toast{
+  position:fixed;
+  left:50%;
+  bottom:78px;
+  transform:translate(-50%,20px);
+  z-index:200;
+  opacity:0;
+  pointer-events:none;
+  background:#24162e;
+  color:#fff;
+  padding:12px 16px;
+  border-radius:11px;
+  font-size:12px;
+  font-weight:700;
+  transition:.2s;
+  max-width:90%;
+  text-align:center;
+}
+
+#toast.show{
+  opacity:1;
+  transform:translate(-50%,0);
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media(max-width:750px){
+  .quickGrid{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .numberGrid{
+    grid-template-columns:1fr;
+  }
+
+  .inboxLayout{
+    grid-template-columns:1fr;
+  }
+
+  .numberList{
+    max-height:190px;
+    overflow:auto;
+  }
+
+  .bottomInner{
+    grid-template-columns:repeat(6,1fr);
+  }
+
+  .navBtn{
+    font-size:9px;
+  }
+
+  .navIcon{
+    font-size:17px;
+  }
+}
+
+@media(max-width:430px){
+  .container{
+    padding-left:14px;
+    padding-right:14px;
+  }
+
+  .topbarInner{
+    padding:0 14px;
+  }
+
+  .brandText{
+    font-size:14px;
+  }
+
+  .hero h1{
+    font-size:24px;
+  }
+
+  .balanceAmount{
+    font-size:27px;
+  }
+
+  .quickCard{
+    padding:13px;
+  }
+
+  .quickIcon{
+    width:34px;
+    height:34px;
+  }
+
+  .toolbar{
+    flex-direction:column;
+  }
+
+  .filter{
+    width:100%;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- =========================================================
+     AUTH SCREEN
+========================================================= -->
+
+<div id="authScreen">
+
+  <div class="authBox">
+
+    <div class="authLogo">O</div>
+
+    <div class="authTitle">OlaqVerify</div>
+
+    <div class="authSubtitle">
+      Number and SMS workspace for authorized testing and development.
+    </div>
+
+    <div class="authTabs">
+      <button id="signupTab" class="active" onclick="switchAuth('signup')">
+        Create account
+      </button>
+
+      <button id="loginTab" onclick="switchAuth('login')">
+        Login
+      </button>
+    </div>
+
+    <form id="authForm" onsubmit="handleAuth(event)">
+
+      <div id="nameGroup" class="formGroup">
+        <label>Full name</label>
+        <input
+          id="authName"
+          type="text"
+          placeholder="Enter your name"
+          autocomplete="name"
+        >
+      </div>
+
+      <div class="formGroup">
+        <label>Email address</label>
+        <input
+          id="authEmail"
+          type="email"
+          placeholder="you@example.com"
+          autocomplete="email"
+          required
+        >
+      </div>
+
+      <div class="formGroup">
+        <label>Password</label>
+        <input
+          id="authPassword"
+          type="password"
+          placeholder="Create a password"
+          autocomplete="new-password"
+          minlength="6"
+          required
+        >
+      </div>
+
+      <button id="authSubmit" class="primaryBtn" type="submit">
+        Create account
+      </button>
+
+    </form>
+
+    <div class="authNote">
+      New accounts start with a ₦0.00 balance.
+      This browser version stores account data locally.
+      A production service should use a secure server/database.
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- =========================================================
+     MAIN APP
+========================================================= -->
+
+<div id="app">
+
+  <header class="topbar">
+
+    <div class="topbarInner">
+
+      <div class="brand">
+        <div class="logo">O</div>
+        <div class="brandText">OlaqVerify</div>
+      </div>
+
+      <div class="topActions">
+
+        <button class="iconBtn" onclick="go('support')" title="Customer care">
+          ?
+        </button>
+
+        <button class="iconBtn" onclick="logout()" title="Logout">
+          ↪
+        </button>
+
+      </div>
+
+    </div>
+
+  </header>
+
+
+  <main class="container">
+
+    <!-- ================= HOME ================= -->
+
+    <section id="page-home" class="page active">
+
+      <div class="hero">
+        <h1>Number & SMS workspace</h1>
+        <p>
+          Manage your authorized testing numbers, projects and SMS test messages.
+        </p>
+      </div>
+
+      <div class="balanceCard">
+
+        <div class="balanceLabel">
+          Available balance
+        </div>
+
+        <div id="balanceAmount" class="balanceAmount">
+          ₦0.00
+        </div>
+
+        <div class="balanceBottom">
+
+          <div id="balanceUser" class="balanceUser">
+            Welcome
+          </div>
+
+          <button class="smallWhiteBtn" onclick="openModal('fundModal')">
+            Add funds
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <div class="quickGrid">
+
+        <div class="quickCard" onclick="go('numbers')">
+          <div class="quickIcon">#</div>
+          <strong>Numbers</strong>
+          <span>Browse testing inventory</span>
+        </div>
+
+        <div class="quickCard" onclick="go('inbox')">
+          <div class="quickIcon">✉</div>
+          <strong>SMS Inbox</strong>
+          <span>View test messages</span>
+        </div>
+
+        <div class="quickCard" onclick="go('projects')">
+          <div class="quickIcon">□</div>
+          <strong>Projects</strong>
+          <span>Manage your projects</span>
+        </div>
+
+        <div class="quickCard" onclick="go('orders')">
+          <div class="quickIcon">≡</div>
+          <strong>Orders</strong>
+          <span>View your purchases</span>
+        </div>
+
+      </div>
+
+
+      <div class="card">
+
+        <div class="cardHeader">
+          <strong>Recent activity</strong>
+
+          <button class="secondaryBtn" onclick="go('orders')">
+            View all
+          </button>
+        </div>
+
+        <div id="recentActivity" class="list"></div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ================= NUMBERS ================= -->
+
+    <section id="page-numbers" class="page">
+
+      <div class="hero">
+        <h1>Numbers</h1>
+        <p>
+          Browse numbers made available for authorized testing.
+        </p>
+      </div>
+
+      <div class="toolbar">
+
+        <input
+          id="numberSearch"
+          class="search"
+          type="search"
+          placeholder="Search country or number..."
+          oninput="renderNumbers()"
+        >
+
+        <select
+          id="countryFilter"
+          class="filter"
+          onchange="renderNumbers()"
+        >
+          <option value="">All countries</option>
+        </select>
+
+      </div>
+
+      <div id="numberGrid" class="numberGrid"></div>
+
+    </section>
+
+
+    <!-- ================= INBOX ================= -->
+
+    <section id="page-inbox" class="page">
+
+      <div class="hero">
+        <h1>SMS Inbox</h1>
+        <p>
+          Messages received during your authorized testing sessions.
+        </p>
+      </div>
+
+      <div class="inboxLayout">
+
+        <div class="card numberList">
+
+          <div class="cardHeader">
+            <strong>My numbers</strong>
+          </div>
+
+          <div id="ownedNumbers"></div>
+
+        </div>
+
+
+        <div class="card">
+
+          <div class="cardHeader">
+
+            <strong id="selectedNumberTitle">
+              Select a number
+            </strong>
+
+            <button
+              class="secondaryBtn"
+              onclick="generateTestSMS()"
+            >
+              + Test SMS
+            </button>
+
+          </div>
+
+          <div id="messageBox" class="messageBox">
+            <div class="empty">
+              Select one of your testing numbers.
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ================= PROJECTS ================= -->
+
+    <section id="page-projects" class="page">
+
+      <div class="hero">
+
+        <h1>Projects</h1>
+
+        <p>
+          Organize your authorized SMS testing work.
+        </p>
+
+      </div>
+
+      <div class="card">
+
+        <div class="cardHeader">
+
+          <strong>Your projects</strong>
+
+          <button
+            class="secondaryBtn"
+            onclick="openModal('projectModal')"
+          >
+            + New project
+          </button>
+
+        </div>
+
+        <div id="projectsList" class="list"></div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ================= ORDERS ================= -->
+
+    <section id="page-orders" class="page">
+
+      <div class="hero">
+
+        <h1>Orders & history</h1>
+
+        <p>
+          Your account activity and number purchases.
+        </p>
+
+      </div>
+
+      <div class="card">
+
+        <div class="cardHeader">
+          <strong>Order history</strong>
+        </div>
+
+        <div id="ordersList" class="list"></div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ================= SUPPORT ================= -->
+
+    <section id="page-support" class="page">
+
+      <div class="hero">
+
+        <h1>Customer Care</h1>
+
+        <p>
+          Need help with your OlaqVerify account? Contact our support team.
+        </p>
+
+      </div>
+
+      <div class="card">
+
+        <div class="cardHeader">
+          <strong>Contact Support</strong>
+        </div>
+
+        <div class="supportBox">
+
+          <div class="supportHighlight">
+
+            <strong>WhatsApp Support</strong>
+
+            <span>
+              Chat with OlaqVerify customer care on WhatsApp for account
+              and website support.
+            </span>
+
+          </div>
+
+          <a
+            class="whatsappBtn"
+            href="https://wa.me/2348164886717?text=Hello%20OlaqVerify%20Customer%20Care%2C%20I%20need%20help."
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Chat on WhatsApp
+          </a>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ================= PROFILE ================= -->
+
+    <section id="page-profile" class="page">
+
+      <div class="hero">
+
+        <h1>Profile & settings</h1>
+
+        <p>
+          Manage your OlaqVerify account.
+        </p>
+
+      </div>
+
+      <div class="card">
+
+        <div class="profileBox">
+
+          <div id="profileAvatar" class="profileAvatar">
+            O
+          </div>
+
+          <div id="profileName" class="profileName">
+            User
+          </div>
+
+          <div id="profileEmail" class="profileEmail">
+            user@example.com
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="card">
+
+        <div class="cardHeader">
+          <strong>Account</strong>
+        </div>
+
+        <div class="list">
+
+          <div class="listItem">
+
+            <div class="listLeft">
+
+              <div class="listTitle">
+                Starting balance
+              </div>
+
+              <div class="listSub">
+                New accounts begin with ₦0.00
+              </div>
+
+            </div>
+
+            <strong>₦0.00</strong>
+
+          </div>
+
+
+          <div class="listItem">
+
+            <div class="listLeft">
+
+              <div class="listTitle">
+                Customer care
+              </div>
+
+              <div class="listSub">
+                WhatsApp support
+              </div>
+
+            </div>
+
+            <button
+              class="secondaryBtn"
+              onclick="go('support')"
+            >
+              Contact
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="card">
+
+        <div class="list">
+
+          <div class="listItem">
+
+            <div class="listLeft">
+
+              <div class="listTitle">
+                Sign out
+              </div>
+
+              <div class="listSub">
+                Sign out of this browser
+              </div>
+
+            </div>
+
+            <button
+              class="dangerBtn"
+              onclick="logout()"
+            >
+              Logout
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- BOTTOM NAV -->
+
+  <nav class="bottomNav">
+
+    <div class="bottomInner">
+
+      <button
+        class="navBtn active"
+        data-page="home"
+        onclick="go('home')"
+      >
+        <span class="navIcon">⌂</span>
+        <span>Home</span>
+      </button>
+
+      <button
+        class="navBtn"
+        data-page="numbers"
+        onclick="go('numbers')"
+      >
+        <span class="navIcon">#</span>
+        <span>Numbers</span>
+      </button>
+
+      <button
+        class="navBtn"
+        data-page="inbox"
+        onclick="go('inbox')"
+      >
+        <span class="navIcon">✉</span>
+        <span>Inbox</span>
+      </button>
+
+      <button
+        class="navBtn"
+        data-page="orders"
+        onclick="go('orders')"
+      >
+        <span class="navIcon">≡</span>
+        <span>Orders</span>
+      </button>
+
+      <button
+        class="navBtn"
+        data-page="support"
+        onclick="go('support')"
+      >
+        <span class="navIcon">?</span>
+        <span>Support</span>
+      </button>
+
+      <button
+        class="navBtn"
+        data-page="profile"
+        onclick="go('profile')"
+      >
+        <span class="navIcon">♙</span>
+        <span>Profile</span>
+      </button>
+
+    </div>
+
+  </nav>
+
+</div>
+
+
+<!-- =========================================================
+     ADD FUNDS / PALMPAY PAYMENT
+========================================================= -->
+
+<div id="fundModal" class="modal">
+
+  <div class="modalBox">
+
+    <div class="modalHeader">
+
+      <strong>Add funds</strong>
+
+      <button
+        class="closeBtn"
+        onclick="closeModal('fundModal')"
+      >
+        ×
+      </button>
+
+    </div>
+
+    <div class="modalBody">
+
+      <div class="formGroup">
+
+        <label>Amount (₦)</label>
+
+        <input
+          id="fundAmount"
+          type="number"
+          min="1"
+          placeholder="Enter amount"
+        >
+
+      </div>
+
+
+      <div class="palmPayBox">
+
+        <div class="palmPayBadge">
+          PALMPAY PAYMENT
+        </div>
+
+        <div class="palmPayTitle">
+          Pay with PalmPay
+        </div>
+
+        <div class="palmPayText">
+          Transfer the exact amount you entered above to the
+          PalmPay account below. After completing the transfer,
+          enter your transaction reference and tap
+          <strong>I Have Paid</strong>.
+        </div>
+
+
+        <div class="palmAccount">
+
+          <div class="palmAccountLabel">
+            ACCOUNT NAME
+          </div>
+
+          <div class="palmAccountValue">
+            Adekunle
+          </div>
+
+        </div>
+
+
+        <div class="palmAccount">
+
+          <div class="palmAccountLabel">
+            PALMPAY ACCOUNT NUMBER
+          </div>
+
+          <div
+            id="palmNumber"
+            class="palmAccountValue"
+          >
+            8164886717
+          </div>
+
+          <button
+            type="button"
+            class="palmCopyBtn"
+            onclick="copyPalmNumber()"
+          >
+            Copy Account Number
+          </button>
+
+        </div>
+
+
+        <label
+          style="
+          display:block;
+          font-size:11px;
+          font-weight:800;
+          margin-top:14px;
+          "
+        >
+          PalmPay Transaction Reference
+        </label>
+
+        <input
+          id="transactionRef"
+          class="palmPayInput"
+          type="text"
+          placeholder="Enter transaction reference"
+          autocomplete="off"
+        >
+
+
+        <button
+          type="button"
+          class="palmPaySubmit"
+          onclick="submitPalmPayment()"
+        >
+          I Have Paid
+        </button>
+
+
+        <div
+          id="paymentStatus"
+          class="palmPayStatus"
+        ></div>
+
+      </div>
+
+
+      <div
+        style="
+        color:var(--muted);
+        font-size:11px;
+        line-height:1.5;
+        margin-top:13px;
+        text-align:center;
+        "
+      >
+        Your payment will remain pending until it is manually
+        verified. Your balance is not automatically credited.
+      </div>
+
+
+      <div class="modalActions">
+
+        <button
+          class="secondaryBtn"
+          onclick="closeModal('fundModal')"
+        >
+          Cancel
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- =========================================================
+     CREATE PROJECT MODAL
+========================================================= -->
+
+<div id="projectModal" class="modal">
+
+  <div class="modalBox">
+
+    <div class="modalHeader">
+
+      <strong>Create project</strong>
+
+      <button
+        class="closeBtn"
+        onclick="closeModal('projectModal')"
+      >
+        ×
+      </button>
+
+    </div>
+
+    <div class="modalBody">
+
+      <div class="formGroup">
+
+        <label>Project name</label>
+
+        <input
+          id="projectName"
+          type="text"
+          placeholder="e.g. Login SMS Testing"
+        >
+
+      </div>
+
+      <div class="modalActions">
+
+        <button
+          class="secondaryBtn"
+          onclick="closeModal('projectModal')"
+        >
+          Cancel
+        </button>
+
+        <button
+          class="primaryBtn"
+          onclick="createProject()"
+        >
+          Create
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- =========================================================
+     NUMBER DETAILS MODAL
+========================================================= -->
+
+<div id="numberModal" class="modal">
+
+  <div class="modalBox">
+
+    <div class="modalHeader">
+
+      <strong>Number details</strong>
+
+      <button
+        class="closeBtn"
+        onclick="closeModal('numberModal')"
+      >
+        ×
+      </button>
+
+    </div>
+
+    <div id="numberDetails" class="modalBody"></div>
+
+  </div>
+
+</div>
+
+
+<!-- TOAST -->
+
+<div id="toast"></div>
+
+
+<script>
+/* =========================================================
+   OLAQVERIFY LOCAL ACCOUNT SYSTEM
+========================================================= */
+
+const ACCOUNTS_KEY = "olaqverify_accounts_v2";
+const SESSION_KEY = "olaqverify_session_v2";
+
+
+/* =========================================================
+   TESTING INVENTORY
+========================================================= */
+
+const inventory = [
+
+  {
+    id:"us-2048",
+    country:"United States",
+    code:"+1",
+    number:"555 010 2048",
+    price:800
+  },
+
+  {
+    id:"ng-1024",
+    country:"Nigeria",
+    code:"+234",
+    number:"810 000 1024",
+    price:500
+  },
+
+  {
+    id:"uk-0123",
+    country:"United Kingdom",
+    code:"+44",
+    number:"7700 900123",
+    price:950
+  },
+
+  {
+    id:"ca-3099",
+    country:"Canada",
+    code:"+1",
+    number:"555 010 3099",
+    price:850
+  },
+
+  {
+    id:"au-0321",
+    country:"Australia",
+    code:"+61",
+    number:"490 000 321",
+    price:1100
+  },
+
+  {
+    id:"de-4567",
+    country:"Germany",
+    code:"+49",
+    number:"151 000 4567",
+    price:1000
+  },
+
+  {
+    id:"za-0888",
+    country:"South Africa",
+    code:"+27",
+    number:"710 000 888",
+    price:650
+  },
+
+  {
+    id:"gh-0777",
+    country:"Ghana",
+    code:"+233",
+    number:"240 000 777",
+    price:600
+  }
+
+];
+
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let state = {
+
+  loggedIn:false,
+
+  user:{
+    name:"",
+    email:""
+  },
+
+  balance:0,
+
+  projects:[],
+
+  messages:[],
+
+  orders:[]
+
+};
+
+let authMode = "signup";
+
+let selectedInboxNumber = null;
+
+
+/* =========================================================
+   ACCOUNT STORAGE
+================================================  color:var(--text);
+  min-height:100vh;
+}
+
+button,
+input,
+select{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+}
+
+a{
+  color:inherit;
+}
+
+/* =========================
+   AUTH
+========================= */
+
+#authScreen{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:
+    radial-gradient(circle at top left,rgba(91,33,182,.16),transparent 35%),
+    radial-gradient(circle at bottom right,rgba(59,7,100,.13),transparent 35%),
+    var(--bg);
+}
+
+.authBox{
+  width:min(430px,100%);
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:22px;
+  box-shadow:var(--shadow);
+  padding:28px;
+}
+
+.authLogo{
+  width:52px;
+  height:52px;
+  border-radius:15px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+  font-weight:900;
+  font-size:21px;
+  margin-bottom:14px;
+  background:linear-gradient(135deg,var(--purple),var(--purple2));
+}
+
+.authTitle{
+  font-size:27px;
+  font-weight:900;
+  margin-bottom:7px;
+}
+
+.authSubtitle{
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.5;
+  margin-bottom:23px;
+}
+
+.authTabs{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  background:#f3eef8;
+  padding:4px;
+  border-radius:11px;
+  margin-bottom:20px;
+}
+
+.authTabs button{
+  border:0;
+  background:transparent;
+  padding:11px;
+  border-radius:8px;
+  color:var(--muted);
+  font-weight:800;
+}
+
+.authTabs button.active{
+  color:var(--purple);
+  background:#fff;
+  box-shadow:0 2px 8px rgba(50,20,70,.08);
+}
+
+.formGroup{
+  margin-bottom:15px;
+}
+
+.formGroup label{
+  display:block;
+  font-size:13px;
+  font-weight:800;
+  margin-bottom:7px;
+}
+
+.formGroup input{
+  width:100%;
+  border:1px solid var(--border);
+  border-radius:11px;
+  padding:13px;
+  outline:none;
+  background:#fff;
+  color:var(--text);
+}
+
+.formGroup input:focus{
+  border-color:var(--purple);
+  box-shadow:0 0 0 3px rgba(91,33,182,.08);
+}
+
+.primaryBtn{
+  width:100%;
+  border:0;
+  color:#fff;
+  padding:13px;
+  border-radius:11px;
+  font-weight:900;
+  background:linear-gradient(135deg,var(--purple),var(--purple2));
+}
+
+.authNote{
+  margin-top:15px;
+  color:var(--muted);
+  font-size:11px;
+  line-height:1.5;
+  text-align:center;
+}
+
+/* =========================
+   APP
+========================= */
+
+#app{
+  display:none;
+}
+
+.topbar{
+  height:64px;
+  position:sticky;
+  top:0;
+  z-index:50;
+  background:rgba(255,255,255,.96);
+  border-bottom:1px solid var(--border);
+  backdrop-filter:blur(10px);
+}
+
+.topbarInner{
+  width:min(1050px,100%);
+  height:100%;
+  margin:auto;
+  padding:0 20px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.logo{
+  width:39px;
+  height:39px;
+  border-radius:12px;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:900;
+  background:linear-gradient(135deg,var(--purple),var(--purple2));
+}
+
+.brandText{
+  font-weight:900;
+  letter-spacing:-.3px;
+}
+
+.topActions{
+  display:flex;
+  gap:8px;
+}
+
+.iconBtn{
+  width:38px;
+  height:38px;
+  border:1px solid var(--border);
+  background:#fff;
+  border-radius:11px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--purple);
+  font-weight:900;
+}
+
+.container{
+  width:min(1050px,100%);
+  margin:auto;
+  padding:20px 20px 100px;
+}
+
+.page{
+  display:none;
+}
+
+.page.active{
+  display:block;
+  animation:fade .18s ease;
+}
+
+@keyframes fade{
+  from{opacity:0;transform:translateY(4px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+.hero{
+  padding:8px 0 20px;
+}
+
+.hero h1{
+  font-size:27px;
+  letter-spacing:-.7px;
+  margin-bottom:7px;
+}
+
+.hero p{
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.5;
+}
+
+/* =========================
+   CARDS
+========================= */
+
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:17px;
+  box-shadow:var(--shadow);
+  overflow:hidden;
+  margin-bottom:17px;
+}
+
+.cardHeader{
+  padding:17px 18px;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.cardHeader strong{
+  font-size:15px;
+}
+
+.balanceCard{
+  color:#fff;
+  padding:21px;
+  border-radius:18px;
+  margin-bottom:18px;
+  background:linear-gradient(135deg,var(--purple),var(--purple2));
+  box-shadow:0 12px 30px rgba(59,7,100,.2);
+}
+
+.balanceLabel{
+  font-size:12px;
+  opacity:.82;
+  margin-bottom:8px;
+}
+
+.balanceAmount{
+  font-size:30px;
+  font-weight:900;
+  letter-spacing:-1px;
+}
+
+.balanceBottom{
+  margin-top:17px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.balanceUser{
+  font-size:12px;
+  opacity:.85;
+}
+
+.smallWhiteBtn{
+  border:0;
+  padding:9px 13px;
+  border-radius:9px;
+  color:var(--purple2);
+  background:#fff;
+  font-weight:900;
+}
+
+/* =========================
+   QUICK ACCESS
+========================= */
+
+.quickGrid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+  margin-bottom:18px;
+}
+
+.quickCard{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:15px;
+  padding:16px;
+  cursor:pointer;
+  transition:.15s;
+}
+
+.quickCard:hover{
+  transform:translateY(-2px);
+  box-shadow:var(--shadow);
+}
+
+.quickIcon{
+  width:38px;
+  height:38px;
+  border-radius:11px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--purple);
+  background:var(--purpleLight);
+  font-weight:900;
+  margin-bottom:11px;
+}
+
+.quickCard strong{
+  display:block;
+  font-size:14px;
+  margin-bottom:4px;
+}
+
+.quickCard span{
+  display:block;
+  color:var(--muted);
+  font-size:11px;
+}
+
+/* =========================
+   LISTS
+========================= */
+
+.list{
+  padding:0 18px;
+}
+
+.listItem{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:15px 0;
+  border-bottom:1px solid var(--border);
+}
+
+.listItem:last-child{
+  border-bottom:0;
+}
+
+.listLeft{
+  min-width:0;
+}
+
+.listTitle{
+  font-weight:800;
+  font-size:13px;
+}
+
+.listSub{
+  color:var(--muted);
+  font-size:11px;
+  margin-top:4px;
+}
+
+.price{
+  font-weight:900;
+  white-space:nowrap;
+}
+
+.empty{
+  padding:35px 20px;
+  text-align:center;
+  color:var(--muted);
+  font-size:13px;
+}
+
+/* =========================
+   SEARCH / FILTER
+========================= */
+
+.toolbar{
+  display:flex;
+  gap:10px;
+  margin-bottom:15px;
+}
+
+.search{
+  flex:1;
+  border:1px solid var(--border);
+  border-radius:11px;
+  background:#fff;
+  padding:12px;
+  outline:none;
+}
+
+.filter{
+  border:1px solid var(--border);
+  border-radius:11px;
+  background:#fff;
+  padding:12px;
+  outline:none;
+}
+
+.search:focus,
+.filter:focus{
+  border-color:var(--purple);
+}
+
+/* =========================
+   NUMBER MARKET
+========================= */
+
+.numberGrid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+}
+
+.numberCard{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:15px;
+  padding:17px;
+}
+
+.country{
+  color:var(--muted);
+  font-size:11px;
+  margin-bottom:7px;
+}
+
+.number{
+  font-weight:900;
+  font-size:18px;
+  margin-bottom:10px;
+}
+
+.numberBottom{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.buyBtn{
+  border:0;
+  color:#fff;
+  background:linear-gradient(135deg,var(--purple),var(--purple2));
+  padding:9px 13px;
+  border-radius:9px;
+  font-weight:900;
+}
+
+.detailsBtn{
+  border:1px solid var(--border);
+  color:var(--purple);
+  background:#fff;
+  padding:9px 13px;
+  border-radius:9px;
+  font-weight:800;
+}
+
+/* =========================
+   INBOX
+========================= */
+
+.inboxLayout{
+  display:grid;
+  grid-template-columns:280px 1fr;
+  gap:15px;
+}
+
+.numberSelect{
+  width:100%;
+  border:0;
+  background:#fff;
+  padding:15px;
+  text-align:left;
+  border-bottom:1px solid var(--border);
+}
+
+.numberSelect.active{
+  background:var(--purpleLight);
+  color:var(--purple2);
+}
+
+.messageBox{
+  min-height:360px;
+  padding:18px;
+}
+
+.message{
+  max-width:80%;
+  background:var(--purpleLight);
+  color:var(--text);
+  border-radius:13px;
+  padding:12px;
+  margin-bottom:12px;
+}
+
+.message small{
+  display:block;
+  color:var(--muted);
+  margin-top:6px;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.secondaryBtn{
+  border:1px solid var(--border);
+  background:#fff;
+  color:var(--purple);
+  padding:10px 13px;
+  border-radius:10px;
+  font-weight:800;
+}
+
+.dangerBtn{
+  border:0;
+  background:#fff0f0;
+  color:var(--red);
+  padding:10px 13px;
+  border-radius:10px;
+  font-weight:800;
+}
+
+/* =========================
+   PROFILE
+========================= */
+
+.profileBox{
+  padding:20px;
+}
+
+.profileAvatar{
+  width:64px;
+  height:64px;
+  border-radius:20px;
+  background:linear-gradient(135deg,var(--purple),var(--purple2));
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:24px;
+  font-weight:900;
+  margin-bottom:13px;
+}
+
+.profileName{
+  font-size:20px;
+  font-weight:900;
+}
+
+.profileEmail{
+  color:var(--muted);
+  font-size:13px;
+  margin-top:4px;
+}
+
+/* =========================
+   SUPPORT
+========================= */
+
+.supportBox{
+  padding:20px;
+}
+
+.supportHighlight{
+  background:var(--purpleLight);
+  border-radius:14px;
+  padding:18px;
+  margin-bottom:15px;
+}
+
+.supportHighlight strong{
+  display:block;
+  margin-bottom:6px;
+}
+
+.supportHighlight span{
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.5;
+}
+
+.whatsappBtn{
+  display:block;
+  width:100%;
+  text-align:center;
+  text-decoration:none;
+  color:#fff;
+  background:linear-gradient(135deg,var(--purple),var(--purple2));
+  padding:13px;
+  border-radius:11px;
+  font-weight:900;
+}
+
+/* =========================
+   BOTTOM NAV
+========================= */
+
+.bottomNav{
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  z-index:50;
+  background:rgba(255,255,255,.97);
+  border-top:1px solid var(--border);
+  backdrop-filter:blur(10px);
+}
+
+.bottomInner{
+  width:min(1050px,100%);
+  margin:auto;
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+}
+
+.navBtn{
+  border:0;
+  background:transparent;
+  padding:9px 4px 8px;
+  color:var(--muted);
+  font-size:10px;
+  font-weight:800;
+}
+
+.navBtn.active{
+  color:var(--purple);
+}
+
+.navIcon{
+  display:block;
+  font-size:19px;
+  line-height:20px;
+  margin-bottom:3px;
+}
+
+/* =========================
+   MODALS
+========================= */
+
+.modal{
+  position:fixed;
+  inset:0;
+  z-index:100;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:rgba(20,10,30,.48);
+}
+
+.modal.show{
+  display:flex;
+}
+
+.modalBox{
+  width:min(430px,100%);
+  background:#fff;
+  border-radius:18px;
+  box-shadow:0 20px 60px rgba(0,0,0,.2);
+  overflow:hidden;
+}
+
+.modalHeader{
+  padding:17px 18px;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.closeBtn{
+  border:0;
+  background:transparent;
+  color:var(--muted);
+  font-size:22px;
+}
+
+.modalBody{
+  padding:20px;
+}
+
+.modalActions{
+  display:flex;
+  gap:10px;
+  margin-top:17px;
+}
+
+.modalActions button{
+  flex:1;
+}
+
+/* =========================
    TOAST
 ========================= */
 
