@@ -1,0 +1,3245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>OlaqVerify</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{box-sizing:border-box}
+
+html,body{
+  margin:0;
+  padding:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#f5f3ff;
+  color:#171717;
+  overflow-x:hidden;
+}
+
+body{min-height:100vh}
+
+:root{
+  --purple:#5b21b6;
+  --purple2:#3b0764;
+  --light:#f5f3ff;
+  --white:#fff;
+  --green:#15803d;
+  --red:#dc2626;
+  --orange:#d97706;
+  --border:#e5e7eb;
+  --muted:#6b7280;
+}
+
+.hidden{display:none!important}
+
+button,input,select{font:inherit}
+button{cursor:pointer}
+
+.auth-wrap{
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:20px;
+  background:
+    radial-gradient(circle at top right,#8b5cf633,transparent 35%),
+    linear-gradient(135deg,#f5f3ff,#fff);
+}
+
+.auth-box{
+  width:100%;
+  max-width:430px;
+  background:#fff;
+  border-radius:22px;
+  padding:28px;
+  box-shadow:0 15px 50px #3b076425;
+}
+
+.logo{
+  text-align:center;
+  font-size:30px;
+  font-weight:900;
+  color:var(--purple);
+  margin-bottom:5px;
+}
+
+.logo-sub{
+  text-align:center;
+  color:#777;
+  margin-bottom:25px;
+}
+
+.auth-title{
+  font-size:23px;
+  font-weight:800;
+  margin-bottom:18px;
+}
+
+.field{margin-bottom:14px}
+
+.field label{
+  display:block;
+  font-size:13px;
+  font-weight:700;
+  margin-bottom:7px;
+}
+
+.field input,
+.field select{
+  width:100%;
+  padding:13px 14px;
+  border:1px solid #ddd;
+  border-radius:11px;
+  outline:none;
+  background:#fff;
+}
+
+.field input:focus,
+.field select:focus{
+  border-color:var(--purple);
+  box-shadow:0 0 0 3px #5b21b615;
+}
+
+.primary-btn{
+  width:100%;
+  border:0;
+  padding:14px;
+  border-radius:11px;
+  background:linear-gradient(135deg,var(--purple),var(--purple2));
+  color:#fff;
+  font-weight:800;
+  margin-top:5px;
+}
+
+.primary-btn:disabled{
+  opacity:.6;
+  cursor:not-allowed;
+}
+
+.secondary-btn{
+  width:100%;
+  border:1px solid var(--purple);
+  padding:13px;
+  border-radius:11px;
+  background:#fff;
+  color:var(--purple);
+  font-weight:800;
+  margin-top:10px;
+}
+
+.auth-switch{
+  text-align:center;
+  margin-top:18px;
+  color:#666;
+  font-size:14px;
+}
+
+.auth-switch span{
+  color:var(--purple);
+  font-weight:800;
+  cursor:pointer;
+}
+
+.app{
+  min-height:100vh;
+  padding-bottom:85px;
+}
+
+.header{
+  background:linear-gradient(135deg,var(--purple),var(--purple2));
+  color:#fff;
+  padding:18px 18px 24px;
+  border-radius:0 0 25px 25px;
+}
+
+.header-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+}
+
+.header-logo{
+  font-size:23px;
+  font-weight:900;
+}
+
+.header-user{
+  font-size:13px;
+  opacity:.9;
+}
+
+.balance-card{
+  margin-top:20px;
+  background:#ffffff18;
+  border:1px solid #ffffff25;
+  border-radius:18px;
+  padding:18px;
+}
+
+.balance-label{
+  font-size:13px;
+  opacity:.85;
+}
+
+.balance{
+  font-size:30px;
+  font-weight:900;
+  margin-top:6px;
+}
+
+.account-number{
+  margin-top:5px;
+  font-size:12px;
+  opacity:.8;
+}
+
+.container{
+  width:100%;
+  max-width:900px;
+  margin:auto;
+  padding:16px;
+}
+
+.section{margin-bottom:18px}
+
+.section-title{
+  font-size:18px;
+  font-weight:900;
+  margin-bottom:12px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+
+.card{
+  background:#fff;
+  border-radius:17px;
+  padding:16px;
+  border:1px solid var(--border);
+  box-shadow:0 5px 18px #00000008;
+  min-width:0;
+  overflow:hidden;
+}
+
+.action-card{
+  cursor:pointer;
+  transition:.15s;
+}
+
+.action-card:active{
+  transform:scale(.98);
+}
+
+.action-icon{
+  width:42px;
+  height:42px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#f0e7ff;
+  color:var(--purple);
+  border-radius:12px;
+  font-size:20px;
+  margin-bottom:10px;
+}
+
+.action-title{font-weight:800}
+
+.action-sub{
+  font-size:12px;
+  color:var(--muted);
+  margin-top:4px;
+}
+
+.content-page{display:none}
+
+.content-page.active{display:block}
+
+.page-header{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:16px;
+}
+
+.back-btn{
+  border:0;
+  background:#fff;
+  width:40px;
+  height:40px;
+  border-radius:11px;
+  box-shadow:0 2px 10px #00000010;
+}
+
+.page-title{
+  font-size:21px;
+  font-weight:900;
+}
+
+.country-card{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:15px;
+  margin-bottom:11px;
+}
+
+.country-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.country-info{
+  display:flex;
+  align-items:center;
+  gap:11px;
+  min-width:0;
+}
+
+.flag{font-size:28px}
+
+.country-name{font-weight:900}
+
+.service-name{
+  color:#777;
+  font-size:12px;
+  margin-top:3px;
+}
+
+.price{
+  font-weight:900;
+  color:var(--purple);
+}
+
+.buy-btn{
+  width:100%;
+  margin-top:12px;
+  padding:12px;
+  border:0;
+  border-radius:10px;
+  background:var(--purple);
+  color:#fff;
+  font-weight:800;
+}
+
+.buy-btn.deal-btn{
+  background:linear-gradient(135deg,#dc2626,#991b1b);
+}
+
+.buy-btn:disabled{
+  background:#c4c4c4;
+}
+
+.deal-price-box{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:3px;
+  text-align:right;
+}
+
+.old-price{
+  color:#777;
+  text-decoration:line-through;
+  font-size:12px;
+  font-weight:700;
+}
+
+.new-price{
+  color:#dc2626;
+  font-size:18px;
+  font-weight:900;
+}
+
+.discount-badge{
+  background:#dc2626;
+  color:#fff;
+  padding:3px 7px;
+  border-radius:6px;
+  font-size:10px;
+  font-weight:900;
+}
+
+.deal-banner{
+  margin-top:10px;
+  padding:9px 10px;
+  background:#fff1f2;
+  border:1px solid #fecdd3;
+  border-radius:10px;
+  color:#dc2626;
+  font-size:12px;
+  font-weight:800;
+}
+
+.deal-stock{
+  margin-top:5px;
+  color:#777;
+  font-size:11px;
+  font-weight:600;
+}
+
+.pause-box{
+  background:#fff;
+  border:1px solid #e9d5ff;
+  border-radius:20px;
+  padding:25px 20px;
+  text-align:center;
+  box-shadow:0 8px 25px #5b21b612;
+}
+
+.pause-icon{
+  width:65px;
+  height:65px;
+  margin:0 auto 15px;
+  border-radius:50%;
+  background:#f3e8ff;
+  color:var(--purple);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-size:29px;
+}
+
+.pause-title{
+  font-size:21px;
+  font-weight:900;
+  margin-bottom:10px;
+}
+
+.pause-text{
+  color:#666;
+  line-height:1.6;
+  font-size:14px;
+}
+
+.order-card{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:12px;
+}
+
+.order-top{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.order-country{font-weight:900}
+
+.order-id{
+  font-size:11px;
+  color:#777;
+  margin-top:4px;
+  word-break:break-all;
+}
+
+.status{
+  display:inline-block;
+  padding:5px 9px;
+  border-radius:20px;
+  font-size:11px;
+  font-weight:800;
+}
+
+.approved{
+  background:#dcfce7;
+  color:#166534;
+}
+
+.pending{
+  background:#fef3c7;
+  color:#92400e;
+}
+
+.declined{
+  background:#fee2e2;
+  color:#991b1b;
+}
+
+.info-line{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  padding:9px 0;
+  border-bottom:1px solid #f0f0f0;
+  font-size:13px;
+}
+
+.info-line:last-child{border-bottom:0}
+
+.payment-step{
+  background:#f5f3ff;
+  border-radius:15px;
+  padding:15px;
+  margin-top:12px;
+}
+
+.payment-step-title{
+  font-weight:900;
+  color:var(--purple);
+  margin-bottom:8px;
+}
+
+.payment-step p{
+  margin:5px 0;
+  font-size:13px;
+  color:#555;
+  line-height:1.5;
+}
+
+.bank-row{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  padding:9px 0;
+  border-bottom:1px solid #ddd;
+}
+
+.bank-row:last-child{border-bottom:0}
+
+.bank-label{
+  color:#777;
+  font-size:13px;
+}
+
+.bank-value{
+  font-weight:900;
+  text-align:right;
+  word-break:break-word;
+}
+
+.payment-success{
+  text-align:center;
+  padding:20px 5px;
+}
+
+.success-icon{
+  width:62px;
+  height:62px;
+  border-radius:50%;
+  background:#dcfce7;
+  color:#15803d;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  margin:0 auto 14px;
+  font-size:28px;
+}
+
+.payment-success h3{
+  margin:0 0 8px;
+}
+
+.payment-success p{
+  color:#666;
+  line-height:1.5;
+  font-size:14px;
+}
+
+.support-btn{
+  display:block;
+  text-decoration:none;
+  background:#16a34a;
+  color:#fff;
+  text-align:center;
+  padding:14px;
+  border-radius:11px;
+  font-weight:900;
+  margin-top:15px;
+}
+
+.logout-btn{
+  width:100%;
+  padding:13px;
+  border:0;
+  border-radius:11px;
+  background:#fee2e2;
+  color:#991b1b;
+  font-weight:800;
+}
+
+.bottom-nav{
+  position:fixed;
+  left:0;
+  right:0;
+  bottom:0;
+  height:70px;
+  background:#fff;
+  border-top:1px solid #eee;
+  display:flex;
+  justify-content:space-around;
+  align-items:center;
+  z-index:50;
+}
+
+.nav-btn{
+  border:0;
+  background:none;
+  color:#777;
+  min-width:65px;
+  padding:6px 4px;
+}
+
+.nav-btn.active{color:var(--purple)}
+
+.nav-icon{
+  font-size:21px;
+  line-height:23px;
+}
+
+.nav-label{
+  font-size:10px;
+  margin-top:3px;
+  font-weight:700;
+}
+
+.modal{
+  position:fixed;
+  inset:0;
+  background:#00000070;
+  display:none;
+  align-items:flex-end;
+  justify-content:center;
+  z-index:100;
+  padding:0;
+}
+
+.modal.show{display:flex}
+
+.modal-box{
+  width:100%;
+  max-width:600px;
+  background:#fff;
+  border-radius:23px 23px 0 0;
+  padding:22px;
+  max-height:88vh;
+  overflow:auto;
+}
+
+.modal-title{
+  font-size:20px;
+  font-weight:900;
+  margin-bottom:15px;
+}
+
+.close-btn{
+  float:right;
+  border:0;
+  background:#f3f4f6;
+  border-radius:50%;
+  width:34px;
+  height:34px;
+}
+
+.toast{
+  position:fixed;
+  left:50%;
+  bottom:84px;
+  transform:translateX(-50%) translateY(20px);
+  background:#171717;
+  color:#fff;
+  padding:12px 16px;
+  border-radius:11px;
+  font-size:13px;
+  opacity:0;
+  pointer-events:none;
+  transition:.25s;
+  z-index:300;
+  max-width:90%;
+  text-align:center;
+}
+
+.toast.show{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+
+.empty{
+  text-align:center;
+  padding:35px 15px;
+  color:#777;
+}
+
+.empty-icon{
+  font-size:35px;
+  margin-bottom:8px;
+}
+
+@media(min-width:700px){
+
+  .grid{
+    grid-template-columns:repeat(4,minmax(0,1fr));
+  }
+
+  .modal{
+    align-items:center;
+    padding:20px;
+  }
+
+  .modal-box{
+    border-radius:20px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div id="authPage" class="auth-wrap">
+
+  <div class="auth-box">
+
+    <div class="logo">OlaqVerify</div>
+    <div class="logo-sub">Fast and simple verification services</div>
+
+    <div id="loginBox">
+
+      <div class="auth-title">Welcome back</div>
+
+      <div class="field">
+        <label>Email</label>
+        <input id="loginEmail" type="email" placeholder="Enter your email">
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <input id="loginPassword" type="password" placeholder="Enter your password">
+      </div>
+
+      <button class="primary-btn" onclick="login()">
+        Sign In
+      </button>
+
+      <div class="auth-switch">
+        Don't have an account?
+        <span onclick="showSignup()">Create one</span>
+      </div>
+
+    </div>
+
+    <div id="signupBox" class="hidden">
+
+      <div class="auth-title">Create account</div>
+
+      <div class="field">
+        <label>Full name</label>
+        <input id="signupName" type="text" placeholder="Your full name">
+      </div>
+
+      <div class="field">
+        <label>Email</label>
+        <input id="signupEmail" type="email" placeholder="Your email">
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <input id="signupPassword" type="password" placeholder="Create password">
+      </div>
+
+      <button class="primary-btn" onclick="signup()">
+        Create Account
+      </button>
+
+      <div class="auth-switch">
+        Already have an account?
+        <span onclick="showLogin()">Sign in</span>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<div id="app" class="app hidden">
+
+  <header class="header">
+
+    <div class="header-top">
+      <div class="header-logo">OlaqVerify</div>
+      <div id="headerUser" class="header-user"></div>
+    </div>
+
+    <div class="balance-card">
+
+      <div class="balance-label">
+        Available Balance
+      </div>
+
+      <div id="balance" class="balance">
+        ₦0.00
+      </div>
+
+      <div class="account-number">
+        OlaqVerify Wallet
+      </div>
+
+    </div>
+
+  </header>
+
+  <main class="container">
+
+    <section id="homePage" class="content-page active">
+
+      <div class="section">
+
+        <div class="section-title">
+          Quick Actions
+        </div>
+
+        <div class="grid">
+
+          <div class="card action-card"
+               onclick="openBuyPage()">
+
+            <div class="action-icon">＋</div>
+
+            <div class="action-title">
+              Buy Number
+            </div>
+
+            <div class="action-sub">
+              Get a verification number
+            </div>
+
+          </div>
+
+          <div class="card action-card"
+               onclick="openPage('ordersPage')">
+
+            <div class="action-icon">▣</div>
+
+            <div class="action-title">
+              My Orders
+            </div>
+
+            <div class="action-sub">
+              View your transactions
+            </div>
+
+          </div>
+
+          <div class="card action-card"
+               onclick="openTopup()">
+
+            <div class="action-icon">₦</div>
+
+            <div class="action-title">
+              Add Money
+            </div>
+
+            <div class="action-sub">
+              Fund your wallet
+            </div>
+
+          </div>
+
+          <div class="card action-card"
+               onclick="window.location.href='support.html'">
+
+            <div class="action-icon">?</div>
+
+            <div class="action-title">
+              Support
+            </div>
+
+            <div class="action-sub">
+              Help Centre & WhatsApp Support
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="section">
+
+        <div class="section-title">
+          Account
+        </div>
+
+        <div class="card">
+
+          <div class="info-line">
+            <span>Name</span>
+            <strong id="homeName">—</strong>
+          </div>
+
+          <div class="info-line">
+            <span>Email</span>
+            <strong id="homeEmail">—</strong>
+          </div>
+
+          <div class="info-line">
+            <span>Wallet Balance</span>
+            <strong id="homeBalance">₦0.00</strong>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <section id="buyPage" class="content-page">
+
+      <div class="page-header">
+
+        <button class="back-btn"
+                onclick="openPage('homePage')">
+          ‹
+        </button>
+
+        <div class="page-title">
+          Buy Number
+        </div>
+
+      </div>
+
+      <div id="buyContent">
+
+        <div class="card"
+             style="margin-bottom:12px">
+
+          <div style="font-weight:800;margin-bottom:5px">
+            Choose a service
+          </div>
+
+          <div style="font-size:13px;color:#777">
+            Select a country and service below.
+          </div>
+
+        </div>
+
+        <div id="pricesList">
+          <div class="empty">
+            Loading available services...
+          </div>
+        </div>
+
+      </div>
+
+      <div id="transactionsPaused"
+           class="hidden">
+
+        <div class="pause-box">
+
+          <div class="pause-icon">
+            ⏸
+          </div>
+
+          <div class="pause-title">
+            Orders Temporarily Paused
+          </div>
+
+          <div class="pause-text">
+            We’re currently preparing the service for the next batch of transactions.
+            Please check back shortly. Everything is being prepared, and we’ll reopen
+            orders as soon as the service is ready. Thanks for your patience.
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <section id="ordersPage" class="content-page">
+
+      <div class="page-header">
+
+        <button class="back-btn"
+                onclick="openPage('homePage')">
+          ‹
+        </button>
+
+        <div class="page-title">
+          My Orders
+        </div>
+
+      </div>
+
+      <div id="ordersList">
+        <div class="empty">
+          Loading orders...
+        </div>
+      </div>
+
+    </section>
+
+    <section id="walletPage" class="content-page">
+
+      <div class="page-header">
+
+        <button class="back-btn"
+                onclick="openPage('homePage')">
+          ‹
+        </button>
+
+        <div class="page-title">
+          Wallet
+        </div>
+
+      </div>
+
+      <div class="card">
+
+        <div style="color:#777;font-size:13px">
+          Available balance
+        </div>
+
+        <div id="walletBalance"
+             style="font-size:30px;font-weight:900;color:#5b21b6;margin-top:5px">
+          ₦0.00
+        </div>
+
+        <button class="primary-btn"
+                onclick="openTopup()">
+          Add Money
+        </button>
+
+      </div>
+
+      <div class="section"
+           style="margin-top:18px">
+
+        <div class="section-title">
+          Payment History
+        </div>
+
+        <div id="paymentHistory">
+          <div class="empty">
+            Loading payment history...
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <section id="supportPage" class="content-page">
+
+      <div class="page-header">
+
+        <button class="back-btn"
+                onclick="openPage('homePage')">
+          ‹
+        </button>
+
+        <div class="page-title">
+          Support
+        </div>
+
+      </div>
+
+      <div class="card">
+
+        <div style="font-size:20px;font-weight:900">
+          Need help?
+        </div>
+
+        <p style="color:#666;line-height:1.6">
+          Contact OlaqVerify support if you have a problem with your
+          wallet, order or verification service.
+        </p>
+
+        <a
+          class="support-btn"
+          href="https://wa.me/2348164886717"
+          target="_blank"
+        >
+          Chat on WhatsApp
+        </a>
+
+      </div>
+
+    </section>
+
+    <section id="settingsPage" class="content-page">
+
+      <div class="page-header">
+
+        <button class="back-btn"
+                onclick="openPage('homePage')">
+          ‹
+        </button>
+
+        <div class="page-title">
+          Settings
+        </div>
+
+      </div>
+
+      <div class="card">
+
+        <div class="info-line">
+          <span>Name</span>
+          <strong id="settingsName">—</strong>
+        </div>
+
+        <div class="info-line">
+          <span>Email</span>
+          <strong id="settingsEmail">—</strong>
+        </div>
+
+      </div>
+
+      <div class="card"
+           style="margin-top:12px">
+
+        <button class="logout-btn"
+                onclick="logout()">
+          Sign Out
+        </button>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <nav class="bottom-nav">
+
+    <button class="nav-btn active"
+            onclick="openPage('homePage',this)">
+      <div class="nav-icon">⌂</div>
+      <div class="nav-label">Home</div>
+    </button>
+
+    <button class="nav-btn"
+            onclick="openBuyPage(this)">
+      <div class="nav-icon">＋</div>
+      <div class="nav-label">Buy</div>
+    </button>
+
+    <button class="nav-btn"
+            onclick="openPage('ordersPage',this)">
+      <div class="nav-icon">▣</div>
+      <div class="nav-label">Orders</div>
+    </button>
+
+    <button class="nav-btn"
+            onclick="openPage('walletPage',this)">
+      <div class="nav-icon">₦</div>
+      <div class="nav-label">Wallet</div>
+    </button>
+
+    <button class="nav-btn"
+            onclick="openPage('settingsPage',this)">
+      <div class="nav-icon">⚙</div>
+      <div class="nav-label">Settings</div>
+    </button>
+
+  </nav>
+
+</div>
+
+<div id="topupModal" class="modal">
+
+  <div class="modal-box">
+
+    <button class="close-btn"
+            onclick="closeTopup()">
+      ×
+    </button>
+
+    <div class="modal-title">
+      Add Money
+    </div>
+
+    <div class="payment-step">
+
+      <div class="payment-step-title">
+        Step 1 — Make your transfer
+      </div>
+
+      <p>
+        Transfer the amount you want to add to your OlaqVerify wallet
+        to the account below.
+      </p>
+
+      <div class="bank-row">
+        <span class="bank-label">Account Name</span>
+        <span class="bank-value">Adekunle</span>
+      </div>
+
+      <div class="bank-row">
+        <span class="bank-label">Account Number</span>
+        <span class="bank-value">8164886717</span>
+      </div>
+
+      <div class="bank-row">
+        <span class="bank-label">Bank</span>
+        <span class="bank-value">PalmPay</span>
+      </div>
+
+    </div>
+
+    <div class="payment-step">
+
+      <div class="payment-step-title">
+        Step 2 — Submit your payment
+      </div>
+
+      <p>
+        After completing the transfer, enter the exact amount and
+        your transaction/reference number below.
+      </p>
+
+      <div class="field">
+        <label>Amount transferred</label>
+        <input
+          id="paymentAmount"
+          type="number"
+          min="1"
+          step="0.01"
+          placeholder="e.g. 500"
+        >
+      </div>
+
+      <div class="field">
+        <label>Transaction / Reference number</label>
+        <input
+          id="paymentReference"
+          type="text"
+          placeholder="Enter your payment reference"
+        >
+      </div>
+
+      <button
+        id="submitPaymentBtn"
+        class="primary-btn"
+        onclick="submitPayment()"
+      >
+        Submit Payment
+      </button>
+
+    </div>
+
+    <div class="payment-step">
+
+      <div class="payment-step-title">
+        What happens next?
+      </div>
+
+      <p>
+        Your payment will appear in our admin payment panel.
+        We will verify the transfer and approve it if the payment
+        is confirmed.
+      </p>
+
+      <p>
+        Once approved, the money will be added to your OlaqVerify
+        wallet.
+      </p>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div id="paymentResultModal" class="modal">
+
+  <div class="modal-box">
+
+    <div class="payment-success">
+
+      <div class="success-icon">
+        ✓
+      </div>
+
+      <h3>
+        Payment Submitted
+      </h3>
+
+      <p>
+        Your payment request has been submitted successfully and
+        is now waiting for verification.
+      </p>
+
+      <button
+        class="primary-btn"
+        onclick="closePaymentResult()"
+      >
+        Done
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div id="orderModal" class="modal">
+
+  <div class="modal-box">
+
+    <button class="close-btn"
+            onclick="closeOrderModal()">
+      ×
+    </button>
+
+    <div class="modal-title">
+      Confirm Order
+    </div>
+
+    <div id="orderConfirmContent"></div>
+
+    <button
+      id="confirmOrderBtn"
+      class="primary-btn"
+      onclick="confirmOrder()"
+    >
+      Confirm Purchase
+    </button>
+
+  </div>
+
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+
+const SUPABASE_URL =
+"https://alemtvfchysptzgzhaap.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_UEnF6pfZ2ORRcuIQUzgbRw_6bWNDnKm";
+
+const db =
+supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+let currentUser = null;
+let currentProfile = null;
+let transactionsEnabled = true;
+let selectedPrice = null;
+
+window.olaqPrices = [];
+window.olaqDeals = [];
+
+function money(value){
+
+  const number = Number(value || 0);
+
+  return "₦" +
+    number.toLocaleString(
+      "en-NG",
+      {
+        minimumFractionDigits:2,
+        maximumFractionDigits:2
+      }
+    );
+}
+
+function escapeHTML(value){
+
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+function notify(message){
+
+  const toast =
+    document.getElementById("toast");
+
+  toast.textContent = message;
+
+  toast.classList.add("show");
+
+  setTimeout(()=>{
+    toast.classList.remove("show");
+  },3000);
+}
+
+function showSignup(){
+
+  document
+    .getElementById("loginBox")
+    .classList.add("hidden");
+
+  document
+    .getElementById("signupBox")
+    .classList.remove("hidden");
+}
+
+function showLogin(){
+
+  document
+    .getElementById("signupBox")
+    .classList.add("hidden");
+
+  document
+    .getElementById("loginBox")
+    .classList.remove("hidden");
+}
+
+async function signup(){
+
+  const name =
+    document.getElementById("signupName").value.trim();
+
+  const email =
+    document.getElementById("signupEmail").value.trim();
+
+  const password =
+    document.getElementById("signupPassword").value;
+
+  if(!name || !email || !password){
+
+    notify("Please fill all fields.");
+    return;
+  }
+
+  if(password.length < 6){
+
+    notify("Password must be at least 6 characters.");
+    return;
+  }
+
+  const {data,error} =
+    await db.auth.signUp({
+      email,
+      password,
+      options:{
+        data:{
+          full_name:name
+        }
+      }
+    });
+
+  if(error){
+
+    notify(error.message);
+    return;
+  }
+
+  if(data.user){
+
+    const profileResult =
+      await db
+        .from("profiles")
+        .upsert({
+          id:data.user.id,
+          email:email,
+          full_name:name,
+          balance:0
+        });
+
+    if(profileResult.error){
+
+      console.error(
+        "Profile creation error:",
+        profileResult.error
+      );
+    }
+  }
+
+  notify("Account created. Please sign in.");
+
+  showLogin();
+}
+
+async function login(){
+
+  const email =
+    document.getElementById("loginEmail").value.trim();
+
+  const password =
+    document.getElementById("loginPassword").value;
+
+  if(!email || !password){
+
+    notify("Enter your email and password.");
+    return;
+  }
+
+  const {data,error} =
+    await db.auth.signInWithPassword({
+      email,
+      password
+    });
+
+  if(error){
+
+    notify(error.message);
+    return;
+  }
+
+  currentUser = data.user;
+
+  await startApp();
+}
+
+async function logout(){
+
+  await db.auth.signOut();
+
+  currentUser = null;
+  currentProfile = null;
+
+  document
+    .getElementById("app")
+    .classList.add("hidden");
+
+  document
+    .getElementById("authPage")
+    .classList.remove("hidden");
+
+  showLogin();
+}
+
+async function loadProfile(){
+
+  if(!currentUser)return;
+
+  let {data,error} =
+    await db
+      .from("profiles")
+      .select("*")
+      .eq("id",currentUser.id)
+      .maybeSingle();
+
+  if(error){
+
+    console.error(error);
+    return;
+  }
+
+  if(!data){
+
+    const result =
+      await db
+        .from("profiles")
+        .insert({
+          id:currentUser.id,
+          email:currentUser.email,
+          full_name:
+            currentUser.user_metadata?.full_name ||
+            "Customer",
+          balance:0
+        })
+        .select()
+        .single();
+
+    if(result.error){
+
+      console.error(
+        "Profile creation error:",
+        result.error
+      );
+
+      return;
+    }
+
+    data = result.data;
+  }
+
+  currentProfile = data;
+
+  updateProfileUI();
+}
+
+function updateProfileUI(){
+
+  if(!currentProfile)return;
+
+  const name =
+    currentProfile.full_name ||
+    currentProfile.name ||
+    "Customer";
+
+  const email =
+    currentProfile.email ||
+    currentUser?.email ||
+    "";
+
+  const balance =
+    Number(currentProfile.balance || 0);
+
+  document.getElementById("headerUser").textContent =
+    name;
+
+  document.getElementById("balance").textContent =
+    money(balance);
+
+  document.getElementById("homeBalance").textContent =
+    money(balance);
+
+  document.getElementById("walletBalance").textContent =
+    money(balance);
+
+  document.getElementById("homeName").textContent =
+    name;
+
+  document.getElementById("homeEmail").textContent =
+    email;
+
+  document.getElementById("settingsName").textContent =
+    name;
+
+  document.getElementById("settingsEmail").textContent =
+    email;
+}
+
+async function loadTransactionSetting(){
+
+  const paused =
+    document.getElementById("transactionsPaused");
+
+  const content =
+    document.getElementById("buyContent");
+
+  if(!paused || !content)return;
+
+  const {data,error} =
+    await db
+      .from("site_settings")
+      .select("value")
+      .eq("key","transactions_enabled")
+      .maybeSingle();
+
+  if(error){
+
+    console.error(
+      "Transaction setting error:",
+      error
+    );
+
+    transactionsEnabled = true;
+
+    updateTransactionUI();
+
+    return;
+  }
+
+  let enabled = true;
+
+  if(data && data.value !== undefined){
+
+    if(typeof data.value === "boolean"){
+
+      enabled = data.value;
+
+    }else if(typeof data.value === "string"){
+
+      enabled = data.value === "true";
+
+    }else if(
+      typeof data.value === "object" &&
+      data.value !== null &&
+      data.value.value !== undefined
+    ){
+
+      enabled = !!data.value.value;
+    }
+  }
+
+  transactionsEnabled = enabled;
+
+  updateTransactionUI();
+}
+
+function updateTransactionUI(){
+
+  const paused =
+    document.getElementById("transactionsPaused");
+
+  const content =
+    document.getElementById("buyContent");
+
+  if(!paused || !content)return;
+
+  if(transactionsEnabled){
+
+    paused.classList.add("hidden");
+    content.classList.remove("hidden");
+
+  }else{
+
+    content.classList.add("hidden");
+    paused.classList.remove("hidden");
+  }
+}
+
+/* =====================================================
+   FLASH DEAL HELPER
+===================================================== */
+
+function getActiveDeal(priceId){
+
+  const now =
+    new Date();
+
+  return (window.olaqDeals || [])
+    .find(deal => {
+
+      if(String(deal.price_id) !== String(priceId)){
+        return false;
+      }
+
+      if(deal.active !== true){
+        return false;
+      }
+
+      if(
+        new Date(deal.starts_at) > now ||
+        new Date(deal.ends_at) <= now
+      ){
+        return false;
+      }
+
+      const quantity =
+        Number(deal.quantity || 0);
+
+      const sold =
+        Number(deal.sold_quantity || 0);
+
+      if(sold >= quantity){
+        return false;
+      }
+
+      return true;
+    }) || null;
+}
+
+async function loadPrices(){
+
+  const list =
+    document.getElementById("pricesList");
+
+  if(!list)return;
+
+  list.innerHTML =
+    `<div class="empty">
+      Loading available services...
+    </div>`;
+
+  /*
+    Load prices
+  */
+
+  const {data:prices,error:pricesError} =
+    await db
+      .from("prices")
+      .select("*")
+      .eq("active",true)
+      .order("country",{ascending:true});
+
+  if(pricesError){
+
+    console.error(
+      "Prices error:",
+      pricesError
+    );
+
+    list.innerHTML =
+      `<div class="empty">
+        Unable to load services.
+      </div>`;
+
+    return;
+  }
+
+  if(!prices || prices.length === 0){
+
+    list.innerHTML =
+      `<div class="empty">
+        <div class="empty-icon">○</div>
+        No services are currently available.
+      </div>`;
+
+    return;
+  }
+
+  /*
+    Load active flash deals
+
+    We deliberately select the fields used
+    by the public Buy page.
+  */
+
+  const now =
+    new Date().toISOString();
+
+  const {data:deals,error:dealsError} =
+    await db
+      .from("deals")
+      .select(`
+        id,
+        price_id,
+        title,
+        description,
+        original_price,
+        deal_price,
+        quantity,
+        sold_quantity,
+        starts_at,
+        ends_at,
+        active
+      `)
+      .eq("active",true)
+      .lte("starts_at",now)
+      .gt("ends_at",now)
+      .order("created_at",{ascending:false});
+
+  if(dealsError){
+
+    console.error(
+      "Deals error:",
+      dealsError
+    );
+
+    /*
+      Do not break the normal price page
+      if the deals query fails.
+    */
+
+    window.olaqDeals = [];
+
+  }else{
+
+    window.olaqDeals =
+      deals || [];
+  }
+
+  window.olaqPrices =
+    prices;
+
+  list.innerHTML =
+    prices.map(item => {
+
+      const normalPrice =
+        Number(item.customer_price || 0);
+
+      const deal =
+        getActiveDeal(item.id);
+
+      let displayedPriceHTML = "";
+
+      let dealBannerHTML = "";
+
+      let buttonText =
+        "Buy Number";
+
+      let buttonClass =
+        "buy-btn";
+
+      if(deal){
+
+        const dealPrice =
+          Number(
+            deal.deal_price ??
+            normalPrice
+          );
+
+        const discount =
+          normalPrice > 0
+            ? Math.max(
+                0,
+                Math.round(
+                  ((normalPrice - dealPrice) /
+                  normalPrice) * 100
+                )
+              )
+            : 0;
+
+        displayedPriceHTML = `
+
+          <div class="deal-price-box">
+
+            <div class="old-price">
+              ${money(normalPrice)}
+            </div>
+
+            <div class="new-price">
+              ${money(dealPrice)}
+            </div>
+
+            <div class="discount-badge">
+              ${discount}% OFF
+            </div>
+
+          </div>
+
+        `;
+
+        dealBannerHTML = `
+
+          <div class="deal-banner">
+
+            🔥 ${escapeHTML(
+              deal.title || "Flash Deal"
+            )}
+
+            ${
+              deal.description
+                ? `
+                  <div style="
+                    margin-top:3px;
+                    font-weight:600;
+                    color:#777;
+                  ">
+                    ${escapeHTML(
+                      deal.description
+                    )}
+                  </div>
+                `
+                : ""
+            }
+
+            <div class="deal-stock">
+
+              ${
+                Math.max(
+                  0,
+                  Number(deal.quantity || 0) -
+                  Number(deal.sold_quantity || 0)
+                )
+              }
+              deal slots remaining
+
+            </div>
+
+          </div>
+
+        `;
+
+        buttonText =
+          "Buy at Deal Price";
+
+        buttonClass =
+          "buy-btn deal-btn";
+
+      }else{
+
+        displayedPriceHTML = `
+
+          <div class="price">
+            ${money(normalPrice)}
+          </div>
+
+        `;
+      }
+
+      return `
+
+        <div class="country-card">
+
+          <div class="country-top">
+
+            <div class="country-info">
+
+              <div class="flag">
+                ${escapeHTML(
+                  item.flag || "🌍"
+                )}
+              </div>
+
+              <div>
+
+                <div class="country-name">
+                  ${escapeHTML(
+                    item.country
+                  )}
+                </div>
+
+                <div class="service-name">
+                  ${escapeHTML(
+                    item.service
+                  )}
+                </div>
+
+              </div>
+
+            </div>
+
+            ${displayedPriceHTML}
+
+          </div>
+
+          ${dealBannerHTML}
+
+          <button
+            class="${buttonClass}"
+            onclick="openOrderConfirmation('${String(item.id).replace(/'/g,"\\'")}')"
+          >
+            ${buttonText}
+          </button>
+
+        </div>
+
+      `;
+
+    }).join("");
+}
+
+async function openBuyPage(navButton){
+
+  openPage(
+    "buyPage",
+    navButton
+  );
+
+  await loadTransactionSetting();
+
+  if(transactionsEnabled){
+
+    await loadPrices();
+
+  }
+}
+
+async function openOrderConfirmation(priceId){
+
+  await loadTransactionSetting();
+
+  if(!transactionsEnabled){
+
+    notify(
+      "Orders are temporarily paused. Please check back shortly."
+    );
+
+    return;
+  }
+
+  const price =
+    (window.olaqPrices || [])
+      .find(
+        x =>
+          String(x.id) ===
+          String(priceId)
+      );
+
+  if(!price){
+
+    notify(
+      "This service is no longer available."
+    );
+
+    return;
+  }
+
+  /*
+    Find active deal
+  */
+
+  const deal =
+    getActiveDeal(price.id);
+
+  selectedPrice =
+    price;
+
+  /*
+    IMPORTANT:
+
+    Store the selected deal separately.
+    This lets the confirmation screen know
+    whether a deal was selected.
+  */
+
+  window.selectedDeal =
+    deal;
+
+  const balance =
+    Number(
+      currentProfile?.balance || 0
+    );
+
+  const normalPrice =
+    Number(
+      price.customer_price || 0
+    );
+
+  const finalPrice =
+    deal
+      ? Number(
+          deal.deal_price ??
+          normalPrice
+        )
+      : normalPrice;
+
+  const discount =
+    deal && normalPrice > 0
+      ? Math.max(
+          0,
+          Math.round(
+            ((normalPrice - finalPrice) /
+            normalPrice) * 100
+          )
+        )
+      : 0;
+
+  document
+    .getElementById(
+      "orderConfirmContent"
+    )
+    .innerHTML = `
+
+      <div class="info-line">
+
+        <span>Country</span>
+
+        <strong>
+
+          ${escapeHTML(
+            price.flag || "🌍"
+          )}
+
+          ${escapeHTML(
+            price.country
+          )}
+
+        </strong>
+
+      </div>
+
+      <div class="info-line">
+
+        <span>Service</span>
+
+        <strong>
+          ${escapeHTML(
+            price.service
+          )}
+        </strong>
+
+      </div>
+
+      ${
+        deal
+          ? `
+
+            <div class="info-line">
+
+              <span>Regular Price</span>
+
+              <strong style="
+                color:#777;
+                text-decoration:line-through;
+              ">
+                ${money(normalPrice)}
+              </strong>
+
+            </div>
+
+            <div class="info-line">
+
+              <span>Flash Deal</span>
+
+              <strong style="
+                color:#dc2626;
+              ">
+                ${money(finalPrice)}
+
+                <span style="
+                  display:inline-block;
+                  margin-left:5px;
+                  background:#dc2626;
+                  color:#fff;
+                  padding:3px 6px;
+                  border-radius:5px;
+                  font-size:10px;
+                ">
+                  ${discount}% OFF
+                </span>
+
+              </strong>
+
+            </div>
+
+            <div style="
+              margin:12px 0;
+              padding:11px;
+              background:#fff1f2;
+              border:1px solid #fecdd3;
+              border-radius:10px;
+              color:#dc2626;
+              font-size:12px;
+              font-weight:800;
+            ">
+
+              🔥 ${escapeHTML(
+                deal.title || "Flash Deal"
+              )}
+
+            </div>
+
+          `
+          : `
+
+            <div class="info-line">
+
+              <span>Price</span>
+
+              <strong>
+                ${money(normalPrice)}
+              </strong>
+
+            </div>
+
+          `
+      }
+
+      <div class="info-line">
+
+        <span>Your balance</span>
+
+        <strong>
+          ${money(balance)}
+        </strong>
+
+      </div>
+
+      ${
+        deal
+          ? `
+
+            <div style="
+              margin-top:12px;
+              padding:10px;
+              background:#f0fdf4;
+              color:#166534;
+              border-radius:9px;
+              font-size:12px;
+              font-weight:800;
+              text-align:center;
+            ">
+
+              You save
+              ${money(
+                normalPrice -
+                finalPrice
+              )}
+
+            </div>
+
+          `
+          : ""
+      }
+
+    `;
+
+  document
+    .getElementById(
+      "orderModal"
+    )
+    .classList.add("show");
+}
+
+function closeOrderModal(){
+
+  document
+    .getElementById(
+      "orderModal"
+    )
+    .classList.remove("show");
+
+  selectedPrice =
+    null;
+
+  window.selectedDeal =
+    null;
+}
+
+async function confirmOrder(){
+
+  if(!selectedPrice){
+
+    notify(
+      "Please select a service."
+    );
+
+    return;
+  }
+
+  await loadTransactionSetting();
+
+  if(!transactionsEnabled){
+
+    closeOrderModal();
+
+    notify(
+      "Orders are temporarily paused. Please check back shortly."
+    );
+
+    return;
+  }
+
+  const price =
+    selectedPrice;
+
+  const deal =
+    window.selectedDeal ||
+    getActiveDeal(price.id);
+
+  const balance =
+    Number(
+      currentProfile?.balance || 0
+    );
+
+  /*
+    Display amount.
+
+    NOTE:
+    The actual wallet charge is controlled
+    by the Supabase place_order RPC.
+  */
+
+  const normalPrice =
+    Number(
+      price.customer_price || 0
+    );
+
+  const amount =
+    deal
+      ? Number(
+          deal.deal_price ??
+          normalPrice
+        )
+      : normalPrice;
+
+  if(balance < amount){
+
+    notify(
+      "Insufficient wallet balance."
+    );
+
+    return;
+  }
+
+  const button =
+    document.getElementById(
+      "confirmOrderBtn"
+    );
+
+  button.disabled =
+    true;
+
+  button.textContent =
+    "Processing...";
+
+  try{
+
+    /*
+      Existing Supabase function:
+
+      place_order(
+        p_country text,
+        p_service text
+      )
+
+      We keep this signature unchanged.
+    */
+
+    const {data,error} =
+      await db.rpc(
+        "place_order",
+        {
+          p_country:
+            String(
+              price.country
+            ),
+
+          p_service:
+            String(
+              price.service
+            )
+        }
+      );
+
+    if(error){
+
+      console.error(
+        "place_order error:",
+        error
+      );
+
+      notify(
+        "Order failed: " +
+        error.message
+      );
+
+      return;
+    }
+
+    console.log(
+      "place_order result:",
+      data
+    );
+
+    closeOrderModal();
+
+    notify(
+      "Order placed successfully."
+    );
+
+    await loadProfile();
+
+    await loadOrders();
+
+    openPage(
+      "ordersPage"
+    );
+
+  }catch(err){
+
+    console.error(
+      "Unexpected order error:",
+      err
+    );
+
+    notify(
+      "Something went wrong while placing the order."
+    );
+
+  }finally{
+
+    button.disabled =
+      false;
+
+    button.textContent =
+      "Confirm Purchase";
+  }
+}
+
+function openTopup(){
+
+  document
+    .getElementById(
+      "topupModal"
+    )
+    .classList.add("show");
+
+  document
+    .getElementById(
+      "paymentAmount"
+    )
+    .value = "";
+
+  document
+    .getElementById(
+      "paymentReference"
+    )
+    .value = "";
+}
+
+function closeTopup(){
+
+  document
+    .getElementById(
+      "topupModal"
+    )
+    .classList.remove("show");
+}
+
+async function submitPayment(){
+
+  if(!currentUser){
+
+    notify(
+      "Please sign in first."
+    );
+
+    return;
+  }
+
+  const amountInput =
+    document.getElementById(
+      "paymentAmount"
+    );
+
+  const referenceInput =
+    document.getElementById(
+      "paymentReference"
+    );
+
+  const amount =
+    Number(
+      amountInput.value
+    );
+
+  const reference =
+    referenceInput.value.trim();
+
+  if(!amount || amount <= 0){
+
+    notify(
+      "Enter the amount you transferred."
+    );
+
+    return;
+  }
+
+  if(!reference){
+
+    notify(
+      "Enter your transaction/reference number."
+    );
+
+    return;
+  }
+
+  const button =
+    document.getElementById(
+      "submitPaymentBtn"
+    );
+
+  button.disabled =
+    true;
+
+  button.textContent =
+    "Submitting...";
+
+  try{
+
+    const {error} =
+      await db
+        .from("payment_requests")
+        .insert({
+          user_id:
+            currentUser.id,
+
+          amount:
+            amount,
+
+          reference:
+            reference,
+
+          status:
+            "pending"
+        });
+
+    if(error){
+
+      console.error(
+        "Payment request error:",
+        error
+      );
+
+      notify(
+        error.message
+      );
+
+      return;
+    }
+
+    closeTopup();
+
+    document
+      .getElementById(
+        "paymentResultModal"
+      )
+      .classList.add("show");
+
+    await loadPaymentHistory();
+
+  }finally{
+
+    button.disabled =
+      false;
+
+    button.textContent =
+      "Submit Payment";
+  }
+}
+
+function closePaymentResult(){
+
+  document
+    .getElementById(
+      "paymentResultModal"
+    )
+    .classList.remove("show");
+}
+
+async function loadPaymentHistory(){
+
+  if(!currentUser)return;
+
+  const box =
+    document.getElementById(
+      "paymentHistory"
+    );
+
+  if(!box)return;
+
+  const {data,error} =
+    await db
+      .from("payment_requests")
+      .select("*")
+      .eq(
+        "user_id",
+        currentUser.id
+      )
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      );
+
+  if(error){
+
+    console.error(error);
+
+    box.innerHTML =
+      `<div class="empty">
+        Unable to load payment history.
+      </div>`;
+
+    return;
+  }
+
+  if(!data || data.length === 0){
+
+    box.innerHTML =
+      `<div class="empty">
+        No payment requests yet.
+      </div>`;
+
+    return;
+  }
+
+  box.innerHTML =
+    data.map(payment=>{
+
+      const status =
+        String(
+          payment.status ||
+          "pending"
+        ).toLowerCase();
+
+      let statusClass =
+        "pending";
+
+      if(status === "approved"){
+        statusClass =
+          "approved";
+      }
+
+      if(status === "declined"){
+        statusClass =
+          "declined";
+      }
+
+      const date =
+        payment.created_at
+          ? new Date(
+              payment.created_at
+            ).toLocaleString(
+              "en-NG"
+            )
+          : "—";
+
+      return `
+
+        <div class="order-card">
+
+          <div class="order-top">
+
+            <div>
+
+              <div class="order-country">
+                Wallet Funding
+              </div>
+
+              <div class="order-id">
+                Ref:
+                ${escapeHTML(
+                  payment.reference
+                )}
+              </div>
+
+            </div>
+
+            <span class="status ${statusClass}">
+              ${escapeHTML(
+                payment.status ||
+                "pending"
+              )}
+            </span>
+
+          </div>
+
+          <div class="info-line">
+
+            <span>Amount</span>
+
+            <strong>
+              ${money(
+                payment.amount
+              )}
+            </strong>
+
+          </div>
+
+          <div class="info-line">
+
+            <span>Date</span>
+
+            <strong>
+              ${escapeHTML(
+                date
+              )}
+            </strong>
+
+          </div>
+
+        </div>
+      `;
+
+    }).join("");
+}
+
+async function loadOrders(){
+
+  if(!currentUser)return;
+
+  const list =
+    document.getElementById(
+      "ordersList"
+    );
+
+  if(!list)return;
+
+  list.innerHTML =
+    `<div class="empty">
+      Loading orders...
+    </div>`;
+
+  const {data,error} =
+    await db
+      .from("orders")
+      .select("*")
+      .eq(
+        "user_id",
+        currentUser.id
+      )
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      );
+
+  if(error){
+
+    console.error(
+      "Orders error:",
+      error
+    );
+
+    list.innerHTML =
+      `<div class="empty">
+        Unable to load orders.
+      </div>`;
+
+    return;
+  }
+
+  if(!data || data.length === 0){
+
+    list.innerHTML =
+      `<div class="empty">
+
+        <div class="empty-icon">
+          ▣
+        </div>
+
+        You don't have any orders yet.
+
+      </div>`;
+
+    return;
+  }
+
+  list.innerHTML =
+    data.map(order=>{
+
+      const status =
+        String(
+          order.status ||
+          "pending"
+        ).toLowerCase();
+
+      let statusClass =
+        "pending";
+
+      if(
+        status === "approved" ||
+        status === "completed" ||
+        status === "fulfilled"
+      ){
+
+        statusClass =
+          "approved";
+
+      }else if(
+        status === "declined" ||
+        status === "cancelled"
+      ){
+
+        statusClass =
+          "declined";
+      }
+
+      const created =
+        order.created_at
+          ? new Date(
+              order.created_at
+            ).toLocaleString(
+              "en-NG"
+            )
+          : "—";
+
+      return `
+
+        <div class="order-card">
+
+          <div class="order-top">
+
+            <div>
+
+              <div class="order-country">
+
+                ${escapeHTML(
+                  order.country ||
+                  order.service ||
+                  "Verification Order"
+                )}
+
+              </div>
+
+              <div class="order-id">
+
+                ID:
+                ${escapeHTML(
+                  order.id
+                )}
+
+              </div>
+
+            </div>
+
+            <span class="status ${statusClass}">
+
+              ${escapeHTML(
+                order.status ||
+                "Pending"
+              )}
+
+            </span>
+
+          </div>
+
+          <div class="info-line">
+
+            <span>Service</span>
+
+            <strong>
+              ${escapeHTML(
+                order.service ||
+                "—"
+              )}
+            </strong>
+
+          </div>
+
+          <div class="info-line">
+
+            <span>Phone Number</span>
+
+            <strong>
+              ${escapeHTML(
+                order.assigned_number ||
+                order.phone_number ||
+                "Waiting for number"
+              )}
+            </strong>
+
+          </div>
+
+          <div class="info-line">
+
+            <span>Amount</span>
+
+            <strong>
+              ${money(
+                order.amount ||
+                order.customer_price ||
+                order.price ||
+                0
+              )}
+            </strong>
+
+          </div>
+
+          <div class="info-line">
+
+            <span>Date</span>
+
+            <strong>
+              ${escapeHTML(
+                created
+              )}
+            </strong>
+
+          </div>
+
+          <div
+            id="sms-${escapeHTML(order.id)}"
+            style="margin-top:12px"
+          ></div>
+
+        </div>
+      `;
+
+    }).join("");
+
+  for(const order of data){
+
+    await loadOrderMessages(
+      order.id
+    );
+  }
+}
+
+async function loadOrderMessages(orderId){
+
+  const target =
+    document.getElementById(
+      "sms-" + orderId
+    );
+
+  if(!target)return;
+
+  const {data,error} =
+    await db
+      .from("messages")
+      .select("*")
+      .eq(
+        "order_id",
+        orderId
+      )
+      .order(
+        "created_at",
+        {
+          ascending:true
+        }
+      );
+
+  if(error){
+
+    console.error(error);
+    return;
+  }
+
+  if(!data || data.length === 0){
+    return;
+  }
+
+  target.innerHTML = `
+
+    <div style="
+      margin-top:10px;
+      padding:12px;
+      border-radius:12px;
+      background:#f5f3ff;
+    ">
+
+      <div style="
+        font-weight:900;
+        color:#5b21b6;
+        margin-bottom:7px;
+      ">
+        SMS / Verification Code
+      </div>
+
+      ${
+        data.map(msg=>`
+
+          <div style="
+            padding:9px 0;
+            border-bottom:1px solid #ddd;
+          ">
+
+            <div style="
+              font-size:11px;
+              color:#777;
+            ">
+              ${escapeHTML(
+                msg.sender ||
+                "SMS"
+              )}
+            </div>
+
+            <div style="
+              font-size:14px;
+              margin-top:3px;
+              word-break:break-word;
+            ">
+              ${escapeHTML(
+                msg.message ||
+                ""
+              )}
+            </div>
+
+          </div>
+
+        `).join("")
+      }
+
+    </div>
+  `;
+}
+
+function openPage(
+  pageId,
+  navButton
+){
+
+  document
+    .querySelectorAll(
+      ".content-page"
+    )
+    .forEach(page=>{
+      page.classList.remove(
+        "active"
+      );
+    });
+
+  const page =
+    document.getElementById(
+      pageId
+    );
+
+  if(page){
+    page.classList.add(
+      "active"
+    );
+  }
+
+  document
+    .querySelectorAll(
+      ".nav-btn"
+    )
+    .forEach(btn=>{
+      btn.classList.remove(
+        "active"
+      );
+    });
+
+  if(navButton){
+
+    navButton.classList.add(
+      "active"
+    );
+
+  }else{
+
+    const map = {
+      homePage:0,
+      buyPage:1,
+      ordersPage:2,
+      walletPage:3,
+      settingsPage:4
+    };
+
+    if(
+      map[pageId] !==
+      undefined
+    ){
+
+      const buttons =
+        document.querySelectorAll(
+          ".nav-btn"
+        );
+
+      buttons[
+        map[pageId]
+      ]?.classList.add(
+        "active"
+      );
+    }
+  }
+
+  if(
+    pageId ===
+    "ordersPage"
+  ){
+
+    loadOrders();
+
+  }else if(
+    pageId ===
+    "walletPage"
+  ){
+
+    loadPaymentHistory();
+
+  }else if(
+    pageId ===
+    "buyPage"
+  ){
+
+    loadTransactionSetting();
+
+    if(transactionsEnabled){
+
+      loadPrices();
+
+    }
+  }
+}
+
+async function startApp(){
+
+  document
+    .getElementById(
+      "authPage"
+    )
+    .classList.add(
+      "hidden"
+    );
+
+  document
+    .getElementById(
+      "app"
+    )
+    .classList.remove(
+      "hidden"
+    );
+
+  await loadProfile();
+
+  await loadTransactionSetting();
+
+  if(transactionsEnabled){
+
+    await loadPrices();
+
+  }
+
+  await loadOrders();
+
+  await loadPaymentHistory();
+}
+
+async function init(){
+
+  const {data} =
+    await db.auth.getSession();
+
+  if(data.session){
+
+    currentUser =
+      data.session.user;
+
+    await startApp();
+
+  }else{
+
+    document
+      .getElementById(
+        "authPage"
+      )
+      .classList.remove(
+        "hidden"
+      );
+
+    document
+      .getElementById(
+        "app"
+      )
+      .classList.add(
+        "hidden"
+      );
+  }
+}
+
+db.auth.onAuthStateChange(
+  async(
+    event,
+    session
+  )=>{
+
+    if(
+      event ===
+      "SIGNED_IN" &&
+      session?.user
+    ){
+
+      currentUser =
+        session.user;
+
+      await startApp();
+    }
+
+  }
+);
+
+/*
+  Refresh transaction status
+  and prices/deals periodically.
+*/
+
+setInterval(
+  async()=>{
+
+    if(
+      currentUser &&
+      !document
+        .getElementById("app")
+        ?.classList
+        .contains("hidden")
+    ){
+
+      await loadTransactionSetting();
+
+      const buyPage =
+        document.getElementById(
+          "buyPage"
+        );
+
+      if(
+        buyPage &&
+        buyPage.classList
+          .contains("active") &&
+        transactionsEnabled
+      ){
+
+        await loadPrices();
+      }
+    }
+
+  },
+  15000
+);
+
+init();
+
+</script>
+
+</body>
+</html>
