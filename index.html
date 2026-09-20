@@ -1,0 +1,3688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>OlaqVerify</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root{
+  --purple:#6d28d9;
+  --purple2:#4c1d95;
+  --purple3:#8b5cf6;
+  --red:#ef4444;
+  --red2:#dc2626;
+  --green:#16a34a;
+  --orange:#f59e0b;
+  --blue:#2563eb;
+  --bg:#f7f5ff;
+  --card:#fff;
+  --text:#171323;
+  --muted:#746d80;
+  --border:#ebe7f3;
+  --shadow:0 12px 35px rgba(76,29,149,.10);
+}
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+
+button,input,select,textarea{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+}
+
+.hidden{
+  display:none!important;
+}
+
+/* AUTH */
+
+.auth{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:
+    radial-gradient(circle at top left,#8b5cf655,transparent 35%),
+    radial-gradient(circle at bottom right,#ef444455,transparent 35%),
+    #f7f5ff;
+}
+
+.auth-card{
+  width:100%;
+  max-width:430px;
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:25px;
+  padding:30px;
+  box-shadow:var(--shadow);
+}
+
+.logo{
+  width:62px;
+  height:62px;
+  border-radius:18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+  font-size:28px;
+  font-weight:900;
+  background:linear-gradient(135deg,var(--purple),var(--red));
+  margin-bottom:15px;
+}
+
+.auth-card h1{
+  margin:0 0 7px;
+}
+
+.auth-card p{
+  color:var(--muted);
+}
+
+.input{
+  width:100%;
+  border:1px solid var(--border);
+  border-radius:13px;
+  padding:14px;
+  margin-top:8px;
+  outline:none;
+  background:#fff;
+}
+
+.input:focus{
+  border-color:var(--purple3);
+  box-shadow:0 0 0 3px #8b5cf622;
+}
+
+.primary{
+  border:0;
+  color:#fff;
+  background:linear-gradient(135deg,var(--purple),var(--red));
+  padding:13px 18px;
+  border-radius:13px;
+  font-weight:800;
+}
+
+.secondary{
+  border:1px solid var(--border);
+  color:var(--text);
+  background:#fff;
+  padding:12px 16px;
+  border-radius:12px;
+  font-weight:700;
+}
+
+.danger{
+  border:0;
+  color:#991b1b;
+  background:#fee2e2;
+  padding:11px 15px;
+  border-radius:11px;
+  font-weight:700;
+}
+
+/* APP */
+
+.app{
+  min-height:100vh;
+}
+
+.topbar{
+  position:sticky;
+  top:0;
+  z-index:30;
+  height:72px;
+  background:#fff;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 25px;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:11px;
+  font-size:20px;
+  font-weight:900;
+}
+
+.brand-icon{
+  width:43px;
+  height:43px;
+  border-radius:13px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+  background:linear-gradient(135deg,var(--purple),var(--red));
+}
+
+.top-right{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.balance-mini{
+  background:#f0e7ff;
+  color:var(--purple);
+  padding:9px 13px;
+  border-radius:999px;
+  font-weight:800;
+}
+
+.logout{
+  border:0;
+  background:#fee2e2;
+  color:#b91c1c;
+  padding:9px 13px;
+  border-radius:10px;
+  font-weight:700;
+}
+
+/* LAYOUT */
+
+.layout{
+  display:flex;
+  min-height:calc(100vh - 72px);
+}
+
+.sidebar{
+  width:235px;
+  background:#fff;
+  border-right:1px solid var(--border);
+  padding:20px 14px;
+}
+
+.nav-btn{
+  width:100%;
+  border:0;
+  background:transparent;
+  text-align:left;
+  padding:13px 14px;
+  border-radius:12px;
+  margin-bottom:6px;
+  font-weight:700;
+  color:#5e5768;
+}
+
+.nav-btn:hover,
+.nav-btn.active{
+  background:#f0e7ff;
+  color:var(--purple);
+}
+
+.main{
+  flex:1;
+  padding:25px;
+  max-width:1500px;
+}
+
+.section{
+  display:none;
+}
+
+.section.active{
+  display:block;
+}
+
+.page-title{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:15px;
+  margin-bottom:20px;
+}
+
+.page-title h1{
+  margin:0;
+  font-size:27px;
+}
+
+.page-title p{
+  color:var(--muted);
+  margin:6px 0 0;
+}
+
+/* HERO */
+
+.hero{
+  background:
+    radial-gradient(circle at 100% 0,#ef444466,transparent 35%),
+    linear-gradient(135deg,var(--purple2),var(--purple));
+  color:#fff;
+  border-radius:24px;
+  padding:25px;
+  margin-bottom:20px;
+  box-shadow:0 18px 45px #4c1d9540;
+}
+
+.hero-top{
+  display:flex;
+  justify-content:space-between;
+  gap:20px;
+  align-items:flex-start;
+}
+
+.hero small{
+  opacity:.8;
+}
+
+.hero h2{
+  font-size:36px;
+  margin:8px 0;
+}
+
+.hero p{
+  opacity:.85;
+  margin:0;
+}
+
+.hero-actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:20px;
+}
+
+.hero-actions button{
+  border:0;
+  padding:11px 15px;
+  border-radius:11px;
+  font-weight:800;
+}
+
+.white-btn{
+  background:#fff;
+  color:var(--purple);
+}
+
+.soft-btn{
+  background:#ffffff22;
+  color:#fff;
+  border:1px solid #ffffff33!important;
+}
+
+/* CARDS */
+
+.cards{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:15px;
+  margin-bottom:20px;
+}
+
+.card{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:20px;
+  box-shadow:var(--shadow);
+  margin-bottom:18px;
+}
+
+.stat-label{
+  color:var(--muted);
+  font-size:13px;
+  font-weight:700;
+}
+
+.stat-value{
+  font-size:25px;
+  font-weight:900;
+  margin-top:8px;
+}
+
+.card h3{
+  margin-top:0;
+}
+
+/* OFFER */
+
+.offer{
+  border-radius:18px;
+  padding:20px;
+  background:linear-gradient(135deg,#f0e7ff,#fff);
+  border:1px solid #ddd0ff;
+  margin-bottom:20px;
+}
+
+.offer strong{
+  color:var(--purple);
+}
+
+.offer button{
+  margin-top:12px;
+}
+
+/* QUICK */
+
+.quick{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+  margin-bottom:20px;
+}
+
+.quick button{
+  border:1px solid var(--border);
+  background:#fff;
+  border-radius:15px;
+  padding:17px 10px;
+  font-weight:800;
+  box-shadow:var(--shadow);
+}
+
+/* SEARCH */
+
+.search-row{
+  display:flex;
+  gap:10px;
+  margin-bottom:18px;
+}
+
+.search-row .input{
+  margin:0;
+}
+
+/* COUNTRY */
+
+.country-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+}
+
+.country{
+  border:1px solid var(--border);
+  background:#fff;
+  border-radius:15px;
+  padding:15px;
+  text-align:left;
+  font-weight:800;
+}
+
+.country:hover{
+  border-color:var(--purple3);
+  box-shadow:0 7px 20px #6d28d91a;
+}
+
+/* NUMBERS */
+
+.number-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:15px;
+}
+
+.number-card{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:18px;
+  box-shadow:var(--shadow);
+}
+
+.number-country{
+  font-weight:800;
+  color:var(--purple);
+}
+
+.number-phone{
+  font-size:20px;
+  font-weight:900;
+  margin:10px 0;
+  word-break:break-word;
+}
+
+.number-bottom{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+}
+
+.price{
+  font-size:18px;
+  font-weight:900;
+}
+
+.buy-btn{
+  border:0;
+  color:#fff;
+  background:linear-gradient(135deg,var(--purple),var(--red));
+  padding:10px 13px;
+  border-radius:10px;
+  font-weight:800;
+}
+
+/* TABLE */
+
+.table-wrap{
+  overflow-x:auto;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:650px;
+}
+
+th,td{
+  text-align:left;
+  padding:13px 10px;
+  border-bottom:1px solid var(--border);
+  font-size:14px;
+}
+
+th{
+  color:#675f70;
+  font-size:12px;
+  text-transform:uppercase;
+}
+
+.status{
+  display:inline-block;
+  padding:6px 9px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:800;
+}
+
+.status.pending{
+  background:#fef3c7;
+  color:#92400e;
+}
+
+.status.approved,
+.status.available{
+  background:#dcfce7;
+  color:#166534;
+}
+
+.status.declined,
+.status.disabled{
+  background:#fee2e2;
+  color:#991b1b;
+}
+
+.status.sold{
+  background:#e0e7ff;
+  color:#3730a3;
+}
+
+/* WALLET */
+
+.wallet-box{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:15px;
+}
+
+.wallet-info{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:20px;
+}
+
+.wallet-number{
+  font-size:30px;
+  font-weight:900;
+  color:var(--purple);
+  margin:10px 0;
+}
+
+/* FORM */
+
+.form-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:14px;
+}
+
+.field label{
+  display:block;
+  font-size:13px;
+  font-weight:800;
+  margin-bottom:5px;
+}
+
+/* MODAL */
+
+.modal{
+  position:fixed;
+  inset:0;
+  z-index:100;
+  background:#0008;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+
+.modal-box{
+  width:100%;
+  max-width:510px;
+  max-height:90vh;
+  overflow:auto;
+  background:#fff;
+  border-radius:20px;
+  padding:24px;
+  box-shadow:0 25px 70px #0004;
+}
+
+.modal-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.close{
+  border:0;
+  background:#f3f4f6;
+  width:35px;
+  height:35px;
+  border-radius:10px;
+}
+
+.payment-reference{
+  background:#f5f3ff;
+  border:1px dashed var(--purple3);
+  border-radius:13px;
+  padding:14px;
+  margin:15px 0;
+  word-break:break-all;
+}
+
+.reference{
+  font-weight:900;
+  color:var(--purple);
+}
+
+/* ALERT */
+
+.alert{
+  position:fixed;
+  right:20px;
+  bottom:20px;
+  z-index:300;
+  max-width:360px;
+  padding:14px 17px;
+  border-radius:13px;
+  color:#fff;
+  background:#171323;
+  box-shadow:0 15px 40px #0004;
+}
+
+.alert.success{
+  background:var(--green);
+}
+
+.alert.error{
+  background:var(--red2);
+}
+
+/* EMPTY */
+
+.empty{
+  padding:30px;
+  text-align:center;
+  color:var(--muted);
+}
+
+/* MOBILE */
+
+.mobile-nav{
+  display:none;
+}
+
+@media(max-width:1050px){
+
+  .cards{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .number-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .country-grid{
+    grid-template-columns:repeat(3,1fr);
+  }
+}
+
+@media(max-width:900px){
+
+  .sidebar{
+    display:none;
+  }
+
+  .main{
+    padding:18px;
+    padding-bottom:90px;
+  }
+
+  .mobile-nav{
+    position:fixed;
+    display:flex;
+    bottom:0;
+    left:0;
+    right:0;
+    z-index:50;
+    background:#fff;
+    border-top:1px solid var(--border);
+    padding:8px;
+    gap:5px;
+  }
+
+  .mobile-nav button{
+    flex:1;
+    border:0;
+    background:#fff;
+    padding:8px 3px;
+    border-radius:10px;
+    font-size:11px;
+    font-weight:700;
+  }
+
+  .mobile-nav button.active{
+    background:#f0e7ff;
+    color:var(--purple);
+  }
+
+  .hero-top{
+    display:block;
+  }
+}
+
+@media(max-width:650px){
+
+  .cards{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .quick{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .number-grid{
+    grid-template-columns:1fr;
+  }
+
+  .country-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .wallet-box{
+    grid-template-columns:1fr;
+  }
+
+  .form-grid{
+    grid-template-columns:1fr;
+  }
+
+  .topbar{
+    padding:0 14px;
+  }
+
+  .brand span{
+    font-size:17px;
+  }
+
+  .balance-mini{
+    font-size:12px;
+    padding:8px;
+  }
+
+  .logout{
+    display:none;
+  }
+
+  .hero{
+    padding:20px;
+  }
+
+  .hero h2{
+    font-size:29px;
+  }
+
+  .page-title h1{
+    font-size:22px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- =========================================================
+     AUTH SCREEN
+========================================================= -->
+
+<div id="authScreen" class="auth">
+
+  <div class="auth-card">
+
+    <div class="logo">O</div>
+
+    <h1 id="authTitle">Welcome to OlaqVerify</h1>
+
+    <p id="authSubtitle">
+      Sign in to manage your wallet and authorized testing services.
+    </p>
+
+    <div id="signupNameBox" class="hidden">
+
+      <input
+        id="signupName"
+        class="input"
+        type="text"
+        placeholder="Full name">
+
+    </div>
+
+    <input
+      id="authEmail"
+      class="input"
+      type="email"
+      placeholder="Email address"
+      autocomplete="email">
+
+    <input
+      id="authPassword"
+      class="input"
+      type="password"
+      placeholder="Password"
+      autocomplete="current-password">
+
+    <button
+      id="authBtn"
+      class="primary"
+      style="width:100%;margin-top:15px"
+      onclick="handleAuth()">
+
+      Sign in
+
+    </button>
+
+    <button
+      id="switchAuthBtn"
+      class="secondary"
+      style="width:100%;margin-top:10px"
+      onclick="switchAuthMode()">
+
+      Create account
+
+    </button>
+
+    <p
+      id="authMessage"
+      style="font-size:13px;margin-top:14px">
+    </p>
+
+  </div>
+
+</div>
+
+
+<!-- =========================================================
+     MAIN APP
+========================================================= -->
+
+<div id="app" class="app hidden">
+
+  <header class="topbar">
+
+    <div class="brand">
+
+      <div class="brand-icon">
+        O
+      </div>
+
+      <span>
+        OlaqVerify
+      </span>
+
+    </div>
+
+    <div class="top-right">
+
+      <div class="balance-mini">
+        <span id="topBalance">₦0.00</span>
+      </div>
+
+      <button
+        class="logout"
+        onclick="logout()">
+
+        Logout
+
+      </button>
+
+    </div>
+
+  </header>
+
+
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+      <button
+        class="nav-btn active"
+        onclick="showSection('home',this)">
+
+        🏠 Dashboard
+
+      </button>
+
+      <button
+        class="nav-btn"
+        onclick="showSection('buy',this)">
+
+        📱 Testing Numbers
+
+      </button>
+
+      <button
+        class="nav-btn"
+        onclick="showSection('orders',this)">
+
+        🛒 My Orders
+
+      </button>
+
+      <button
+        class="nav-btn"
+        onclick="showSection('wallet',this)">
+
+        💳 Wallet
+
+      </button>
+
+      <button
+        class="nav-btn"
+        onclick="showSection('transactions',this)">
+
+        📄 Transactions
+
+      </button>
+
+      <button
+        class="nav-btn"
+        onclick="showSection('support',this)">
+
+        💬 Support
+
+      </button>
+
+      <button
+        class="nav-btn"
+        onclick="showSection('settings',this)">
+
+        ⚙️ Settings
+
+      </button>
+
+    </aside>
+
+
+    <!-- MAIN -->
+
+    <main class="main">
+
+      <!-- ===================================================
+           HOME
+      =================================================== -->
+
+      <section
+        id="home"
+        class="section active">
+
+        <div class="hero">
+
+          <div class="hero-top">
+
+            <div>
+
+              <small>
+                Available wallet balance
+              </small>
+
+              <h2 id="heroBalance">
+                ₦0.00
+              </h2>
+
+              <p id="welcomeText">
+                Welcome to OlaqVerify.
+              </p>
+
+            </div>
+
+          </div>
+
+          <div class="hero-actions">
+
+            <button
+              class="white-btn"
+              onclick="openTopupModal()">
+
+              + Top Up
+
+            </button>
+
+            <button
+              class="soft-btn"
+              onclick="showSectionById('transactions')">
+
+              Transactions
+
+            </button>
+
+            <button
+              class="soft-btn"
+              onclick="showSectionById('support')">
+
+              Support
+
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <div class="offer">
+
+          <strong>
+            OlaqVerify Authorized Testing Services
+          </strong>
+
+          <p>
+            Fund your wallet and use your balance for
+            available authorized testing-number inventory.
+          </p>
+
+          <button
+            class="primary"
+            onclick="showSectionById('buy')">
+
+            View available numbers
+
+          </button>
+
+        </div>
+
+
+        <div class="quick">
+
+          <button onclick="openTopupModal()">
+            💳<br>
+            Top Up
+          </button>
+
+          <button onclick="showSectionById('transactions')">
+            📄<br>
+            Transactions
+          </button>
+
+          <button onclick="showSectionById('orders')">
+            🛒<br>
+            Orders
+          </button>
+
+          <button onclick="showSectionById('support')">
+            💬<br>
+            Support
+          </button>
+
+        </div>
+
+
+        <div class="cards">
+
+          <div class="card">
+
+            <div class="stat-label">
+              Available Numbers
+            </div>
+
+            <div
+              id="homeNumbers"
+              class="stat-value">
+              0
+            </div>
+
+          </div>
+
+          <div class="card">
+
+            <div class="stat-label">
+              My Orders
+            </div>
+
+            <div
+              id="homeOrders"
+              class="stat-value">
+              0
+            </div>
+
+          </div>
+
+          <div class="card">
+
+            <div class="stat-label">
+              Pending Top Ups
+            </div>
+
+            <div
+              id="homePending"
+              class="stat-value">
+              0
+            </div>
+
+          </div>
+
+          <div class="card">
+
+            <div class="stat-label">
+              Account
+            </div>
+
+            <div
+              id="homeAccount"
+              class="stat-value"
+              style="font-size:17px">
+              Active
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- ===================================================
+           BUY
+      =================================================== -->
+
+      <section
+        id="buy"
+        class="section">
+
+        <div class="page-title">
+
+          <div>
+
+            <h1>
+              Authorized Testing Numbers
+            </h1>
+
+            <p>
+              Browse numbers that have been added to your authorized inventory.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div class="search-row">
+
+          <input
+            id="numberSearch"
+            class="input"
+            placeholder="Search country or number..."
+            oninput="filterNumbers()">
+
+        </div>
+
+
+        <div
+          id="numberGrid"
+          class="number-grid">
+
+        </div>
+
+      </section>
+
+
+      <!-- ===================================================
+           ORDERS
+      =================================================== -->
+
+      <section
+        id="orders"
+        class="section">
+
+        <div class="page-title">
+
+          <div>
+
+            <h1>
+              My Orders
+            </h1>
+
+            <p>
+              View your authorized testing service orders.
+            </p>
+
+          </div>
+
+          <button
+            class="secondary"
+            onclick="loadOrders()">
+
+            ↻ Refresh
+
+          </button>
+
+        </div>
+
+
+        <div class="card">
+
+          <div class="table-wrap">
+
+            <table>
+
+              <thead>
+
+                <tr>
+                  <th>Order</th>
+                  <th>Country</th>
+                  <th>Number</th>
+                  <th>Price</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                </tr>
+
+              </thead>
+
+              <tbody id="ordersTable">
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- ===================================================
+           WALLET
+      =================================================== -->
+
+      <section
+        id="wallet"
+        class="section">
+
+        <div class="page-title">
+
+          <div>
+
+            <h1>
+              Wallet
+            </h1>
+
+            <p>
+              Manage your OlaqVerify wallet.
+            </p>
+
+          </div>
+
+          <button
+            class="primary"
+            onclick="openTopupModal()">
+
+            + Top Up
+
+          </button>
+
+        </div>
+
+
+        <div class="wallet-box">
+
+          <div class="wallet-info">
+
+            <div class="stat-label">
+              Current balance
+            </div>
+
+            <div
+              id="walletBalance"
+              class="wallet-number">
+              ₦0.00
+            </div>
+
+            <p style="color:var(--muted)">
+              Your balance changes only after a payment
+              request has been reviewed and approved.
+            </p>
+
+          </div>
+
+
+          <div class="wallet-info">
+
+            <div class="stat-label">
+              Account status
+            </div>
+
+            <div
+              class="wallet-number"
+              style="font-size:23px">
+
+              Active
+
+            </div>
+
+            <p
+              id="walletEmail"
+              style="color:var(--muted)">
+              -
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div class="card">
+
+          <h3>
+            PalmPay payment details
+          </h3>
+
+          <p>
+            Use the payment details supplied by the OlaqVerify administrator.
+            After payment, submit the reference below for manual review.
+          </p>
+
+          <div
+            class="payment-reference">
+
+            <b>
+              Account number
+            </b>
+
+            <br>
+
+            <span class="reference">
+              8164886717
+            </span>
+
+            <br><br>
+
+            <b>
+              Account name
+            </b>
+
+            <br>
+
+            Adekunle
+
+          </div>
+
+          <button
+            class="primary"
+            onclick="openTopupModal()">
+
+            Submit Top-Up Request
+
+          </button>
+
+        </div>
+
+      </section>
+
+
+      <!-- ===================================================
+           TRANSACTIONS
+      =================================================== -->
+
+      <section
+        id="transactions"
+        class="section">
+
+        <div class="page-title">
+
+          <div>
+
+            <h1>
+              Transactions
+            </h1>
+
+            <p>
+              Top-up requests and wallet activity.
+            </p>
+
+          </div>
+
+          <button
+            class="secondary"
+            onclick="loadTransactions()">
+
+            ↻ Refresh
+
+          </button>
+
+        </div>
+
+
+        <div class="card">
+
+          <div class="table-wrap">
+
+            <table>
+
+              <thead>
+
+                <tr>
+                  <th>Reference</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                </tr>
+
+              </thead>
+
+              <tbody id="transactionsTable">
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- ===================================================
+           SUPPORT
+      =================================================== -->
+
+      <section
+        id="support"
+        class="section">
+
+        <div class="page-title">
+
+          <div>
+
+            <h1>
+              Support
+            </h1>
+
+            <p>
+              Contact OlaqVerify support.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div class="card">
+
+          <h3>
+            WhatsApp Support
+          </h3>
+
+          <p style="color:var(--muted)">
+            For payment or account questions, contact support.
+          </p>
+
+          <a
+            href="https://wa.me/2348164886717"
+            target="_blank"
+            style="text-decoration:none">
+
+            <button class="primary">
+              Open WhatsApp Support
+            </button>
+
+          </a>
+
+        </div>
+
+
+        <div class="card">
+
+          <h3>
+            Send a support message
+          </h3>
+
+          <textarea
+            id="supportMessage"
+            class="input"
+            rows="5"
+            placeholder="Describe your issue..."></textarea>
+
+          <button
+            class="primary"
+            style="margin-top:12px"
+            onclick="sendSupportMessage()">
+
+            Send Message
+
+          </button>
+
+        </div>
+
+
+        <div class="card">
+
+          <h3>
+            My Support Messages
+          </h3>
+
+          <div
+            id="myMessages"
+            class="empty">
+
+            Loading...
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- ===================================================
+           SETTINGS
+      =================================================== -->
+
+      <section
+        id="settings"
+        class="section">
+
+        <div class="page-title">
+
+          <div>
+
+            <h1>
+              Settings
+            </h1>
+
+            <p>
+              Manage your OlaqVerify account.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div class="card">
+
+          <h3>
+            Account information
+          </h3>
+
+          <div class="form-grid">
+
+            <div class="field">
+
+              <label>
+                Name
+              </label>
+
+              <input
+                id="settingsName"
+                class="input">
+
+            </div>
+
+            <div class="field">
+
+              <label>
+                Email
+              </label>
+
+              <input
+                id="settingsEmail"
+                class="input"
+                readonly>
+
+            </div>
+
+          </div>
+
+          <button
+            class="primary"
+            style="margin-top:16px"
+            onclick="saveProfile()">
+
+            Save Profile
+
+          </button>
+
+        </div>
+
+
+        <div class="card">
+
+          <h3>
+            Security
+          </h3>
+
+          <p style="color:var(--muted)">
+            Sign out of your account on this device.
+          </p>
+
+          <button
+            class="danger"
+            onclick="logout()">
+
+            Sign Out
+
+          </button>
+
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+
+  <!-- =====================================================
+       MOBILE NAV
+  ====================================================== -->
+
+  <div class="mobile-nav">
+
+    <button
+      class="active"
+      onclick="showMobile('home',this)">
+
+      🏠<br>
+      Home
+
+    </button>
+
+    <button
+      onclick="showMobile('buy',this)">
+
+      📱<br>
+      Buy
+
+    </button>
+
+    <button
+      onclick="showMobile('orders',this)">
+
+      🛒<br>
+      Orders
+
+    </button>
+
+    <button
+      onclick="showMobile('wallet',this)">
+
+      💳<br>
+      Wallet
+
+    </button>
+
+    <button
+      onclick="showMobile('settings',this)">
+
+      ⚙️<br>
+      Settings
+
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- =========================================================
+     TOP UP MODAL
+========================================================= -->
+
+<div
+  id="topupModal"
+  class="modal hidden">
+
+  <div class="modal-box">
+
+    <div class="modal-head">
+
+      <h2>
+        Top Up Wallet
+      </h2>
+
+      <button
+        class="close"
+        onclick="closeTopupModal()">
+
+        ✕
+
+      </button>
+
+    </div>
+
+
+    <p style="color:var(--muted)">
+      Make your payment first, then submit the amount and
+      your payment reference for administrator review.
+    </p>
+
+
+    <div class="payment-reference">
+
+      <b>
+        PalmPay Account
+      </b>
+
+      <br>
+
+      <span class="reference">
+        8164886717
+      </span>
+
+      <br><br>
+
+      <b>
+        Account Name
+      </b>
+
+      <br>
+
+      Adekunle
+
+    </div>
+
+
+    <label style="font-weight:800">
+      Amount
+    </label>
+
+    <input
+      id="topupAmount"
+      class="input"
+      type="number"
+      min="1"
+      placeholder="Enter amount">
+
+
+    <label
+      style="font-weight:800;display:block;margin-top:14px">
+
+      Payment Reference
+
+    </label>
+
+    <input
+      id="topupReference"
+      class="input"
+      placeholder="Enter your payment reference">
+
+
+    <button
+      class="primary"
+      style="width:100%;margin-top:17px"
+      onclick="submitTopup()">
+
+      Submit Payment Request
+
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- =========================================================
+     ORDER MODAL
+========================================================= -->
+
+<div
+  id="orderModal"
+  class="modal hidden">
+
+  <div class="modal-box">
+
+    <div class="modal-head">
+
+      <h2>
+        Confirm Order
+      </h2>
+
+      <button
+        class="close"
+        onclick="closeOrderModal()">
+
+        ✕
+
+      </button>
+
+    </div>
+
+
+    <div id="orderDetails">
+      Loading...
+    </div>
+
+
+    <button
+      id="confirmOrderBtn"
+      class="primary"
+      style="width:100%;margin-top:17px"
+      onclick="confirmOrder()">
+
+      Confirm Purchase
+
+    </button>
+
+  </div>
+
+</div>
+
+
+<div
+  id="alert"
+  class="alert hidden">
+</div>
+
+
+<script>
+
+/* =========================================================
+   SUPABASE
+========================================================= */
+
+const SUPABASE_URL =
+  "https://alemtvfchysptzgzhaap.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY =
+  "sb_publishable_UEnF6pfZ2ORRcuIQUzgbRw_6bWNDnKm";
+
+const db =
+  supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+  );
+
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let currentUser = null;
+let currentProfile = null;
+let allNumbers = [];
+let selectedNumber = null;
+let authMode = "login";
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function showAlert(message,type=""){
+
+  const el =
+    document.getElementById("alert");
+
+  el.textContent =
+    message;
+
+  el.className =
+    "alert";
+
+  if(type){
+    el.classList.add(type);
+  }
+
+  el.classList.remove("hidden");
+
+  setTimeout(()=>{
+    el.classList.add("hidden");
+  },3500);
+}
+
+
+function money(value){
+
+  return "₦" +
+    Number(value || 0)
+      .toLocaleString(
+        "en-NG",
+        {
+          minimumFractionDigits:2,
+          maximumFractionDigits:2
+        }
+      );
+}
+
+
+function date(value){
+
+  if(!value){
+    return "-";
+  }
+
+  return new Date(value)
+    .toLocaleString();
+}
+
+
+function escapeHtml(value){
+
+  return String(value ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+
+/* =========================================================
+   AUTH MODE
+========================================================= */
+
+function switchAuthMode(){
+
+  if(authMode === "login"){
+
+    authMode = "signup";
+
+    document
+      .getElementById("authTitle")
+      .textContent =
+      "Create your OlaqVerify account";
+
+    document
+      .getElementById("authSubtitle")
+      .textContent =
+      "Create an account to use the authorized testing service.";
+
+    document
+      .getElementById("signupNameBox")
+      .classList.remove("hidden");
+
+    document
+      .getElementById("authBtn")
+      .textContent =
+      "Create account";
+
+    document
+      .getElementById("switchAuthBtn")
+      .textContent =
+      "Already have an account? Sign in";
+
+  }else{
+
+    authMode = "login";
+
+    document
+      .getElementById("authTitle")
+      .textContent =
+      "Welcome to OlaqVerify";
+
+    document
+      .getElementById("authSubtitle")
+      .textContent =
+      "Sign in to manage your wallet and authorized testing services.";
+
+    document
+      .getElementById("signupNameBox")
+      .classList.add("hidden");
+
+    document
+      .getElementById("authBtn")
+      .textContent =
+      "Sign in";
+
+    document
+      .getElementById("switchAuthBtn")
+      .textContent =
+      "Create account";
+  }
+
+}
+
+
+/* =========================================================
+   AUTH
+========================================================= */
+
+async function handleAuth(){
+
+  const email =
+    document
+      .getElementById("authEmail")
+      .value
+      .trim();
+
+  const password =
+    document
+      .getElementById("authPassword")
+      .value;
+
+  const message =
+    document
+      .getElementById("authMessage");
+
+
+  if(!email || !password){
+
+    message.textContent =
+      "Enter your email and password.";
+
+    return;
+  }
+
+
+  const btn =
+    document.getElementById("authBtn");
+
+  btn.disabled=true;
+
+
+  if(authMode === "signup"){
+
+    const name =
+      document
+        .getElementById("signupName")
+        .value
+        .trim();
+
+
+    if(!name){
+
+      message.textContent =
+        "Enter your name.";
+
+      btn.disabled=false;
+
+      return;
+    }
+
+
+    btn.textContent =
+      "Creating account...";
+
+
+    const {data,error} =
+      await db.auth.signUp({
+
+        email,
+        password,
+
+        options:{
+          data:{
+            name
+          }
+        }
+
+      });
+
+
+    btn.disabled=false;
+    btn.textContent="Create account";
+
+
+    if(error){
+
+      message.textContent =
+        error.message;
+
+      return;
+    }
+
+
+    /*
+      If email confirmation is enabled,
+      Supabase may not create a session yet.
+    */
+
+    if(!data.session){
+
+      message.textContent =
+        "Account created. Check your email to confirm your account.";
+
+      return;
+    }
+
+
+    await ensureProfile(
+      data.user,
+      name
+    );
+
+    await openApp();
+
+    return;
+  }
+
+
+  btn.textContent =
+    "Signing in...";
+
+
+  const {data,error} =
+    await db.auth.signInWithPassword({
+      email,
+      password
+    });
+
+
+  btn.disabled=false;
+  btn.textContent="Sign in";
+
+
+  if(error){
+
+    message.textContent =
+      error.message;
+
+    return;
+  }
+
+
+  await ensureProfile(
+    data.user
+  );
+
+  await openApp();
+}
+
+
+/* =========================================================
+   PROFILE
+========================================================= */
+
+async function ensureProfile(
+  user,
+  signupName=""
+){
+
+  if(!user){
+    return null;
+  }
+
+
+  const {data,error} =
+    await db
+      .from("profiles")
+      .select("*")
+      .eq("id",user.id)
+      .maybeSingle();
+
+
+  if(error){
+
+    console.error(
+      "Profile load error:",
+      error
+    );
+
+    return null;
+  }
+
+
+  if(data){
+
+    currentProfile =
+      data;
+
+    return data;
+  }
+
+
+  /*
+    Creates the customer profile if the
+    database does not already have one.
+  */
+
+  const profile = {
+
+    id:user.id,
+
+    email:
+      user.email || "",
+
+    name:
+      signupName ||
+      user.user_metadata?.name ||
+      "Customer",
+
+    balance:0,
+
+    role:"user"
+
+  };
+
+
+  const {data:newProfile,error:createError} =
+    await db
+      .from("profiles")
+      .insert(profile)
+      .select()
+      .single();
+
+
+  if(createError){
+
+    /*
+      If a database trigger already created
+      the profile, try reading it again.
+    */
+
+    const retry =
+      await db
+        .from("profiles")
+        .select("*")
+        .eq("id",user.id)
+        .maybeSingle();
+
+
+    if(retry.data){
+
+      currentProfile =
+        retry.data;
+
+      return retry.data;
+    }
+
+
+    console.error(
+      "Profile creation error:",
+      createError
+    );
+
+    return null;
+  }
+
+
+  currentProfile =
+    newProfile;
+
+  return newProfile;
+}
+
+
+/* =========================================================
+   SESSION
+========================================================= */
+
+async function loadSession(){
+
+  const {
+    data:{
+      session
+    }
+  } =
+    await db.auth.getSession();
+
+
+  if(!session){
+
+    document
+      .getElementById("authScreen")
+      .classList.remove("hidden");
+
+    return;
+  }
+
+
+  currentUser =
+    session.user;
+
+
+  await ensureProfile(
+    session.user
+  );
+
+
+  await openApp();
+}
+
+
+/* =========================================================
+   OPEN APP
+========================================================= */
+
+async function openApp(){
+
+  document
+    .getElementById("authScreen")
+    .classList.add("hidden");
+
+
+  document
+    .getElementById("app")
+    .classList.remove("hidden");
+
+
+  await loadProfile();
+
+  await refreshApp();
+}
+
+
+/* =========================================================
+   LOGOUT
+========================================================= */
+
+async function logout(){
+
+  await db.auth.signOut();
+
+  currentUser=null;
+  currentProfile=null;
+
+
+  document
+    .getElementById("app")
+    .classList.add("hidden");
+
+
+  document
+    .getElementById("authScreen")
+    .classList.remove("hidden");
+}
+
+
+/* =========================================================
+   PROFILE LOAD
+========================================================= */
+
+async function loadProfile(){
+
+  if(!currentUser){
+    return;
+  }
+
+
+  const {data,error} =
+    await db
+      .from("profiles")
+      .select("*")
+      .eq("id",currentUser.id)
+      .maybeSingle();
+
+
+  if(error){
+
+    console.error(error);
+
+    return;
+  }
+
+
+  if(data){
+
+    currentProfile =
+      data;
+  }
+
+
+  const balance =
+    Number(
+      currentProfile?.balance || 0
+    );
+
+
+  const name =
+    currentProfile?.name ||
+    currentUser.email ||
+    "Customer";
+
+
+  document
+    .getElementById("topBalance")
+    .textContent =
+    money(balance);
+
+
+  document
+    .getElementById("heroBalance")
+    .textContent =
+    money(balance);
+
+
+  document
+    .getElementById("walletBalance")
+    .textContent =
+    money(balance);
+
+
+  document
+    .getElementById("welcomeText")
+    .textContent =
+    "Welcome back, " + name + ".";
+
+
+  document
+    .getElementById("walletEmail")
+    .textContent =
+    currentUser.email || "-";
+
+
+  document
+    .getElementById("settingsName")
+    .value =
+    currentProfile?.name || "";
+
+
+  document
+    .getElementById("settingsEmail")
+    .value =
+    currentUser.email || "";
+}
+
+
+/* =========================================================
+   REFRESH
+========================================================= */
+
+async function refreshApp(){
+
+  await loadProfile();
+
+  await Promise.all([
+    loadNumbers(),
+    loadOrders(),
+    loadTransactions(),
+    loadPendingCount(),
+    loadMessages()
+  ]);
+}
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+function showSection(
+  id,
+  button
+){
+
+  document
+    .querySelectorAll(".section")
+    .forEach(section=>{
+      section.classList.remove("active");
+    });
+
+
+  const target =
+    document.getElementById(id);
+
+
+  if(target){
+    target.classList.add("active");
+  }
+
+
+  document
+    .querySelectorAll(".nav-btn")
+    .forEach(btn=>{
+      btn.classList.remove("active");
+    });
+
+
+  if(button){
+    button.classList.add("active");
+  }
+
+
+  loadSection(id);
+}
+
+
+function showSectionById(id){
+
+  document
+    .querySelectorAll(".section")
+    .forEach(section=>{
+      section.classList.remove("active");
+    });
+
+
+  const target =
+    document.getElementById(id);
+
+
+  if(target){
+    target.classList.add("active");
+  }
+
+
+  document
+    .querySelectorAll(".nav-btn")
+    .forEach(btn=>{
+      btn.classList.remove("active");
+    });
+
+
+  loadSection(id);
+
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
+}
+
+
+function showMobile(
+  id,
+  button
+){
+
+  document
+    .querySelectorAll(".mobile-nav button")
+    .forEach(btn=>{
+      btn.classList.remove("active");
+    });
+
+
+  button.classList.add("active");
+
+
+  document
+    .querySelectorAll(".section")
+    .forEach(section=>{
+      section.classList.remove("active");
+    });
+
+
+  document
+    .getElementById(id)
+    .classList.add("active");
+
+
+  loadSection(id);
+}
+
+
+async function loadSection(id){
+
+  if(id==="home"){
+
+    await loadProfile();
+    await loadNumbers();
+    await loadOrders();
+    await loadPendingCount();
+
+  }
+
+
+  if(id==="buy"){
+    await loadNumbers();
+  }
+
+
+  if(id==="orders"){
+    await loadOrders();
+  }
+
+
+  if(id==="wallet"){
+    await loadProfile();
+  }
+
+
+  if(id==="transactions"){
+    await loadTransactions();
+  }
+
+
+  if(id==="support"){
+    await loadMessages();
+  }
+
+
+  if(id==="settings"){
+    await loadProfile();
+  }
+}
+
+
+/* =========================================================
+   NUMBERS
+========================================================= */
+
+async function loadNumbers(){
+
+  const {data,error} =
+    await db
+      .from("numbers")
+      .select("*")
+      .eq("status","available")
+      .order(
+        "created_at",
+        {ascending:false}
+      );
+
+
+  if(error){
+
+    showAlert(
+      "Could not load number inventory: " +
+      error.message,
+      "error"
+    );
+
+    return;
+  }
+
+
+  allNumbers =
+    data || [];
+
+
+  document
+    .getElementById("homeNumbers")
+    .textContent =
+    allNumbers.length;
+
+
+  renderNumbers(
+    allNumbers
+  );
+}
+
+
+function renderNumbers(numbers){
+
+  const grid =
+    document.getElementById(
+      "numberGrid"
+    );
+
+
+  grid.innerHTML="";
+
+
+  if(!numbers.length){
+
+    grid.innerHTML = `
+      <div class="card empty" style="grid-column:1/-1">
+        No authorized testing numbers are currently available.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  numbers.forEach(number=>{
+
+    const card =
+      document.createElement("div");
+
+    card.className =
+      "number-card";
+
+
+    card.innerHTML = `
+
+      <div class="number-country">
+
+        ${escapeHtml(
+          number.flag || ""
+        )}
+
+        ${escapeHtml(
+          number.country || "Unknown"
+        )}
+
+      </div>
+
+      <div class="number-phone">
+
+        ${escapeHtml(
+          number.phone_number || "-"
+        )}
+
+      </div>
+
+      <div class="number-bottom">
+
+        <div class="price">
+          ${money(number.price)}
+        </div>
+
+        <button
+          class="buy-btn"
+          onclick="openOrderModal('${String(number.id).replace(/'/g,"\\'")}')">
+
+          Order
+
+        </button>
+
+      </div>
+    `;
+
+
+    grid.appendChild(card);
+
+  });
+}
+
+
+function filterNumbers(){
+
+  const query =
+    document
+      .getElementById("numberSearch")
+      .value
+      .toLowerCase()
+      .trim();
+
+
+  const filtered =
+    allNumbers.filter(number=>{
+
+      return (
+
+        String(
+          number.country || ""
+        )
+        .toLowerCase()
+        .includes(query)
+
+        ||
+
+        String(
+          number.phone_number || ""
+        )
+        .toLowerCase()
+        .includes(query)
+
+      );
+
+    });
+
+
+  renderNumbers(filtered);
+}
+
+
+/* =========================================================
+   ORDER MODAL
+========================================================= */
+
+function openOrderModal(id){
+
+  selectedNumber =
+    allNumbers.find(
+      number =>
+        String(number.id) === String(id)
+    );
+
+
+  if(!selectedNumber){
+
+    showAlert(
+      "Number is no longer available.",
+      "error"
+    );
+
+    return;
+  }
+
+
+  const balance =
+    Number(
+      currentProfile?.balance || 0
+    );
+
+
+  const price =
+    Number(
+      selectedNumber.price || 0
+    );
+
+
+  document
+    .getElementById("orderDetails")
+    .innerHTML = `
+
+      <div class="payment-reference">
+
+        <b>
+          Country
+        </b>
+
+        <br>
+
+        ${escapeHtml(
+          selectedNumber.flag || ""
+        )}
+        ${escapeHtml(
+          selectedNumber.country || "-"
+        )}
+
+        <br><br>
+
+        <b>
+          Number
+        </b>
+
+        <br>
+
+        ${escapeHtml(
+          selectedNumber.phone_number || "-"
+        )}
+
+        <br><br>
+
+        <b>
+          Price
+        </b>
+
+        <br>
+
+        ${money(price)}
+
+        <br><br>
+
+        <b>
+          Your balance
+        </b>
+
+        <br>
+
+        ${money(balance)}
+
+      </div>
+
+    `;
+
+
+  const button =
+    document.getElementById(
+      "confirmOrderBtn"
+    );
+
+
+  if(balance < price){
+
+    button.disabled=true;
+
+    button.textContent =
+      "Insufficient Balance";
+
+  }else{
+
+    button.disabled=false;
+
+    button.textContent =
+      "Confirm Order";
+
+  }
+
+
+  document
+    .getElementById("orderModal")
+    .classList
+    .remove("hidden");
+}
+
+
+function closeOrderModal(){
+
+  selectedNumber=null;
+
+  document
+    .getElementById("orderModal")
+    .classList
+    .add("hidden");
+}
+
+
+/* =========================================================
+   CONFIRM ORDER
+========================================================= */
+
+async function confirmOrder(){
+
+  if(!selectedNumber || !currentUser){
+
+    return;
+  }
+
+
+  const button =
+    document.getElementById(
+      "confirmOrderBtn"
+    );
+
+
+  button.disabled=true;
+
+  button.textContent =
+    "Creating order...";
+
+
+  const price =
+    Number(
+      selectedNumber.price || 0
+    );
+
+
+  /*
+    IMPORTANT:
+    This INSERT only creates the order.
+    Your database RLS / server-side logic should
+    handle the actual wallet deduction atomically.
+  */
+
+  const {data,error} =
+    await db
+      .from("orders")
+      .insert({
+
+        user_id:
+          currentUser.id,
+
+        country:
+          selectedNumber.country,
+
+        phone_number:
+          selectedNumber.phone_number,
+
+        price:
+
+          price,
+
+        status:
+          "pending"
+
+      })
+      .select()
+      .single();
+
+
+  if(error){
+
+    button.disabled=false;
+    button.textContent="Confirm Order";
+
+
+    showAlert(
+      "Could not create order: " +
+      error.message,
+      "error"
+    );
+
+    return;
+  }
+
+
+  /*
+    We do NOT change profiles.balance here.
+    The database should perform any wallet deduction
+    through a secure server-side function/trigger.
+  */
+
+
+  closeOrderModal();
+
+
+  showAlert(
+    "Order created successfully.",
+    "success"
+  );
+
+
+  await loadOrders();
+  await loadNumbers();
+  await loadProfile();
+}
+
+
+/* =========================================================
+   ORDERS
+========================================================= */
+
+async function loadOrders(){
+
+  if(!currentUser){
+    return;
+  }
+
+
+  const {data,error} =
+    await db
+      .from("orders")
+      .select("*")
+      .eq(
+        "user_id",
+        currentUser.id
+      )
+      .order(
+        "created_at",
+        {ascending:false}
+      );
+
+
+  if(error){
+
+    showAlert(
+      "Could not load orders: " +
+      error.message,
+      "error"
+    );
+
+    return;
+  }
+
+
+  const orders =
+    data || [];
+
+
+  document
+    .getElementById("homeOrders")
+    .textContent =
+    orders.length;
+
+
+  const tbody =
+    document.getElementById(
+      "ordersTable"
+    );
+
+
+  tbody.innerHTML="";
+
+
+  if(!orders.length){
+
+    tbody.innerHTML = `
+
+      <tr>
+
+        <td
+          colspan="6"
+          class="empty">
+
+          You have no orders yet.
+
+        </td>
+
+      </tr>
+
+    `;
+
+    return;
+  }
+
+
+  orders.forEach(order=>{
+
+    const tr =
+      document.createElement("tr");
+
+
+    const status =
+      order.status || "pending";
+
+
+    tr.innerHTML = `
+
+      <td>
+
+        ${escapeHtml(
+          String(order.id).slice(0,8)
+        )}...
+
+      </td>
+
+      <td>
+
+        ${escapeHtml(
+          order.country || "-"
+        )}
+
+      </td>
+
+      <td>
+
+        ${escapeHtml(
+          order.phone_number || "-"
+        )}
+
+      </td>
+
+      <td>
+
+        ${money(order.price)}
+
+      </td>
+
+      <td>
+
+        <span class="status ${escapeHtml(status)}">
+
+          ${escapeHtml(status)}
+
+        </span>
+
+      </td>
+
+      <td>
+
+        ${date(
+          order.created_at
+        )}
+
+      </td>
+
+    `;
+
+
+    tbody.appendChild(tr);
+
+  });
+
+}
+
+
+/* =========================================================
+   TOP UP
+========================================================= */
+
+function openTopupModal(){
+
+  document
+    .getElementById("topupAmount")
+    .value="";
+
+
+  document
+    .getElementById("topupReference")
+    .value="";
+
+
+  document
+    .getElementById("topupModal")
+    .classList
+    .remove("hidden");
+}
+
+
+function closeTopupModal(){
+
+  document
+    .getElementById("topupModal")
+    .classList
+    .add("hidden");
+}
+
+
+async function submitTopup(){
+
+  if(!currentUser){
+    return;
+  }
+
+
+  const amount =
+    Number(
+      document
+        .getElementById("topupAmount")
+        .value
+    );
+
+
+  const reference =
+    document
+      .getElementById("topupReference")
+      .value
+      .trim();
+
+
+  if(!amount || amount <= 0){
+
+    showAlert(
+      "Enter a valid amount.",
+      "error"
+    );
+
+    return;
+  }
+
+
+  if(!reference){
+
+    showAlert(
+      "Enter your payment reference.",
+      "error"
+    );
+
+    return;
+  }
+
+
+  /*
+    Do not automatically approve the payment.
+    The admin page will see this as pending.
+  */
+
+  const {error} =
+    await db
+      .from("payment_requests")
+      .insert({
+
+        user_id:
+          currentUser.id,
+
+        amount:
+          amount,
+
+        reference:
+          reference,
+
+        status:
+          "pending"
+
+      });
+
+
+  if(error){
+
+    showAlert(
+      "Could not submit payment request: " +
+      error.message,
+      "error"
+    );
+
+    return;
+  }
+
+
+  closeTopupModal();
+
+
+  showAlert(
+    "Payment request submitted for admin review.",
+    "success"
+  );
+
+
+  await loadTransactions();
+  await loadPendingCount();
+}
+
+
+/* =========================================================
+   TRANSACTIONS
+========================================================= */
+
+async function loadTransactions(){
+
+  if(!currentUser){
+    return;
+  }
+
+
+  const {data,error} =
+    await db
+      .from("payment_requests")
+      .select("*")
+      .eq(
+        "user_id",
+        currentUser.id
+      )
+      .order(
+        "created_at",
+        {ascending:false}
+      );
+
+
+  if(error){
+
+    showAlert(
+      "Could not load transactions: " +
+      error.message,
+      "error"
+    );
+
+    return;
+  }
+
+
+  const tbody =
+    document.getElementById(
+      "transactionsTable"
+    );
+
+
+  tbody.innerHTML="";
+
+
+  if(!data?.length){
+
+    tbody.innerHTML = `
+
+      <tr>
+
+        <td
+          colspan="4"
+          class="empty">
+
+          No transactions yet.
+
+        </td>
+
+      </tr>
+
+    `;
+
+    return;
+  }
+
+
+  data.forEach(transaction=>{
+
+    const tr =
+      document.createElement("tr");
+
+
+    const status =
+      transaction.status || "pending";
+
+
+    tr.innerHTML = `
+
+      <td>
+
+        ${escapeHtml(
+          transaction.reference || "-"
+        )}
+
+      </td>
+
+      <td>
+
+        ${money(
+          transaction.amount
+        )}
+
+      </td>
+
+      <td>
+
+        <span class="status ${escapeHtml(status)}">
+
+          ${escapeHtml(status)}
+
+        </span>
+
+      </td>
+
+      <td>
+
+        ${date(
+          transaction.created_at
+        )}
+
+      </td>
+
+    `;
+
+
+    tbody.appendChild(tr);
+
+  });
+
+}
+
+
+/* =========================================================
+   PENDING COUNT
+========================================================= */
+
+async function loadPendingCount(){
+
+  if(!currentUser){
+    return;
+  }
+
+
+  const {data,error} =
+    await db
+      .from("payment_requests")
+      .select("id")
+      .eq(
+        "user_id",
+        currentUser.id
+      )
+      .eq(
+        "status",
+        "pending"
+      );
+
+
+  if(error){
+    return;
+  }
+
+
+  document
+    .getElementById("homePending")
+    .textContent =
+    data?.length || 0;
+}
+
+
+/* =========================================================
+   SUPPORT MESSAGES
+========================================================= */
+
+async function sendSupportMessage(){
+
+  if(!currentUser){
+    return;
+  }
+
+
+  const input =
+    document.getElementById(
+      "supportMessage"
+    );
+
+
+  const message =
+    input.value.trim();
+
+
+  if(!message){
+
+    showAlert(
+      "Write a message first.",
+      "error"
+    );
+
+    return;
+  }
+
+
+  /*
+    The messages table in your admin page expects
+    order_id and message. Since a support message
+    may not have an order, we only insert message
+    if your schema allows order_id to be NULL.
+  */
+
+  const {error} =
+    await db
+      .from("messages")
+      .insert({
+
+        order_id:null,
+
+        message:
+
+          "[Support] " +
+          message,
+
+        user_id:
+          currentUser.id,
+
+        received_at:
+          new Date().toISOString()
+
+      });
+
+
+  if(error){
+
+    showAlert(
+      "Could not send message: " +
+      error.message,
+      "error"
+    );
+
+    return;
+  }
+
+
+  input.value="";
+
+
+  showAlert(
+    "Support message sent.",
+    "success"
+  );
+
+
+  await loadMessages();
+}
+
+
+async function loadMessages(){
+
+  if(!currentUser){
+    return;
+  }
+
+
+  /*
+    The admin page reads the messages table.
+    This query shows messages belonging to the
+    current customer when user_id exists.
+  */
+
+  const {data,error} =
+    await db
+      .from("messages")
+      .select("*")
+      .eq(
+        "user_id",
+        currentUser.id
+      )
+      .order(
+        "received_at",
+        {ascending:false}
+      );
+
+
+  if(error){
+
+    /*
+      If user_id is not yet present in the messages
+      table, don't break the rest of the customer app.
+    */
+
+    console.error(
+      "Messages:",
+      error.message
+    );
+
+    return;
+  }
+
+
+  const box =
+    document.getElementById(
+      "myMessages"
+    );
+
+
+  if(!data?.length){
+
+    box.textContent =
+      "No support messages yet.";
+
+    return;
+  }
+
+
+  box.innerHTML =
+    data.map(message=>`
+
+      <div
+        style="
+          padding:13px 0;
+          border-bottom:1px solid var(--border);
+        ">
+
+        <div style="font-weight:700">
+
+          ${escapeHtml(
+            message.message || ""
+          )}
+
+        </div>
+
+        <div
+          style="
+            color:var(--muted);
+            font-size:12px;
+            margin-top:5px;
+          ">
+
+          ${date(
+            message.received_at
+          )}
+
+        </div>
+
+      </div>
+
+    `).join("");
+}
+
+
+/* =========================================================
+   SAVE PROFILE
+========================================================= */
+
+async function saveProfile(){
+
+  if(!currentUser){
+    return;
+  }
+
+
+  const name =
+    document
+      .getElementById("settingsName")
+      .value
+      .trim();
+
+
+  if(!name){
+
+    showAlert(
+      "Name cannot be empty.",
+      "error"
+    );
+
+    return;
+  }
+
+
+  const {error} =
+    await db
+      .from("profiles")
+      .update({
+        name
+      })
+      .eq(
+        "id",
+        currentUser.id
+      );
+
+
+  if(error){
+
+    showAlert(
+      error.message,
+      "error"
+    );
+
+    return;
+  }
+
+
+  currentProfile.name =
+    name;
+
+
+  await loadProfile();
+
+
+  showAlert(
+    "Profile updated.",
+    "success"
+  );
+}
+
+
+/* =========================================================
+   AUTH STATE
+========================================================= */
+
+db.auth.onAuthStateChange(
+  async(event,session)=>{
+
+    if(event === "SIGNED_OUT"){
+
+      currentUser=null;
+      currentProfile=null;
+
+      document
+        .getElementById("app")
+        .classList.add("hidden");
+
+      document
+        .getElementById("authScreen")
+        .classList.remove("hidden");
+    }
+
+  }
+);
+
+
+/* =========================================================
+   START
+========================================================= */
+
+loadSession();
+
+</script>
+
+</body>
+  </html>
