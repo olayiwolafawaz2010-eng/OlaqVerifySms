@@ -1,0 +1,3955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>OlaqVerify Admin</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root{
+  --purple:#5b21b6;
+  --purple2:#3b0764;
+  --bg:#f6f7fb;
+  --white:#fff;
+  --text:#171717;
+  --muted:#737373;
+  --border:#e5e7eb;
+  --green:#16a34a;
+  --red:#dc2626;
+  --orange:#f59e0b;
+  --blue:#2563eb;
+  --shadow:0 8px 30px rgba(0,0,0,.07);
+}
+
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+}
+
+button,input,select,textarea{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+  border:0;
+}
+
+.hidden{
+  display:none!important;
+}
+
+#loginScreen{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:linear-gradient(145deg,#3b0764,#5b21b6,#7c3aed);
+}
+
+.loginBox{
+  width:100%;
+  max-width:420px;
+  background:#fff;
+  padding:30px 24px;
+  border-radius:24px;
+  box-shadow:0 25px 70px rgba(0,0,0,.25);
+}
+
+.logo{
+  text-align:center;
+  color:var(--purple);
+  font-size:32px;
+  font-weight:900;
+}
+
+.loginSub{
+  text-align:center;
+  color:var(--muted);
+  margin:7px 0 25px;
+}
+
+.field{
+  margin-bottom:14px;
+}
+
+.field label{
+  display:block;
+  font-size:13px;
+  font-weight:bold;
+  margin-bottom:7px;
+}
+
+.field input,
+.field select,
+.field textarea{
+  width:100%;
+  border:1px solid var(--border);
+  border-radius:11px;
+  padding:13px;
+  outline:none;
+  background:#fff;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus{
+  border-color:var(--purple);
+}
+
+.primaryBtn{
+  width:100%;
+  background:var(--purple);
+  color:#fff;
+  padding:14px;
+  border-radius:12px;
+  font-weight:bold;
+}
+
+.primaryBtn:hover{
+  background:var(--purple2);
+}
+
+.message{
+  text-align:center;
+  margin-top:12px;
+  font-size:13px;
+}
+
+.error{color:var(--red);}
+.success{color:var(--green);}
+
+#adminApp{
+  min-height:100vh;
+}
+
+.sidebar{
+  position:fixed;
+  left:0;
+  top:0;
+  bottom:0;
+  width:245px;
+  background:#fff;
+  border-right:1px solid var(--border);
+  z-index:50;
+  padding:20px 13px;
+  overflow-y:auto;
+}
+
+.brand{
+  color:var(--purple);
+  font-size:25px;
+  font-weight:900;
+  padding:0 10px 20px;
+}
+
+.brand small{
+  display:block;
+  color:var(--muted);
+  font-size:11px;
+  font-weight:normal;
+  margin-top:3px;
+}
+
+.sideBtn{
+  width:100%;
+  text-align:left;
+  background:#fff;
+  color:#555;
+  padding:12px 13px;
+  border-radius:10px;
+  margin-bottom:4px;
+  font-weight:bold;
+}
+
+.sideBtn:hover{
+  background:#f5f3ff;
+  color:var(--purple);
+}
+
+.sideBtn.active{
+  background:#ede9fe;
+  color:var(--purple);
+}
+
+.signoutSide{
+  margin-top:15px;
+  background:#fee2e2;
+  color:#b91c1c;
+}
+
+.main{
+  margin-left:245px;
+  min-height:100vh;
+}
+
+.topbar{
+  height:65px;
+  background:#fff;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 24px;
+  position:sticky;
+  top:0;
+  z-index:30;
+}
+
+.menuBtn{
+  display:none;
+  background:#f3f4f6;
+  padding:9px 12px;
+  border-radius:9px;
+}
+
+.adminEmail{
+  color:var(--muted);
+  font-size:12px;
+}
+
+.content{
+  padding:24px;
+  max-width:1500px;
+  margin:auto;
+}
+
+.page{
+  display:none;
+}
+
+.page.active{
+  display:block;
+}
+
+.pageTitle{
+  font-size:28px;
+  font-weight:900;
+  margin-bottom:5px;
+}
+
+.pageSub{
+  color:var(--muted);
+  margin-bottom:22px;
+  font-size:14px;
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:15px;
+  margin-bottom:22px;
+}
+
+.stat{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:17px;
+  padding:20px;
+  box-shadow:var(--shadow);
+}
+
+.statLabel{
+  color:var(--muted);
+  font-size:12px;
+}
+
+.statValue{
+  font-size:28px;
+  font-weight:900;
+  margin-top:8px;
+  color:var(--purple);
+}
+
+.card{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:17px;
+  padding:20px;
+  margin-bottom:18px;
+  box-shadow:0 4px 18px rgba(0,0,0,.04);
+}
+
+.cardTitle{
+  font-size:18px;
+  font-weight:900;
+  margin-bottom:15px;
+}
+
+.grid2{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:15px;
+}
+
+.tableWrap{
+  overflow-x:auto;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:750px;
+}
+
+th{
+  background:#f8f7fc;
+  text-align:left;
+  font-size:12px;
+  color:#666;
+  padding:12px;
+  white-space:nowrap;
+}
+
+td{
+  padding:12px;
+  border-top:1px solid #eee;
+  font-size:13px;
+  vertical-align:middle;
+}
+
+.badge{
+  display:inline-block;
+  padding:5px 9px;
+  border-radius:20px;
+  font-size:11px;
+  font-weight:bold;
+}
+
+.badge.pending{
+  background:#fff7ed;
+  color:#c2410c;
+}
+
+.badge.approved,
+.badge.active,
+.badge.fulfilled{
+  background:#f0fdf4;
+  color:#15803d;
+}
+
+.badge.declined,
+.badge.inactive{
+  background:#fef2f2;
+  color:#b91c1c;
+}
+
+.badge.assigned{
+  background:#eff6ff;
+  color:#1d4ed8;
+}
+
+.badge.available{
+  background:#f0fdf4;
+  color:#15803d;
+}
+
+.btn{
+  padding:8px 11px;
+  border-radius:8px;
+  font-weight:bold;
+  font-size:12px;
+}
+
+.btnPurple{
+  background:var(--purple);
+  color:#fff;
+}
+
+.btnGreen{
+  background:#dcfce7;
+  color:#15803d;
+}
+
+.btnRed{
+  background:#fee2e2;
+  color:#b91c1c;
+}
+
+.btnBlue{
+  background:#dbeafe;
+  color:#1d4ed8;
+}
+
+.btnOrange{
+  background:#ffedd5;
+  color:#c2410c;
+}
+
+.btnGray{
+  background:#f3f4f6;
+  color:#444;
+}
+
+.actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+}
+
+.toolbar{
+  display:flex;
+  gap:10px;
+  margin-bottom:15px;
+  flex-wrap:wrap;
+}
+
+.search{
+  flex:1;
+  min-width:200px;
+  padding:12px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  outline:none;
+}
+
+.search:focus{
+  border-color:var(--purple);
+}
+
+.marginBox{
+  background:#f5f3ff;
+  border:1px solid #ddd6fe;
+  border-radius:12px;
+  padding:13px;
+  margin-top:10px;
+}
+
+.marginValue{
+  font-size:22px;
+  font-weight:900;
+  color:var(--purple);
+}
+
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.55);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  z-index:100;
+}
+
+.modal.show{
+  display:flex;
+}
+
+.modalBox{
+  width:100%;
+  max-width:600px;
+  max-height:90vh;
+  overflow-y:auto;
+  background:#fff;
+  border-radius:20px;
+  padding:22px;
+}
+
+.modalHeader{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:18px;
+}
+
+.close{
+  width:35px;
+  height:35px;
+  border-radius:50%;
+  background:#f3f4f6;
+  font-size:20px;
+}
+
+.orderCard{
+  border:1px solid var(--border);
+  background:#fff;
+  border-radius:17px;
+  padding:18px;
+  margin-bottom:14px;
+  box-shadow:0 4px 18px rgba(0,0,0,.04);
+}
+
+.orderTop{
+  display:flex;
+  justify-content:space-between;
+  gap:15px;
+  flex-wrap:wrap;
+}
+
+.orderCountry{
+  font-size:18px;
+  font-weight:900;
+  color:var(--purple);
+}
+
+.orderMeta{
+  color:#777;
+  font-size:13px;
+  margin-top:5px;
+}
+
+.orderPrice{
+  font-size:18px;
+  font-weight:900;
+  margin-top:10px;
+}
+
+.orderId{
+  color:#999;
+  font-size:11px;
+  margin-top:8px;
+  word-break:break-all;
+}
+
+.emptyBox{
+  text-align:center;
+  padding:35px 15px;
+  color:#777;
+}
+
+.errorBox{
+  background:#fef2f2;
+  border:1px solid #fecaca;
+  color:#991b1b;
+  padding:15px;
+  border-radius:12px;
+  line-height:1.5;
+  word-break:break-word;
+}
+
+.loadingBox{
+  text-align:center;
+  padding:30px;
+  color:#777;
+}
+
+@media(max-width:950px){
+  .sidebar{
+    transform:translateX(-100%);
+    transition:.25s;
+  }
+
+  .sidebar.open{
+    transform:translateX(0);
+  }
+
+  .main{
+    margin-left:0;
+  }
+
+  .menuBtn{
+    display:block;
+  }
+
+  .stats{
+    grid-template-columns:repeat(2,1fr);
+  }
+}
+
+@media(max-width:600px){
+  .content{
+    padding:15px;
+  }
+
+  .topbar{
+    padding:0 15px;
+  }
+
+  .stats{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .stat{
+    padding:15px;
+  }
+
+  .statValue{
+    font-size:23px;
+  }
+
+  .grid2{
+    grid-template-columns:1fr;
+  }
+
+  .pageTitle{
+    font-size:23px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<section id="loginScreen">
+  <div class="loginBox">
+
+    <div class="logo">OlaqVerify</div>
+
+    <div class="loginSub">
+      Admin Control Panel
+    </div>
+
+    <div class="field">
+      <label>Email</label>
+      <input
+        id="adminEmailInput"
+        type="email"
+        placeholder="Admin email"
+        autocomplete="email"
+      >
+    </div>
+
+    <div class="field">
+      <label>Password</label>
+      <input
+        id="adminPasswordInput"
+        type="password"
+        placeholder="Password"
+        autocomplete="current-password"
+      >
+    </div>
+
+    <button class="primaryBtn" onclick="adminLogin()">
+      Sign In
+    </button>
+
+    <div id="loginMessage" class="message"></div>
+
+  </div>
+</section>
+
+
+<div id="adminApp" class="hidden">
+
+  <aside id="sidebar" class="sidebar">
+
+    <div class="brand">
+      OlaqVerify
+      <small>Admin Control Panel</small>
+    </div>
+
+    <button class="sideBtn active" data-page="dashboard"
+      onclick="go('dashboard')">
+      Dashboard
+    </button>
+
+    <button class="sideBtn" data-page="payments"
+      onclick="go('payments')">
+      Payments
+    </button>
+
+    <button class="sideBtn" data-page="prices"
+      onclick="go('prices')">
+      Prices
+    </button>
+
+    <button class="sideBtn" data-page="fulfillment"
+      onclick="go('fulfillment')">
+      Order Fulfillment
+    </button>
+
+    <button class="sideBtn" data-page="orders"
+      onclick="go('orders')">
+      Orders
+    </button>
+
+    <button class="sideBtn" data-page="numbers"
+      onclick="go('numbers')">
+      Numbers
+    </button>
+
+    <button class="sideBtn" data-page="users"
+      onclick="go('users')">
+      Users
+    </button>
+
+    <button class="sideBtn" data-page="messages"
+      onclick="go('messages')">
+      Messages
+    </button>
+
+    <button class="sideBtn signoutSide"
+      onclick="adminLogout()">
+      Sign Out
+    </button>
+
+  </aside>
+
+
+  <main class="main">
+
+    <header class="topbar">
+
+      <button class="menuBtn" onclick="toggleSidebar()">
+        ☰
+      </button>
+
+      <div></div>
+
+      <div id="adminEmail" class="adminEmail">
+        Admin
+      </div>
+
+    </header>
+
+
+    <div class="content">
+
+      <!-- DASHBOARD -->
+
+      <section id="page-dashboard" class="page active">
+
+        <div class="pageTitle">Dashboard</div>
+
+        <div class="pageSub">
+          OlaqVerify platform overview.
+        </div>
+
+        <div class="stats">
+
+          <div class="stat">
+            <div class="statLabel">Users</div>
+            <div id="statUsers" class="statValue">0</div>
+          </div>
+
+          <div class="stat">
+            <div class="statLabel">Pending Payments</div>
+            <div id="statPayments" class="statValue">0</div>
+          </div>
+
+          <div class="stat">
+            <div class="statLabel">Pending Orders</div>
+            <div id="statOrders" class="statValue">0</div>
+          </div>
+
+          <div class="stat">
+            <div class="statLabel">Available Numbers</div>
+            <div id="statNumbers" class="statValue">0</div>
+          </div>
+
+        </div>
+
+        <div class="card">
+
+          <div class="cardTitle">
+            Quick Actions
+          </div>
+
+          <div class="actions">
+
+            <button class="btn btnPurple"
+              onclick="go('payments')">
+              Review Payments
+            </button>
+
+            <button class="btn btnPurple"
+              onclick="go('prices')">
+              Manage Prices
+            </button>
+
+            <button class="btn btnPurple"
+              onclick="go('fulfillment')">
+              Fulfill Orders
+            </button>
+
+            <button class="btn btnPurple"
+              onclick="go('numbers')">
+              Manage Numbers
+            </button>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- PAYMENTS -->
+
+      <section id="page-payments" class="page">
+
+        <div class="pageTitle">Payments</div>
+
+        <div class="pageSub">
+          Review customer wallet top-ups.
+        </div>
+
+        <div class="toolbar">
+
+          <input
+            id="paymentSearch"
+            class="search"
+            placeholder="Search reference or user..."
+            oninput="renderPayments()"
+          >
+
+          <button class="btn btnPurple"
+            onclick="loadPayments()">
+            Refresh
+          </button>
+
+        </div>
+
+        <div class="card">
+
+          <div class="tableWrap">
+
+            <table>
+
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>User</th>
+                  <th>Amount</th>
+                  <th>Reference</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+
+              <tbody id="paymentsTable"></tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- PRICES -->
+
+      <section id="page-prices" class="page">
+
+        <div class="pageTitle">Prices</div>
+
+        <div class="pageSub">
+          Control active customer prices.
+        </div>
+
+        <div class="toolbar">
+
+          <input
+            id="priceSearch"
+            class="search"
+            placeholder="Search country or service..."
+            oninput="renderPrices()"
+          >
+
+          <button class="btn btnPurple"
+            onclick="openPriceModal()">
+            + Add Price
+          </button>
+
+          <button class="btn btnGray"
+            onclick="loadPrices()">
+            Refresh
+          </button>
+
+        </div>
+
+        <div class="card">
+
+          <div class="tableWrap">
+
+            <table>
+
+              <thead>
+                <tr>
+                  <th>Country</th>
+                  <th>Service</th>
+                  <th>Provider Cost</th>
+                  <th>Customer Price</th>
+                  <th>Margin</th>
+                  <th>Currency</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+
+              <tbody id="pricesTable"></tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- FULFILLMENT -->
+
+      <section id="page-fulfillment" class="page">
+
+        <div class="pageTitle">
+          Order Fulfillment
+        </div>
+
+        <div class="pageSub">
+          Assign authorized numbers to pending customer orders.
+        </div>
+
+        <div class="toolbar">
+
+          <button class="btn btnPurple"
+            onclick="loadFulfillment()">
+            Refresh Pending Orders
+          </button>
+
+          <button class="btn btnGray"
+            onclick="loadAllOrderData()">
+            Reload Orders
+          </button>
+
+        </div>
+
+        <div id="fulfillmentList">
+          <div class="loadingBox">
+            Loading pending orders...
+          </div>
+        </div>
+
+      </section>
+
+
+      <!-- ORDERS -->
+
+      <section id="page-orders" class="page">
+
+        <div class="pageTitle">Orders</div>
+
+        <div class="pageSub">
+          View all customer orders.
+        </div>
+
+        <div class="toolbar">
+
+          <input
+            id="orderSearch"
+            class="search"
+            placeholder="Search country, service or status..."
+            oninput="renderOrders()"
+          >
+
+          <button class="btn btnPurple"
+            onclick="loadOrders()">
+            Refresh
+          </button>
+
+        </div>
+
+        <div class="card">
+
+          <div class="tableWrap">
+
+            <table>
+
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>User</th>
+                  <th>Country</th>
+                  <th>Service</th>
+                  <th>Price</th>
+                  <th>Status</th>
+                  <th>Number</th>
+                </tr>
+              </thead>
+
+              <tbody id="ordersTable"></tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- NUMBERS -->
+
+      <section id="page-numbers" class="page">
+
+        <div class="pageTitle">Numbers</div>
+
+        <div class="pageSub">
+          Manage authorized number inventory.
+        </div>
+
+        <div class="toolbar">
+
+          <button class="btn btnPurple"
+            onclick="openNumberModal()">
+            + Add Number
+          </button>
+
+          <button class="btn btnGray"
+            onclick="loadNumbers()">
+            Refresh
+          </button>
+
+        </div>
+
+        <div class="card">
+
+          <div class="tableWrap">
+
+            <table>
+
+              <thead>
+                <tr>
+                  <th>Country</th>
+                  <th>Service</th>
+                  <th>Number</th>
+                  <th>Status</th>
+                  <th>Created</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+
+              <tbody id="numbersTable"></tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- USERS -->
+
+      <section id="page-users" class="page">
+
+        <div class="pageTitle">Users</div>
+
+        <div class="pageSub">
+          Customer profiles and balances.
+        </div>
+
+        <div class="toolbar">
+
+          <input
+            id="userSearch"
+            class="search"
+            placeholder="Search name or email..."
+            oninput="renderUsers()"
+          >
+
+          <button class="btn btnPurple"
+            onclick="loadUsers()">
+            Refresh
+          </button>
+
+        </div>
+
+        <div class="card">
+
+          <div class="tableWrap">
+
+            <table>
+
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Balance</th>
+                  <th>Role</th>
+                  <th>ID</th>
+                </tr>
+              </thead>
+
+              <tbody id="usersTable"></tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- MESSAGES -->
+
+      <section id="page-messages" class="page">
+
+        <div class="pageTitle">Messages</div>
+
+        <div class="pageSub">
+          Customer support messages.
+        </div>
+
+        <div class="toolbar">
+
+          <button class="btn btnPurple"
+            onclick="loadMessages()">
+            Refresh
+          </button>
+
+        </div>
+
+        <div id="messagesList"></div>
+
+      </section>
+
+    </div>
+  </main>
+</div>
+
+
+<!-- PRICE MODAL -->
+
+<div id="priceModal" class="modal"
+  onclick="outsideModal(event,'priceModal')">
+
+  <div class="modalBox">
+
+    <div class="modalHeader">
+
+      <h2 id="priceModalTitle">
+        Add Price
+      </h2>
+
+      <button class="close"
+        onclick="closeModal('priceModal')">
+        ×
+      </button>
+
+    </div>
+
+    <input id="priceId" type="hidden">
+
+    <div class="field">
+      <label>Country</label>
+      <input id="priceCountry"
+        placeholder="Example: Nigeria">
+    </div>
+
+    <div class="field">
+      <label>Service</label>
+      <input id="priceService"
+        value="Authorized SMS Service">
+    </div>
+
+    <div class="grid2">
+
+      <div class="field">
+        <label>Provider Cost</label>
+        <input id="providerCost"
+          type="number"
+          min="0"
+          step="0.01"
+          value="0"
+          oninput="updateMargin()">
+      </div>
+
+      <div class="field">
+        <label>Customer Price</label>
+        <input id="customerPrice"
+          type="number"
+          min="0"
+          step="0.01"
+          value="0"
+          oninput="updateMargin()">
+      </div>
+
+    </div>
+
+    <div class="field">
+
+      <label>Currency</label>
+
+      <select id="priceCurrency">
+
+        <option value="NGN">NGN</option>
+        <option value="USD">USD</option>
+        <option value="GBP">GBP</option>
+        <option value="EUR">EUR</option>
+
+      </select>
+
+    </div>
+
+    <div class="field">
+
+      <label>Status</label>
+
+      <select id="priceActive">
+
+        <option value="true">Active</option>
+        <option value="false">Inactive</option>
+
+      </select>
+
+    </div>
+
+    <div class="marginBox">
+
+      <div style="font-size:12px;color:#777">
+        Margin
+      </div>
+
+      <div id="marginValue"
+        class="marginValue">
+        ₦0.00
+      </div>
+
+    </div>
+
+    <button class="primaryBtn"
+      style="margin-top:15px"
+      onclick="savePrice()">
+      Save Price
+    </button>
+
+  </div>
+</div>
+
+
+<!-- NUMBER MODAL -->
+
+<div id="numberModal" class="modal"
+  onclick="outsideModal(event,'numberModal')">
+
+  <div class="modalBox">
+
+    <div class="modalHeader">
+
+      <h2>Add Number</h2>
+
+      <button class="close"
+        onclick="closeModal('numberModal')">
+        ×
+      </button>
+
+    </div>
+
+    <div class="field">
+
+      <label>Country</label>
+
+      <input id="numberCountry"
+        placeholder="Example: Nigeria">
+
+    </div>
+
+    <div class="field">
+
+      <label>Service</label>
+
+      <input id="numberService"
+        value="Authorized SMS Service">
+
+    </div>
+
+    <div class="field">
+
+      <label>Authorized Number</label>
+
+      <input id="numberPhone"
+        placeholder="Enter authorized number">
+
+    </div>
+
+    <button class="primaryBtn"
+      onclick="saveNumber()">
+      Add Number
+    </button>
+
+  </div>
+</div>
+
+
+<!-- FULFILL MODAL -->
+
+<div id="fulfillModal" class="modal"
+  onclick="outsideModal(event,'fulfillModal')">
+
+  <div class="modalBox">
+
+    <div class="modalHeader">
+
+      <h2>Fulfill Order</h2>
+
+      <button class="close"
+        onclick="closeModal('fulfillModal')">
+        ×
+      </button>
+
+    </div>
+
+    <input id="fulfillOrderId" type="hidden">
+
+    <div id="fulfillInfo" class="card"></div>
+
+    <div class="field">
+
+      <label>
+        Available authorized number
+      </label>
+
+      <select id="availableNumber">
+
+        <option value="">
+          Select number
+        </option>
+
+      </select>
+
+    </div>
+
+    <div style="
+      text-align:center;
+      color:#999;
+      font-size:12px;
+      margin:12px 0;
+    ">
+      OR
+    </div>
+
+    <div class="field">
+
+      <label>
+        Manual authorized number
+      </label>
+
+      <input id="manualNumber"
+        placeholder="Enter authorized number">
+
+    </div>
+
+    <button class="primaryBtn"
+      onclick="fulfillOrder()">
+      Fulfill Order
+    </button>
+
+  </div>
+</div>
+
+
+<div id="toast"></div>
+
+
+<script>
+
+/* =========================================================
+   SUPABASE
+========================================================= */
+
+const SUPABASE_URL =
+  "https://alemtvfchysptzgzhaap.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_UEnF6pfZ2ORRcuIQUzgbRw_6bWNDnKm";
+
+const db =
+  supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let adminUser = null;
+
+let prices = [];
+let payments = [];
+let orders = [];
+let pendingOrders = [];
+let numbers = [];
+let users = [];
+let messages = [];
+
+
+/* =========================================================
+   START
+========================================================= */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  async () => {
+
+    const {
+      data,
+      error
+    } = await db.auth.getSession();
+
+    if(error){
+      console.error(error);
+      return;
+    }
+
+    const session =
+      data?.session;
+
+    if(!session) return;
+
+    const allowed =
+      await verifyAdmin(
+        session.user
+      );
+
+    if(!allowed){
+
+      await db.auth.signOut();
+
+      return;
+    }
+
+    adminUser =
+      session.user;
+
+    showAdmin();
+
+  }
+);
+
+
+/* =========================================================
+   LOGIN
+========================================================= */
+
+async function adminLogin(){
+
+  const email =
+    document
+      .getElementById(
+        "adminEmailInput"
+      )
+      .value
+      .trim();
+
+  const password =
+    document
+      .getElementById(
+        "adminPasswordInput"
+      )
+      .value;
+
+  if(!email || !password){
+
+    loginMessage(
+      "Enter your email and password.",
+      true
+    );
+
+    return;
+  }
+
+  loginMessage(
+    "Signing in..."
+  );
+
+  const {
+    data,
+    error
+  } =
+    await db.auth.signInWithPassword({
+      email,
+      password
+    });
+
+  if(error){
+
+    loginMessage(
+      error.message,
+      true
+    );
+
+    return;
+  }
+
+  const allowed =
+    await verifyAdmin(
+      data.user
+    );
+
+  if(!allowed){
+
+    await db.auth.signOut();
+
+    loginMessage(
+      "This account does not have admin access.",
+      true
+    );
+
+    return;
+  }
+
+  adminUser =
+    data.user;
+
+  showAdmin();
+
+}
+
+
+/* =========================================================
+   VERIFY ADMIN
+========================================================= */
+
+async function verifyAdmin(user){
+
+  if(!user) return false;
+
+  const {
+    data,
+    error
+  } =
+    await db
+      .from("profiles")
+      .select("role")
+      .eq("id",user.id)
+      .maybeSingle();
+
+  if(error){
+
+    console.error(
+      "ADMIN CHECK ERROR:",
+      error
+    );
+
+    return false;
+  }
+
+  return data?.role === "admin";
+
+}
+
+
+/* =========================================================
+   SHOW ADMIN
+========================================================= */
+
+async function showAdmin(){
+
+  document
+    .getElementById("loginScreen")
+    .classList.add("hidden");
+
+  document
+    .getElementById("adminApp")
+    .classList.remove("hidden");
+
+  document
+    .getElementById("adminEmail")
+    .textContent =
+    adminUser?.email || "Admin";
+
+  await loadDashboard();
+
+}
+
+
+/* =========================================================
+   DASHBOARD
+========================================================= */
+
+async function loadDashboard(){
+
+  await Promise.allSettled([
+
+    loadPayments(),
+
+    loadPrices(),
+
+    loadOrders(),
+
+    loadNumbers(),
+
+    loadUsers(),
+
+    loadMessages(),
+
+    loadFulfillment()
+
+  ]);
+
+  updateStats();
+
+}
+
+
+/* =========================================================
+   STATS
+========================================================= */
+
+function updateStats(){
+
+  document.getElementById(
+    "statUsers"
+  ).textContent =
+    users.length;
+
+  document.getElementById(
+    "statPayments"
+  ).textContent =
+    payments.filter(
+      p =>
+        String(p.status)
+          .toLowerCase()
+        === "pending"
+    ).length;
+
+  document.getElementById(
+    "statOrders"
+  ).textContent =
+    pendingOrders.length ||
+    orders.filter(
+      o =>
+        String(o.status)
+          .toLowerCase()
+        === "pending"
+    ).length;
+
+  document.getElementById(
+    "statNumbers"
+  ).textContent =
+    numbers.filter(
+      n =>
+        String(n.status)
+          .toLowerCase()
+        === "available"
+    ).length;
+
+}
+
+
+/* =========================================================
+   PAYMENTS
+========================================================= */
+
+async function loadPayments(){
+
+  const {
+    data,
+    error
+  } =
+    await db
+      .from("payment_requests")
+      .select("*")
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      );
+
+  if(error){
+
+    console.error(
+      "PAYMENTS ERROR:",
+      error
+    );
+
+    toast(
+      "Payments: " +
+      error.message,
+      true
+    );
+
+    return;
+  }
+
+  payments =
+    data || [];
+
+  renderPayments();
+
+  updateStats();
+
+}
+
+
+function renderPayments(){
+
+  const tbody =
+    document.getElementById(
+      "paymentsTable"
+    );
+
+  const search =
+    (
+      document.getElementById(
+        "paymentSearch"
+      )?.value || ""
+    ).toLowerCase();
+
+  const filtered =
+    payments.filter(p => {
+
+      return [
+        p.reference,
+        p.user_id,
+        p.status
+      ]
+        .join(" ")
+        .toLowerCase()
+        .includes(search);
+
+    });
+
+  if(!filtered.length){
+
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6">
+          No payments found.
+        </td>
+      </tr>
+    `;
+
+    return;
+  }
+
+  tbody.innerHTML =
+    filtered.map(p => {
+
+      const status =
+        String(
+          p.status || "pending"
+        ).toLowerCase();
+
+      return `
+        <tr>
+
+          <td>
+            ${escapeHTML(
+              formatDate(p.created_at)
+            )}
+          </td>
+
+          <td>
+            ${escapeHTML(
+              shortId(p.user_id)
+            )}
+          </td>
+
+          <td>
+            <strong>
+              ₦${Number(
+                p.amount || 0
+              ).toLocaleString(
+                "en-NG",
+                {
+                  minimumFractionDigits:2
+                }
+              )}
+            </strong>
+          </td>
+
+          <td>
+            ${escapeHTML(
+              p.reference || "—"
+            )}
+          </td>
+
+          <td>
+            <span class="badge ${escapeHTML(status)}">
+              ${escapeHTML(
+                capitalize(status)
+              )}
+            </span>
+          </td>
+
+          <td>
+            ${
+              status === "pending"
+              ? `
+                <div class="actions">
+
+                  <button
+                    class="btn btnGreen"
+                    onclick="approvePayment('${p.id}')">
+                    Approve
+                  </button>
+
+                  <button
+                    class="btn btnRed"
+                    onclick="declinePayment('${p.id}')">
+                    Decline
+                  </button>
+
+                </div>
+              `
+              : "—"
+            }
+          </td>
+
+        </tr>
+      `;
+
+    }).join("");
+
+}
+
+
+async function approvePayment(id){
+
+  if(!confirm(
+    "Approve this payment and add the amount to the customer's wallet?"
+  )){
+    return;
+  }
+
+  const {
+    error
+  } =
+    await db.rpc(
+      "approve_payment",
+      {
+        p_payment_id:id
+      }
+    );
+
+  if(error){
+
+    console.error(error);
+
+    toast(
+      error.message,
+      true
+    );
+
+    return;
+  }
+
+  toast(
+    "Payment approved."
+  );
+
+  await loadPayments();
+  await loadUsers();
+
+}
+
+
+async function declinePayment(id){
+
+  if(!confirm(
+    "Decline this payment?"
+  )){
+    return;
+  }
+
+  const {
+    error
+  } =
+    await db.rpc(
+      "decline_payment",
+      {
+        p_payment_id:id
+      }
+    );
+
+  if(error){
+
+    console.error(error);
+
+    toast(
+      error.message,
+      true
+    );
+
+    return;
+  }
+
+  toast(
+    "Payment declined."
+  );
+
+  await loadPayments();
+
+}
+
+
+/* =========================================================
+   PRICES
+========================================================= */
+
+async function loadPrices(){
+
+  const {
+    data,
+    error
+  } =
+    await db
+      .from("prices")
+      .select("*")
+      .order(
+        "country",
+        {
+          ascending:true
+        }
+      );
+
+  if(error){
+
+    console.error(
+      "PRICES ERROR:",
+      error
+    );
+
+    toast(
+      "Prices: " + error.message,
+      true
+    );
+
+    return;
+  }
+
+  prices =
+    data || [];
+
+  renderPrices();
+
+}
+
+
+function renderPrices(){
+
+  const tbody =
+    document.getElementById(
+      "pricesTable"
+    );
+
+  const search =
+    (
+      document.getElementById(
+        "priceSearch"
+      )?.value || ""
+    ).toLowerCase();
+
+  const filtered =
+    prices.filter(p => {
+
+      return [
+        p.country,
+        p.service,
+        p.currency
+      ]
+        .join(" ")
+        .toLowerCase()
+        .includes(search);
+
+    });
+
+  if(!filtered.length){
+
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="8">
+          No prices found.
+        </td>
+      </tr>
+    `;
+
+    return;
+  }
+
+  tbody.innerHTML =
+    filtered.map(p => {
+
+      const margin =
+        Number(p.customer_price || 0) -
+        Number(p.provider_cost || 0);
+
+      return `
+        <tr>
+
+          <td>
+            <strong>
+              ${escapeHTML(p.country)}
+            </strong>
+          </td>
+
+          <td>
+            ${escapeHTML(p.service)}
+          </td>
+
+          <td>
+            ${escapeHTML(p.currency || "NGN")}
+            ${Number(
+              p.provider_cost || 0
+            ).toLocaleString(
+              "en-NG",
+              {
+                minimumFractionDigits:2
+              }
+            )}
+          </td>
+
+          <td>
+            <strong>
+              ${escapeHTML(p.currency || "NGN")}
+              ${Number(
+                p.customer_price || 0
+              ).toLocaleString(
+                "en-NG",
+                {
+                  minimumFractionDigits:2
+                }
+              )}
+            </strong>
+          </td>
+
+          <td>
+            ${escapeHTML(p.currency || "NGN")}
+            ${margin.toLocaleString(
+              "en-NG",
+              {
+                minimumFractionDigits:2
+              }
+            )}
+          </td>
+
+          <td>
+            ${escapeHTML(p.currency || "NGN")}
+          </td>
+
+          <td>
+            <span class="badge ${
+              p.active
+              ? "active"
+              : "inactive"
+            }">
+              ${p.active ? "Active" : "Inactive"}
+            </span>
+          </td>
+
+          <td>
+
+            <div class="actions">
+
+              <button
+                class="btn btnBlue"
+                onclick="editPrice('${p.id}')">
+                Edit
+              </button>
+
+              <button
+                class="btn ${
+                  p.active
+                  ? "btnOrange"
+                  : "btnGreen"
+                }"
+                onclick="togglePrice('${p.id}')">
+                ${p.active ? "Disable" : "Activate"}
+              </button>
+
+              <button
+                class="btn btnRed"
+                onclick="deletePrice('${p.id}')">
+                Delete
+              </button>
+
+            </div>
+
+          </td>
+
+        </tr>
+      `;
+
+    }).join("");
+
+}
+
+
+function openPriceModal(){
+
+  document.getElementById(
+    "priceModalTitle"
+  ).textContent =
+    "Add Price";
+
+  document.getElementById(
+    "priceId"
+  ).value = "";
+
+  document.getElementById(
+    "priceCountry"
+  ).value = "";
+
+  document.getElementById(
+    "priceService"
+  ).value =
+    "Authorized SMS Service";
+
+  document.getElementById(
+    "providerCost"
+  ).value = "0";
+
+  document.getElementById(
+    "customerPrice"
+  ).value = "0";
+
+  document.getElementById(
+    "priceCurrency"
+  ).value = "NGN";
+
+  document.getElementById(
+    "priceActive"
+  ).value = "true";
+
+  updateMargin();
+
+  openModal("priceModal");
+
+}
+
+
+function editPrice(id){
+
+  const p =
+    prices.find(
+      x => x.id === id
+    );
+
+  if(!p) return;
+
+  document.getElementById(
+    "priceModalTitle"
+  ).textContent =
+    "Edit Price";
+
+  document.getElementById(
+    "priceId"
+  ).value =
+    p.id;
+
+  document.getElementById(
+    "priceCountry"
+  ).value =
+    p.country;
+
+  document.getElementById(
+    "priceService"
+  ).value =
+    p.service;
+
+  document.getElementById(
+    "providerCost"
+  ).value =
+    p.provider_cost;
+
+  document.getElementById(
+    "customerPrice"
+  ).value =
+    p.customer_price;
+
+  document.getElementById(
+    "priceCurrency"
+  ).value =
+    p.currency || "NGN";
+
+  document.getElementById(
+    "priceActive"
+  ).value =
+    String(p.active);
+
+  updateMargin();
+
+  openModal("priceModal");
+
+}
+
+
+function updateMargin(){
+
+  const provider =
+    Number(
+      document.getElementById(
+        "providerCost"
+      ).value || 0
+    );
+
+  const customer =
+    Number(
+      document.getElementById(
+        "customerPrice"
+      ).value || 0
+    );
+
+  const currency =
+    document.getElementById(
+      "priceCurrency"
+    ).value || "NGN";
+
+  const margin =
+    customer - provider;
+
+  document.getElementById(
+    "marginValue"
+  ).textContent =
+    currency +
+    " " +
+    margin.toLocaleString(
+      "en-NG",
+      {
+        minimumFractionDigits:2
+      }
+    );
+
+}
+
+
+async function savePrice(){
+
+  const id =
+    document.getElementById(
+      "priceId"
+    ).value;
+
+  const country =
+    document.getElementById(
+      "priceCountry"
+    ).value.trim();
+
+  const service =
+    document.getElementById(
+      "priceService"
+    ).value.trim();
+
+  const providerCost =
+    Number(
+      document.getElementById(
+        "providerCost"
+      ).value || 0
+    );
+
+  const customerPrice =
+    Number(
+      document.getElementById(
+        "customerPrice"
+      ).value || 0
+    );
+
+  const currency =
+    document.getElementById(
+      "priceCurrency"
+    ).value;
+
+  const active =
+    document.getElementById(
+      "priceActive"
+    ).value === "true";
+
+  if(!country || !service){
+
+    toast(
+      "Country and service are required.",
+      true
+    );
+
+    return;
+  }
+
+  const payload = {
+    country,
+    service,
+    provider_cost:providerCost,
+    customer_price:customerPrice,
+    currency,
+    active
+  };
+
+  let error;
+
+  if(id){
+
+    ({error} =
+      await db
+        .from("prices")
+        .update(payload)
+        .eq("id",id));
+
+  }else{
+
+    ({error} =
+      await db
+        .from("prices")
+        .insert(payload));
+
+  }
+
+  if(error){
+
+    toast(
+      error.message,
+      true
+    );
+
+    return;
+  }
+
+  closeModal("priceModal");
+
+  toast(
+    "Price saved."
+  );
+
+  await loadPrices();
+
+}
+
+
+async function togglePrice(id){
+
+  const p =
+    prices.find(
+      x => x.id === id
+    );
+
+  if(!p) return;
+
+  const {
+    error
+  } =
+    await db
+      .from("prices")
+      .update({
+        active:!p.active
+      })
+      .eq("id",id);
+
+  if(error){
+
+    toast(
+      error.message,
+      true
+    );
+
+    return;
+  }
+
+  await loadPrices();
+
+}
+
+
+async function deletePrice(id){
+
+  if(!confirm(
+    "Delete this price?"
+  )){
+    return;
+  }
+
+  const {
+    error
+  } =
+    await db
+      .from("prices")
+      .delete()
+      .eq("id",id);
+
+  if(error){
+
+    toast(
+      error.message,
+      true
+    );
+
+    return;
+  }
+
+  await loadPrices();
+
+}
+
+
+/* =========================================================
+   ORDERS
+========================================================= */
+
+async function loadOrders(){
+
+  const {
+    data,
+    error
+  } =
+    await db
+      .from("orders")
+      .select("*")
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      );
+
+  if(error){
+
+    console.error(
+      "ORDERS ERROR:",
+      error
+    );
+
+    toast(
+      "Orders: " + error.message,
+      true
+    );
+
+    return false;
+  }
+
+  orders =
+    data || [];
+
+  renderOrders();
+
+  updateStats();
+
+  return true;
+
+}
+
+
+/* =========================================================
+   DIRECT PENDING ORDER QUERY
+   THIS IS THE IMPORTANT FIX
+========================================================= */
+
+async function loadFulfillment(){
+
+  const box =
+    document.getElementById(
+      "fulfillmentList"
+    );
+
+  box.innerHTML = `
+    <div class="loadingBox">
+      Loading pending orders...
+    </div>
+  `;
+
+
+  const {
+    data,
+    error
+  } =
+    await db
+      .from("orders")
+      .select("*")
+      .eq("status","pending")
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      );
+
+
+  if(error){
+
+    console.error(
+      "FULFILLMENT ERROR:",
+      error
+    );
+
+    box.innerHTML = `
+      <div class="errorBox">
+        <strong>Fulfillment could not load.</strong>
+        <br><br>
+        ${escapeHTML(error.message)}
+        <br><br>
+        <small>
+          Code: ${escapeHTML(error.code || "unknown")}
+        </small>
+      </div>
+    `;
+
+    return;
+  }
+
+
+  pendingOrders =
+    data || [];
+
+
+  /*
+    Keep the main order list synchronized.
+  */
+
+  pendingOrders.forEach(pending => {
+
+    const index =
+      orders.findIndex(
+        o => o.id === pending.id
+      );
+
+    if(index >= 0){
+
+      orders[index] =
+        pending;
+
+    }else{
+
+      orders.push(pending);
+
+    }
+
+  });
+
+
+  if(!pendingOrders.length){
+
+    box.innerHTML = `
+      <div class="card emptyBox">
+
+        <strong>
+          No pending orders.
+        </strong>
+
+        <div style="margin-top:7px">
+          New customer orders will appear here.
+        </div>
+
+      </div>
+    `;
+
+    updateStats();
+
+    return;
+  }
+
+
+  box.innerHTML =
+    pendingOrders.map(o => {
+
+      return `
+        <div class="orderCard">
+
+          <div class="orderTop">
+
+            <div>
+
+              <div class="orderCountry">
+                ${escapeHTML(
+                  o.country || "Unknown country"
+                )}
+              </div>
+
+              <div class="orderMeta">
+                Service:
+                ${escapeHTML(
+                  o.service || "—"
+                )}
+              </div>
+
+              <div class="orderPrice">
+                ₦${Number(
+                  o.price || 0
+                ).toLocaleString(
+                  "en-NG",
+                  {
+                    minimumFractionDigits:2
+                  }
+                )}
+              </div>
+
+              <div class="orderMeta">
+                ${escapeHTML(
+                  formatDate(o.created_at)
+                )}
+              </div>
+
+              <div class="orderId">
+                Order ID:
+                ${escapeHTML(o.id)}
+              </div>
+
+            </div>
+
+            <div>
+
+              <span class="badge pending">
+                Pending
+              </span>
+
+              <br><br>
+
+              <button
+                class="btn btnPurple"
+                onclick="openFulfill('${o.id}')">
+                Fulfill
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+      `;
+
+    }).join("");
+
+  updateStats();
+
+}
+
+
+/* =========================================================
+   RELOAD ORDER DATA
+========================================================= */
+
+async function loadAllOrderData(){
+
+  await loadOrders();
+  await loadNumbers();
+  await loadFulfillment();
+
+}
+
+
+/* =========================================================
+   ORDERS TABLE
+========================================================= */
+
+function renderOrders(){
+
+  const tbody =
+    document.getElementById(
+      "ordersTable"
+    );
+
+  const search =
+    (
+      document.getElementById(
+        "orderSearch"
+      )?.value || ""
+    ).toLowerCase();
+
+  const filtered =
+    orders.filter(o => {
+
+      return [
+        o.country,
+        o.service,
+        o.status,
+        o.assigned_number,
+        o.user_id,
+        o.id
+      ]
+        .join(" ")
+        .toLowerCase()
+        .includes(search);
+
+    });
+
+  if(!filtered.length){
+
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="7">
+          No orders found.
+        </td>
+      </tr>
+    `;
+
+    return;
+  }
+
+  tbody.innerHTML =
+    filtered.map(o => {
+
+      const status =
+        String(
+          o.status || "pending"
+        ).toLowerCase();
+
+      return `
+        <tr>
+
+          <td>
+            ${escapeHTML(
+              formatDate(o.created_at)
+            )}
+          </td>
+
+          <td>
+            ${escapeHTML(
+              shortId(o.user_id)
+            )}
+          </td>
+
+          <td>
+            ${escapeHTML(
+              o.country || ""
+            )}
+          </td>
+
+          <td>
+            ${escapeHTML(
+              o.service || ""
+            )}
+          </td>
+
+          <td>
+            ₦${Number(
+              o.price || 0
+            ).toLocaleString(
+              "en-NG",
+              {
+                minimumFractionDigits:2
+              }
+            )}
+          </td>
+
+          <td>
+            <span class="badge ${escapeHTML(status)}">
+              ${escapeHTML(
+                capitalize(status)
+              )}
+            </span>
+          </td>
+
+          <td>
+            ${
+              o.assigned_number
+              ? escapeHTML(
+                  o.assigned_number
+                )
+              : "—"
+            }
+          </td>
+
+        </tr>
+      `;
+
+    }).join("");
+
+}
+
+
+/* =========================================================
+   OPEN FULFILL
+========================================================= */
+
+async function openFulfill(id){
+
+  const order =
+    pendingOrders.find(
+      o => o.id === id
+    ) ||
+    orders.find(
+      o => o.id === id
+    );
+
+  if(!order){
+
+    toast(
+      "Order could not be found.",
+      true
+    );
+
+    return;
+  }
+
+
+  document.getElementById(
+    "fulfillOrderId"
+  ).value =
+    id;
+
+
+  document.getElementById(
+    "fulfillInfo"
+  ).innerHTML = `
+
+    <strong>
+      ${escapeHTML(
+        order.country || ""
+      )}
+    </strong>
+
+    <div style="
+      margin-top:6px;
+      color:#777;
+      font-size:13px;
+    ">
+      ${escapeHTML(
+        order.service || ""
+      )}
+    </div>
+
+    <div style="
+      margin-top:8px;
+      font-weight:bold;
+    ">
+      ₦${Number(
+        order.price || 0
+      ).toLocaleString(
+        "en-NG",
+        {
+          minimumFractionDigits:2
+        }
+      )}
+    </div>
+
+    <div style="
+      margin-top:8px;
+      color:#999;
+      font-size:11px;
+    ">
+      ${escapeHTML(order.id)}
+    </div>
+  `;
+
+
+  const select =
+    document.getElementById(
+      "availableNumber"
+    );
+
+  select.innerHTML =
+    `<option value="">
+      Select number
+    </option>`;
+
+
+  const matching =
+    numbers.filter(n => {
+
+      const available =
+        String(
+          n.status || ""
+        ).toLowerCase()
+        === "available";
+
+      const sameCountry =
+        String(
+          n.country || ""
+        ).toLowerCase()
+        ===
+        String(
+          order.country || ""
+        ).toLowerCase();
+
+      return available &&
+        sameCountry;
+
+    });
+
+
+  matching.forEach(n => {
+
+    const option =
+      document.createElement(
+        "option"
+      );
+
+    option.value =
+      n.id;
+
+    option.textContent =
+      n.phone_number;
+
+    select.appendChild(
+      option
+    );
+
+  });
+
+
+  document.getElementById(
+    "manualNumber"
+  ).value = "";
+
+
+  openModal(
+    "fulfillModal"
+  );
+
+}
+
+
+/* =========================================================
+   FULFILL ORDER
+========================================================= */
+
+async function fulfillOrder(){
+
+  const orderId =
+    document.getElementById(
+      "fulfillOrderId"
+    ).value;
+
+  const numberId =
+    document.getElementById(
+      "availableNumber"
+    ).value;
+
+  const manualNumber =
+    document.getElementById(
+      "manualNumber"
+    ).value.trim();
+
+
+  if(!orderId){
+
+    toast(
+      "Order not found.",
+      true
+    );
+
+    return;
+  }
+
+
+  if(!numberId && !manualNumber){
+
+    toast(
+      "Select or enter an authorized number.",
+      true
+    );
+
+    return;
+  }
+
+
+  const order =
+    pendingOrders.find(
+      o => o.id === orderId
+    ) ||
+    orders.find(
+      o => o.id === orderId
+    );
+
+
+  if(!order){
+
+    toast(
+      "Order not found.",
+      true
+    );
+
+    return;
+  }
+
+
+  let assignedNumber =
+    manualNumber;
+
+
+  if(numberId){
+
+    const n =
+      numbers.find(
+        x => x.id === numberId
+      );
+
+    if(!n){
+
+      toast(
+        "Selected number was not found.",
+        true
+      );
+
+      return;
+    }
+
+    assignedNumber =
+      n.phone_number;
+
+  }
+
+
+  /*
+    Update order.
+  */
+
+  const {
+    error
+  } =
+    await db
+      .from("orders")
+      .update({
+
+        status:"fulfilled",
+
+        assigned_number:
+          assignedNumber,
+
+        assigned_by:
+          adminUser.id,
+
+        fulfilled_at:
+          new Date().toISOString()
+
+      })
+      .eq("id",orderId)
+      .eq("status","pending");
+
+
+  if(error){
+
+    console.error(
+      "FULFILL ORDER ERROR:",
+      error
+    );
+
+    toast(
+      error.message,
+      true
+    );
+
+    return;
+  }
+
+
+  /*
+    If inventory number was selected,
+    mark it assigned.
+  */
+
+  if(numberId){
+
+    const {
+      error:numberError
+    } =
+      await db
+        .from("numbers")
+        .update({
+          status:"assigned",
+          assigned_at:
+            new Date().toISOString()
+        })
+        .eq("id",numberId)
+        .eq("status","available");
+
+
+    if(numberError){
+
+      console.error(
+        "NUMBER UPDATE ERROR:",
+        numberError
+      );
+
+      toast(
+        "Order fulfilled, but number inventory update failed: " +
+        numberError.message,
+        true
+      );
+
+    }
+
+  }
+
+
+  closeModal(
+    "fulfillModal"
+  );
+
+
+  toast(
+    "Order fulfilled successfully."
+  );
+
+
+  await loadOrders();
+  await loadNumbers();
+  await loadFulfillment();
+
+}
+
+
+/* =========================================================
+   NUMBERS
+========================================================= */
+
+async function loadNumbers(){
+
+  const {
+    data,
+    error
+  } =
+    await db
+      .from("numbers")
+      .select("*")
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      );
+
+  if(error){
+
+    console.error(
+      "NUMBERS ERROR:",
+      error
+    );
+
+    toast(
+      "Numbers: " + error.message,
+      true
+    );
+
+    return;
+  }
+
+  numbers =
+    data || [];
+
+  renderNumbers();
+
+  updateStats();
+
+}
+
+
+function renderNumbers(){
+
+  const tbody =
+    document.getElementById(
+      "numbersTable"
+    );
+
+  if(!numbers.length){
+
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6">
+          No numbers found.
+        </td>
+      </tr>
+    `;
+
+    return;
+  }
+
+  tbody.innerHTML =
+    numbers.map(n => {
+
+      const status =
+        String(
+          n.status || "available"
+        ).toLowerCase();
+
+      return `
+        <tr>
+
+          <td>
+            ${escapeHTML(
+              n.country || ""
+            )}
+          </td>
+
+          <td>
+            ${escapeHTML(
+              n.service || ""
+            )}
+          </td>
+
+          <td>
+            <strong>
+              ${escapeHTML(
+                n.phone_number || ""
+              )}
+            </strong>
+          </td>
+
+          <td>
+            <span class="badge ${escapeHTML(status)}">
+              ${escapeHTML(
+                capitalize(status)
+              )}
+            </span>
+          </td>
+
+          <td>
+            ${escapeHTML(
+              formatDate(n.created_at)
+            )}
+          </td>
+
+          <td>
+            ${
+              status !== "assigned"
+              ? `
+                <button
+                  class="btn btnRed"
+                  onclick="deleteNumber('${n.id}')">
+                  Delete
+                </button>
+              `
+              : "Assigned"
+            }
+          </td>
+
+        </tr>
+      `;
+
+    }).join("");
+
+}
+
+
+function openNumberModal(){
+
+  document.getElementById(
+    "numberCountry"
+  ).value = "";
+
+  document.getElementById(
+    "numberService"
+  ).value =
+    "Authorized SMS Service";
+
+  document.getElementById(
+    "numberPhone"
+  ).value = "";
+
+  openModal(
+    "numberModal"
+  );
+
+}
+
+
+async function saveNumber(){
+
+  const country =
+    document.getElementById(
+      "numberCountry"
+    ).value.trim();
+
+  const service =
+    document.getElementById(
+      "numberService"
+    ).value.trim();
+
+  const phone =
+    document.getElementById(
+      "numberPhone"
+    ).value.trim();
+
+
+  if(!country ||
+     !service ||
+     !phone){
+
+    toast(
+      "Fill in all fields.",
+      true
+    );
+
+    return;
+  }
+
+
+  const {
+    error
+  } =
+    await db
+      .from("numbers")
+      .insert({
+
+        country,
+
+        service,
+
+        phone_number:phone,
+
+        status:"available"
+
+      });
+
+
+  if(error){
+
+    console.error(
+      "SAVE NUMBER ERROR:",
+      error
+    );
+
+    toast(
+      error.message,
+      true
+    );
+
+    return;
+  }
+
+
+  closeModal(
+    "numberModal"
+  );
+
+  toast(
+    "Number added."
+  );
+
+  await loadNumbers();
+
+}
+
+
+async function deleteNumber(id){
+
+  if(!confirm(
+    "Delete this number from inventory?"
+  )){
+    return;
+  }
+
+  const {
+    error
+  } =
+    await db
+      .from("numbers")
+      .delete()
+      .eq("id",id);
+
+  if(error){
+
+    toast(
+      error.message,
+      true
+    );
+
+    return;
+  }
+
+  toast(
+    "Number deleted."
+  );
+
+  await loadNumbers();
+
+}
+
+
+/* =========================================================
+   USERS
+========================================================= */
+
+async function loadUsers(){
+
+  const {
+    data,
+    error
+  } =
+    await db
+      .from("profiles")
+      .select("*")
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      );
+
+  if(error){
+
+    console.error(
+      "USERS ERROR:",
+      error
+    );
+
+    toast(
+      "Users: " + error.message,
+      true
+    );
+
+    return;
+  }
+
+  users =
+    data || [];
+
+  renderUsers();
+
+  updateStats();
+
+}
+
+
+function renderUsers(){
+
+  const tbody =
+    document.getElementById(
+      "usersTable"
+    );
+
+  const search =
+    (
+      document.getElementById(
+        "userSearch"
+      )?.value || ""
+    ).toLowerCase();
+
+  const filtered =
+    users.filter(u => {
+
+      return [
+        u.full_name,
+        u.name,
+        u.email,
+        u.role,
+        u.id
+      ]
+        .join(" ")
+        .toLowerCase()
+        .includes(search);
+
+    });
+
+  if(!filtered.length){
+
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="5">
+          No users found.
+        </td>
+      </tr>
+    `;
+
+    return;
+  }
+
+  tbody.innerHTML =
+    filtered.map(u => {
+
+      return `
+        <tr>
+
+          <td>
+            ${escapeHTML(
+              u.full_name ||
+              u.name ||
+              "—"
+            )}
+          </td>
+
+          <td>
+            ${escapeHTML(
+              u.email || "—"
+            )}
+          </td>
+
+          <td>
+            <strong>
+              ₦${Number(
+                u.balance || 0
+              ).toLocaleString(
+                "en-NG",
+                {
+                  minimumFractionDigits:2
+                }
+              )}
+            </strong>
+          </td>
+
+          <td>
+            ${escapeHTML(
+              u.role || "user"
+            )}
+          </td>
+
+          <td>
+            ${escapeHTML(
+              shortId(u.id)
+            )}
+          </td>
+
+        </tr>
+      `;
+
+    }).join("");
+
+}
+
+
+/* =========================================================
+   MESSAGES
+========================================================= */
+
+async function loadMessages(){
+
+  const {
+    data,
+    error
+  } =
+    await db
+      .from("messages")
+      .select("*")
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      );
+
+  if(error){
+
+    console.error(
+      "MESSAGES ERROR:",
+      error
+    );
+
+    toast(
+      "Messages: " + error.message,
+      true
+    );
+
+    return;
+  }
+
+  messages =
+    data || [];
+
+  renderMessages();
+
+}
+
+
+function renderMessages(){
+
+  const box =
+    document.getElementById(
+      "messagesList"
+    );
+
+  if(!messages.length){
+
+    box.innerHTML = `
+      <div class="card">
+        No customer messages.
+      </div>
+    `;
+
+    return;
+  }
+
+  box.innerHTML =
+    messages.map(m => {
+
+      return `
+        <div class="card">
+
+          <div style="
+            display:flex;
+            justify-content:space-between;
+            gap:10px;
+          ">
+
+            <strong>
+              ${escapeHTML(
+                shortId(m.user_id)
+              )}
+            </strong>
+
+            <span style="
+              color:#999;
+              font-size:11px;
+            ">
+              ${escapeHTML(
+                formatDate(m.created_at)
+              )}
+            </span>
+
+          </div>
+
+          <div style="
+            margin-top:12px;
+            line-height:1.5;
+          ">
+            ${escapeHTML(
+              m.message || ""
+            )}
+          </div>
+
+        </div>
+      `;
+
+    }).join("");
+
+}
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+async function go(page){
+
+  document
+    .querySelectorAll(".page")
+    .forEach(p =>
+      p.classList.remove("active")
+    );
+
+  const target =
+    document.getElementById(
+      "page-" + page
+    );
+
+  if(target){
+    target.classList.add("active");
+  }
+
+  document
+    .querySelectorAll(".sideBtn")
+    .forEach(btn => {
+
+      btn.classList.toggle(
+        "active",
+        btn.dataset.page === page
+      );
+
+    });
+
+  document
+    .getElementById("sidebar")
+    .classList.remove("open");
+
+
+  if(page === "dashboard"){
+
+    await loadDashboard();
+
+  }
+
+  else if(page === "payments"){
+
+    await loadPayments();
+
+  }
+
+  else if(page === "prices"){
+
+    await loadPrices();
+
+  }
+
+  else if(page === "fulfillment"){
+
+    await loadFulfillment();
+    await loadNumbers();
+
+  }
+
+  else if(page === "orders"){
+
+    await loadOrders();
+
+  }
+
+  else if(page === "numbers"){
+
+    await loadNumbers();
+
+  }
+
+  else if(page === "users"){
+
+    await loadUsers();
+
+  }
+
+  else if(page === "messages"){
+
+    await loadMessages();
+
+  }
+
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
+
+}
+
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+function toggleSidebar(){
+
+  document
+    .getElementById("sidebar")
+    .classList.toggle("open");
+
+}
+
+
+/* =========================================================
+   MODALS
+========================================================= */
+
+function openModal(id){
+
+  document
+    .getElementById(id)
+    .classList.add("show");
+
+}
+
+
+function closeModal(id){
+
+  document
+    .getElementById(id)
+    .classList.remove("show");
+
+}
+
+
+function outsideModal(event,id){
+
+  if(event.target.id === id){
+
+    closeModal(id);
+
+  }
+
+}
+
+
+/* =========================================================
+   LOGOUT
+========================================================= */
+
+async function adminLogout(){
+
+  await db.auth.signOut();
+
+  adminUser = null;
+
+  document
+    .getElementById("adminApp")
+    .classList.add("hidden");
+
+  document
+    .getElementById("loginScreen")
+    .classList.remove("hidden");
+
+}
+
+
+/* =========================================================
+   LOGIN MESSAGE
+========================================================= */
+
+function loginMessage(
+  text,
+  error=false
+){
+
+  const el =
+    document.getElementById(
+      "loginMessage"
+    );
+
+  el.textContent =
+    text;
+
+  el.className =
+    "message " +
+    (error ? "error" : "success");
+
+}
+
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+let toastTimer;
+
+function toast(
+  text,
+  error=false
+){
+
+  const el =
+    document.getElementById(
+      "toast"
+    );
+
+  el.textContent =
+    text;
+
+  el.style.position =
+    "fixed";
+
+  el.style.left =
+    "50%";
+
+  el.style.bottom =
+    "25px";
+
+  el.style.transform =
+    "translateX(-50%)";
+
+  el.style.background =
+    error
+      ? "#b91c1c"
+      : "#171717";
+
+  el.style.color =
+    "#fff";
+
+  el.style.padding =
+    "12px 18px";
+
+  el.style.borderRadius =
+    "10px";
+
+  el.style.fontSize =
+    "13px";
+
+  el.style.zIndex =
+    "300";
+
+  el.style.maxWidth =
+    "90%";
+
+  el.style.textAlign =
+    "center";
+
+  el.style.boxShadow =
+    "0 8px 30px rgba(0,0,0,.2)";
+
+  clearTimeout(
+    toastTimer
+  );
+
+  toastTimer =
+    setTimeout(
+      () => {
+        el.textContent = "";
+      },
+      5000
+    );
+
+}
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function shortId(id){
+
+  if(!id) return "—";
+
+  const text =
+    String(id);
+
+  if(text.length <= 12){
+    return text;
+  }
+
+  return (
+    text.slice(0,8) +
+    "..." +
+    text.slice(-4)
+  );
+
+}
+
+
+function formatDate(date){
+
+  if(!date) return "";
+
+  try{
+
+    return new Date(date)
+      .toLocaleString(
+        "en-NG",
+        {
+          dateStyle:"medium",
+          timeStyle:"short"
+        }
+      );
+
+  }catch{
+
+    return String(date);
+
+  }
+
+}
+
+
+function capitalize(text){
+
+  if(!text) return "";
+
+  return (
+    text.charAt(0).toUpperCase() +
+    text.slice(1)
+  );
+
+}
+
+
+function escapeHTML(value){
+
+  return String(
+    value ?? ""
+  )
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
+}
+
+
+/* =========================================================
+   AUTH STATE
+========================================================= */
+
+db.auth.onAuthStateChange(
+  async (
+    event,
+    session
+  ) => {
+
+    if(event === "SIGNED_OUT"){
+
+      adminUser = null;
+
+      document
+        .getElementById("adminApp")
+        .classList.add("hidden");
+
+      document
+        .getElementById("loginScreen")
+        .classList.remove("hidden");
+
+    }
+
+  }
+);
+
+</script>
+
+</body>
+</html>
