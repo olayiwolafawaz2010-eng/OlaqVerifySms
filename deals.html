@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
+
+<title>OlaqVerify Deals</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+body{
+  font-family:Arial,Helvetica,sans-serif;
+  background:#f5f3fa;
+  color:#171321;
+}
+
+.header{
+  background:linear-gradient(
+    135deg,
+    #5b21b6,
+    #3b0764
+  );
+  color:white;
+  padding:22px 18px 28px;
+  border-radius:0 0 28px 28px;
+}
+
+.header-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.back{
+  border:0;
+  background:rgba(255,255,255,.15);
+  color:white;
+  width:42px;
+  height:42px;
+  border-radius:13px;
+  font-size:25px;
+  cursor:pointer;
+}
+
+.brand{
+  font-size:22px;
+  font-weight:900;
+  flex:1;
+}
+
+.live{
+  font-size:11px;
+  font-weight:800;
+  background:#16a34a;
+  padding:7px 10px;
+  border-radius:20px;
+}
+
+.header h1{
+  margin-top:25px;
+  font-size:29px;
+}
+
+.header p{
+  margin-top:8px;
+  opacity:.85;
+  line-height:1.5;
+}
+
+.container{
+  max-width:700px;
+  margin:auto;
+  padding:18px;
+}
+
+.deal-card{
+  background:white;
+  border-radius:22px;
+  padding:18px;
+  margin-bottom:16px;
+  box-shadow:0 7px 25px rgba(40,20,80,.08);
+  border:1px solid #eee8f8;
+}
+
+.deal-top{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:flex-start;
+}
+
+.deal-title{
+  font-size:20px;
+  font-weight:900;
+}
+
+.badge{
+  background:#f3e8ff;
+  color:#6d28d9;
+  padding:6px 9px;
+  border-radius:10px;
+  font-size:11px;
+  font-weight:900;
+}
+
+.description{
+  color:#666;
+  margin-top:8px;
+  line-height:1.5;
+}
+
+.prices{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-top:18px;
+}
+
+.old-price{
+  color:#999;
+  text-decoration:line-through;
+  font-size:15px;
+}
+
+.new-price{
+  color:#5b21b6;
+  font-size:27px;
+  font-weight:900;
+}
+
+.discount{
+  background:#dcfce7;
+  color:#15803d;
+  padding:5px 8px;
+  border-radius:8px;
+  font-size:11px;
+  font-weight:900;
+}
+
+.timer-box{
+  background:#faf7ff;
+  border-radius:15px;
+  padding:13px;
+  margin-top:17px;
+}
+
+.timer-label{
+  color:#777;
+  font-size:11px;
+  font-weight:700;
+}
+
+.timer{
+  margin-top:5px;
+  color:#3b0764;
+  font-size:20px;
+  font-weight:900;
+}
+
+.progress{
+  margin-top:15px;
+}
+
+.progress-row{
+  display:flex;
+  justify-content:space-between;
+  font-size:12px;
+  color:#666;
+  margin-bottom:7px;
+}
+
+.progress-bar{
+  height:8px;
+  background:#eee;
+  border-radius:20px;
+  overflow:hidden;
+}
+
+.progress-fill{
+  height:100%;
+  background:linear-gradient(
+    90deg,
+    #5b21b6,
+    #9333ea
+  );
+  border-radius:20px;
+}
+
+.buy-btn{
+  width:100%;
+  border:0;
+  margin-top:17px;
+  padding:15px;
+  border-radius:14px;
+  background:#5b21b6;
+  color:white;
+  font-size:16px;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.buy-btn:disabled{
+  background:#aaa;
+  cursor:not-allowed;
+}
+
+.empty{
+  background:white;
+  padding:35px 20px;
+  border-radius:22px;
+  text-align:center;
+  box-shadow:0 7px 25px rgba(40,20,80,.06);
+}
+
+.empty-icon{
+  font-size:45px;
+}
+
+.empty h2{
+  margin-top:12px;
+}
+
+.empty p{
+  color:#777;
+  line-height:1.5;
+  margin-top:8px;
+}
+
+.loading{
+  text-align:center;
+  padding:40px;
+  color:#666;
+}
+
+.notice{
+  background:#fff7ed;
+  color:#9a3412;
+  padding:13px;
+  border-radius:14px;
+  margin-bottom:16px;
+  font-size:13px;
+  line-height:1.5;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header class="header">
+
+  <div class="header-top">
+
+    <button
+      class="back"
+      onclick="goBack()"
+    >
+      ‹
+    </button>
+
+    <div class="brand">
+      OlaqVerify
+    </div>
+
+    <div class="live">
+      DEALS
+    </div>
+
+  </div>
+
+  <h1>Flash Deals ⚡</h1>
+
+  <p>
+    Limited-time offers on selected OlaqVerify services.
+  </p>
+
+</header>
+
+
+<main class="container">
+
+  <div class="notice">
+    Deal prices and availability are shown before checkout.
+    Deals automatically expire when their countdown ends or
+    promotional inventory is exhausted.
+  </div>
+
+  <div id="dealsContainer">
+
+    <div class="loading">
+      Loading deals...
+    </div>
+
+  </div>
+
+</main>
+
+
+<script>
+
+const SUPABASE_URL =
+  "https://alemtvfchysptzgzhaap.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_UEnF6pfZ2ORRcuIQUzgbRw_6bWNDnKm";
+
+const db =
+  supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+
+function goBack(){
+
+  if(
+    document.referrer &&
+    document.referrer.includes(location.hostname)
+  ){
+    history.back();
+  }else{
+    window.location.href = "index.html";
+  }
+
+}
+
+
+function money(value){
+
+  return new Intl.NumberFormat(
+    "en-NG",
+    {
+      style:"currency",
+      currency:"NGN",
+      minimumFractionDigits:2
+    }
+  ).format(Number(value || 0));
+
+}
+
+
+function discountPercent(original,deal){
+
+  if(Number(original) <= 0) return 0;
+
+  return Math.round(
+    ((Number(original)-Number(deal))
+    /Number(original))*100
+  );
+
+}
+
+
+function remaining(deal){
+
+  return Math.max(
+    0,
+    Number(deal.quantity || 0)
+    -
+    Number(deal.sold_quantity || 0)
+  );
+
+}
+
+
+function countdown(endTime){
+
+  const end =
+    new Date(endTime).getTime();
+
+  const now =
+    Date.now();
+
+  const difference =
+    end-now;
+
+  if(difference <= 0){
+    return "Expired";
+  }
+
+  const totalSeconds =
+    Math.floor(difference/1000);
+
+  const days =
+    Math.floor(totalSeconds/86400);
+
+  const hours =
+    Math.floor(
+      (totalSeconds%86400)/3600
+    );
+
+  const minutes =
+    Math.floor(
+      (totalSeconds%3600)/60
+    );
+
+  const seconds =
+    totalSeconds%60;
+
+  if(days > 0){
+
+    return `${days}d ${String(hours).padStart(2,"0")}h ${String(minutes).padStart(2,"0")}m`;
+
+  }
+
+  return `${String(hours).padStart(2,"0")}h ${String(minutes).padStart(2,"0")}m ${String(seconds).padStart(2,"0")}s`;
+
+}
+
+
+async function loadDeals(){
+
+  const container =
+    document.getElementById(
+      "dealsContainer"
+    );
+
+  const {data,error} =
+    await db
+      .from("deals")
+      .select(`
+        id,
+        price_id,
+        title,
+        description,
+        original_price,
+        deal_price,
+        quantity,
+        sold_quantity,
+        starts_at,
+        ends_at,
+        active
+      `)
+      .eq("active",true)
+      .lte("starts_at",new Date().toISOString())
+      .gt("ends_at",new Date().toISOString())
+      .order("ends_at",{ascending:true});
+
+  if(error){
+
+    console.error(error);
+
+    container.innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">⚠️</div>
+        <h2>Unable to load deals</h2>
+        <p>
+          Please refresh the page and try again.
+        </p>
+      </div>
+    `;
+
+    return;
+  }
+
+
+  const availableDeals =
+    (data || []).filter(
+      deal =>
+        remaining(deal) > 0
+    );
+
+
+  if(!availableDeals.length){
+
+    container.innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">⚡</div>
+
+        <h2>No active deals</h2>
+
+        <p>
+          There are no Flash Deals available right now.
+          Check back later for new offers.
+        </p>
+      </div>
+    `;
+
+    return;
+  }
+
+
+  container.innerHTML =
+    availableDeals.map(
+      deal => renderDeal(deal)
+    ).join("");
+
+
+  startTimers();
+
+}
+
+
+function renderDeal(deal){
+
+  const original =
+    Number(deal.original_price);
+
+  const price =
+    Number(deal.deal_price);
+
+  const discount =
+    discountPercent(
+      original,
+      price
+    );
+
+  const left =
+    remaining(deal);
+
+  const sold =
+    Number(deal.sold_quantity || 0);
+
+  const total =
+    Number(deal.quantity || 1);
+
+  const percentage =
+    Math.min(
+      100,
+      Math.max(
+        0,
+        (sold/total)*100
+      )
+    );
+
+
+  return `
+    <article
+      class="deal-card"
+      id="deal-${deal.id}"
+      data-end="${deal.ends_at}"
+    >
+
+      <div class="deal-top">
+
+        <div>
+          <div class="deal-title">
+            ${escapeHtml(deal.title)}
+          </div>
+
+          <div class="description">
+            ${escapeHtml(
+              deal.description || ""
+            )}
+          </div>
+        </div>
+
+        <div class="badge">
+          ${discount}% OFF
+        </div>
+
+      </div>
+
+
+      <div class="prices">
+
+        <span class="old-price">
+          ${money(original)}
+        </span>
+
+        <span class="new-price">
+          ${money(price)}
+        </span>
+
+        <span class="discount">
+          SAVE ${money(original-price)}
+        </span>
+
+      </div>
+
+
+      <div class="timer-box">
+
+        <div class="timer-label">
+          DEAL ENDS IN
+        </div>
+
+        <div
+          class="timer"
+          data-timer="${deal.id}"
+        >
+          ${countdown(deal.ends_at)}
+        </div>
+
+      </div>
+
+
+      <div class="progress">
+
+        <div class="progress-row">
+
+          <span>
+            Promotional inventory
+          </span>
+
+          <strong>
+            ${left} left
+          </strong>
+
+        </div>
+
+        <div class="progress-bar">
+
+          <div
+            class="progress-fill"
+            style="width:${percentage}%"
+          ></div>
+
+        </div>
+
+      </div>
+
+
+      <button
+        class="buy-btn"
+        onclick="startDeal('${deal.id}')"
+      >
+        View Deal
+      </button>
+
+    </article>
+  `;
+
+}
+
+
+function escapeHtml(value){
+
+  return String(value)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+
+}
+
+
+function startTimers(){
+
+  setInterval(() => {
+
+    document
+      .querySelectorAll("[data-timer]")
+      .forEach(timer => {
+
+        const card =
+          document.getElementById(
+            "deal-"+timer.dataset.timer
+          );
+
+        if(!card) return;
+
+        const end =
+          card.dataset.end;
+
+        timer.textContent =
+          countdown(end);
+
+        if(
+          countdown(end) === "Expired"
+        ){
+          const button =
+            card.querySelector(".buy-btn");
+
+          if(button){
+            button.disabled = true;
+            button.textContent =
+              "Deal Expired";
+          }
+        }
+
+      });
+
+  },1000);
+
+}
+
+
+async function startDeal(dealId){
+
+  const {data,error} =
+    await db
+      .from("deals")
+      .select(`
+        id,
+        price_id,
+        title,
+        original_price,
+        deal_price,
+        quantity,
+        sold_quantity,
+        starts_at,
+        ends_at,
+        active
+      `)
+      .eq("id",dealId)
+      .maybeSingle();
+
+
+  if(error || !data){
+
+    alert(
+      "This deal is no longer available."
+    );
+
+    return;
+  }
+
+
+  if(!data.active){
+
+    alert(
+      "This deal is currently unavailable."
+    );
+
+    return;
+  }
+
+
+  if(
+    new Date(data.ends_at).getTime()
+    <= Date.now()
+  ){
+
+    alert(
+      "This deal has expired."
+    );
+
+    return;
+  }
+
+
+  if(
+    remaining(data) <= 0
+  ){
+
+    alert(
+      "This deal is sold out."
+    );
+
+    return;
+  }
+
+
+  /*
+    The existing OlaqVerify checkout uses
+    place_order(p_price_id).
+
+    We deliberately do not pretend that the
+    discounted amount has been charged here.
+
+    The next integration step should connect
+    this deal to a secure server-side checkout
+    that atomically validates the deal price,
+    wallet balance and remaining inventory.
+  */
+
+  localStorage.setItem(
+    "olaq_selected_deal",
+    JSON.stringify(data)
+  );
+
+
+  window.location.href =
+    "index.html?deal="+
+    encodeURIComponent(data.id);
+
+}
+
+
+loadDeals();
+
+</script>
+
+</body>
+</html>
