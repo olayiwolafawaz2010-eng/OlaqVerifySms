@@ -1,0 +1,3133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>OlaqVerify Admin</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root{
+  --purple:#5b21b6;
+  --purple2:#3b0764;
+  --red:#dc2626;
+  --red2:#991b1b;
+  --bg:#f5f6fa;
+  --card:#fff;
+  --text:#171717;
+  --muted:#737373;
+  --border:#e5e7eb;
+  --green:#16a34a;
+  --orange:#f59e0b;
+  --blue:#2563eb;
+}
+
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+}
+
+button,input,select,textarea{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+}
+
+.hidden{
+  display:none!important;
+}
+
+/* LOGIN */
+
+#loginScreen{
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:20px;
+  background:linear-gradient(145deg,#3b0764,#5b21b6,#991b1b);
+}
+
+.loginBox{
+  width:100%;
+  max-width:420px;
+  background:white;
+  padding:30px;
+  border-radius:24px;
+  box-shadow:0 20px 60px rgba(0,0,0,.25);
+}
+
+.logo{
+  text-align:center;
+  font-size:30px;
+  font-weight:900;
+  color:var(--purple);
+}
+
+.logo span{
+  color:var(--red);
+}
+
+.subtitle{
+  text-align:center;
+  color:var(--muted);
+  margin:8px 0 25px;
+  font-size:13px;
+}
+
+.field{
+  margin-bottom:14px;
+}
+
+.field label{
+  display:block;
+  font-size:12px;
+  font-weight:bold;
+  margin-bottom:7px;
+}
+
+.field input,
+.field select,
+.field textarea{
+  width:100%;
+  padding:13px;
+  border:1px solid var(--border);
+  border-radius:11px;
+  outline:none;
+  background:white;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus{
+  border-color:var(--purple);
+}
+
+.primary{
+  width:100%;
+  padding:14px;
+  border:0;
+  border-radius:12px;
+  background:linear-gradient(135deg,var(--purple),var(--red));
+  color:white;
+  font-weight:bold;
+}
+
+/* APP */
+
+#adminApp{
+  min-height:100vh;
+}
+
+.topbar{
+  height:65px;
+  background:white;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 18px;
+  position:sticky;
+  top:0;
+  z-index:50;
+}
+
+.brand{
+  font-size:22px;
+  font-weight:900;
+  color:var(--purple);
+}
+
+.brand span{
+  color:var(--red);
+}
+
+.adminBadge{
+  background:#f3e8ff;
+  color:var(--purple);
+  padding:7px 12px;
+  border-radius:20px;
+  font-size:11px;
+  font-weight:bold;
+}
+
+.layout{
+  display:flex;
+  min-height:calc(100vh - 65px);
+}
+
+/* SIDEBAR */
+
+.sidebar{
+  width:235px;
+  background:#fff;
+  border-right:1px solid var(--border);
+  padding:15px 10px;
+  flex-shrink:0;
+}
+
+.menuBtn{
+  width:100%;
+  padding:13px;
+  border:0;
+  background:white;
+  border-radius:11px;
+  text-align:left;
+  font-weight:bold;
+  color:#525252;
+  margin-bottom:5px;
+}
+
+.menuBtn:hover{
+  background:#f5f3ff;
+}
+
+.menuBtn.active{
+  background:#f3e8ff;
+  color:var(--purple);
+}
+
+.menuIcon{
+  display:inline-block;
+  width:27px;
+}
+
+/* CONTENT */
+
+.content{
+  flex:1;
+  padding:20px;
+  max-width:1300px;
+}
+
+.section{
+  display:none;
+}
+
+.section.active{
+  display:block;
+}
+
+.pageTitle{
+  margin-bottom:18px;
+}
+
+.pageTitle h1{
+  font-size:24px;
+}
+
+.pageTitle p{
+  color:var(--muted);
+  font-size:13px;
+  margin-top:4px;
+}
+
+/* STATS */
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:13px;
+  margin-bottom:18px;
+}
+
+.stat{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:17px;
+  padding:18px;
+}
+
+.statLabel{
+  color:var(--muted);
+  font-size:12px;
+}
+
+.statValue{
+  font-size:26px;
+  font-weight:900;
+  margin-top:7px;
+  color:var(--purple);
+}
+
+/* CARDS */
+
+.card{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:17px;
+  padding:17px;
+  margin-bottom:16px;
+}
+
+.cardHeader{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:14px;
+}
+
+.cardHeader h2{
+  font-size:17px;
+}
+
+/* TABLE */
+
+.tableWrap{
+  overflow-x:auto;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:650px;
+}
+
+th{
+  background:#f9fafb;
+  color:#737373;
+  font-size:11px;
+  text-align:left;
+  padding:12px;
+  border-bottom:1px solid var(--border);
+}
+
+td{
+  padding:12px;
+  border-bottom:1px solid var(--border);
+  font-size:12px;
+}
+
+tr:last-child td{
+  border-bottom:0;
+}
+
+/* BUTTONS */
+
+.btn{
+  border:0;
+  border-radius:9px;
+  padding:8px 11px;
+  font-size:11px;
+  font-weight:bold;
+}
+
+.btnGreen{
+  background:#dcfce7;
+  color:#166534;
+}
+
+.btnRed{
+  background:#fee2e2;
+  color:#b91c1c;
+}
+
+.btnPurple{
+  background:#ede9fe;
+  color:#5b21b6;
+}
+
+.btnBlue{
+  background:#dbeafe;
+  color:#1d4ed8;
+}
+
+.btnGray{
+  background:#f3f4f6;
+  color:#404040;
+}
+
+/* STATUS */
+
+.status{
+  display:inline-block;
+  padding:5px 9px;
+  border-radius:20px;
+  font-size:10px;
+  font-weight:bold;
+}
+
+.pending{
+  background:#fff7ed;
+  color:#c2410c;
+}
+
+.approved,
+.fulfilled,
+.available{
+  background:#f0fdf4;
+  color:#15803d;
+}
+
+.declined,
+.cancelled,
+.sold{
+  background:#fef2f2;
+  color:#b91c1c;
+}
+
+.assigned{
+  background:#dbeafe;
+  color:#1d4ed8;
+}
+
+/* ORDER CARD */
+
+.orderCard{
+  border:1px solid var(--border);
+  border-radius:15px;
+  padding:15px;
+  margin-bottom:11px;
+}
+
+.orderHeader{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.orderId{
+  color:var(--muted);
+  font-size:11px;
+}
+
+.orderMain{
+  font-weight:bold;
+  margin-top:4px;
+}
+
+.orderMeta{
+  color:var(--muted);
+  font-size:11px;
+  margin-top:6px;
+}
+
+.assignBox{
+  background:#f8fafc;
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:12px;
+  margin-top:12px;
+}
+
+.assignRow{
+  display:flex;
+  gap:8px;
+}
+
+.assignRow input,
+.assignRow select{
+  flex:1;
+  min-width:0;
+  padding:11px;
+  border:1px solid var(--border);
+  border-radius:9px;
+}
+
+/* SEARCH */
+
+.search{
+  width:100%;
+  padding:12px;
+  border:1px solid var(--border);
+  border-radius:11px;
+  margin-bottom:13px;
+}
+
+/* MODAL */
+
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.5);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:15px;
+  z-index:100;
+}
+
+.modalBox{
+  width:100%;
+  max-width:480px;
+  background:white;
+  border-radius:20px;
+  padding:20px;
+  max-height:90vh;
+  overflow:auto;
+}
+
+.modalHead{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:17px;
+}
+
+.close{
+  border:0;
+  background:#f3f4f6;
+  width:35px;
+  height:35px;
+  border-radius:50%;
+  font-size:18px;
+}
+
+/* MOBILE */
+
+.mobileMenu{
+  display:none;
+  border:0;
+  background:#f3e8ff;
+  color:var(--purple);
+  border-radius:9px;
+  width:38px;
+  height:38px;
+}
+
+@media(max-width:800px){
+
+  .sidebar{
+    position:fixed;
+    left:-250px;
+    top:65px;
+    bottom:0;
+    z-index:60;
+    transition:.25s;
+  }
+
+  .sidebar.open{
+    left:0;
+    box-shadow:10px 0 30px rgba(0,0,0,.12);
+  }
+
+  .mobileMenu{
+    display:block;
+    margin-right:10px;
+  }
+
+  .topLeft{
+    display:flex;
+    align-items:center;
+  }
+
+  .stats{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .content{
+    padding:15px;
+  }
+}
+
+@media(max-width:450px){
+
+  .stats{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .statValue{
+    font-size:21px;
+  }
+
+  .assignRow{
+    flex-direction:column;
+  }
+}
+
+/* TOAST */
+
+.toast{
+  position:fixed;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#171717;
+  color:white;
+  padding:12px 16px;
+  border-radius:11px;
+  z-index:200;
+  font-size:12px;
+  max-width:90%;
+  text-align:center;
+}
+
+.empty{
+  padding:30px;
+  text-align:center;
+  color:var(--muted);
+  font-size:13px;
+}
+
+.loading{
+  padding:25px;
+  text-align:center;
+  color:var(--muted);
+}
+</style>
+</head>
+
+<body>
+
+
+<!-- LOGIN -->
+
+<div id="loginScreen">
+
+  <div class="loginBox">
+
+    <div class="logo">
+      Olaq<span>Verify</span>
+    </div>
+
+    <div class="subtitle">
+      Administrator Dashboard
+    </div>
+
+    <div class="field">
+
+      <label>Email</label>
+
+      <input
+        id="adminEmail"
+        type="email"
+        placeholder="Admin email"
+      >
+
+    </div>
+
+    <div class="field">
+
+      <label>Password</label>
+
+      <input
+        id="adminPassword"
+        type="password"
+        placeholder="Password"
+      >
+
+    </div>
+
+    <button
+      class="primary"
+      onclick="adminLogin()"
+    >
+      Sign In
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- ADMIN -->
+
+<div id="adminApp" class="hidden">
+
+
+  <header class="topbar">
+
+    <div class="topLeft">
+
+      <button
+        class="mobileMenu"
+        onclick="toggleSidebar()"
+      >
+        ☰
+      </button>
+
+      <div class="brand">
+        Olaq<span>Verify</span>
+      </div>
+
+    </div>
+
+    <div class="adminBadge">
+      ADMIN
+    </div>
+
+  </header>
+
+
+  <div class="layout">
+
+
+    <!-- SIDEBAR -->
+
+    <aside id="sidebar" class="sidebar">
+
+      <button
+        class="menuBtn active"
+        onclick="showSection('dashboard',this)"
+      >
+        <span class="menuIcon">▦</span>
+        Dashboard
+      </button>
+
+      <button
+        class="menuBtn"
+        onclick="showSection('payments',this)"
+      >
+        <span class="menuIcon">₦</span>
+        Payments
+      </button>
+
+      <button
+        class="menuBtn"
+        onclick="showSection('fulfillment',this)"
+      >
+        <span class="menuIcon">📦</span>
+        Order Fulfillment
+      </button>
+
+      <button
+        class="menuBtn"
+        onclick="showSection('orders',this)"
+      >
+        <span class="menuIcon">▣</span>
+        Orders
+      </button>
+
+      <button
+        class="menuBtn"
+        onclick="showSection('numbers',this)"
+      >
+        <span class="menuIcon">☎</span>
+        Numbers
+      </button>
+
+      <button
+        class="menuBtn"
+        onclick="showSection('users',this)"
+      >
+        <span class="menuIcon">♟</span>
+        Users
+      </button>
+
+      <button
+        class="menuBtn"
+        onclick="showSection('messages',this)"
+      >
+        <span class="menuIcon">✉</span>
+        Messages
+      </button>
+
+      <button
+        class="menuBtn"
+        onclick="adminLogout()"
+        style="margin-top:20px;color:#b91c1c"
+      >
+        <span class="menuIcon">↪</span>
+        Sign Out
+      </button>
+
+    </aside>
+
+
+    <!-- CONTENT -->
+
+    <main class="content">
+
+
+      <!-- DASHBOARD -->
+
+      <section
+        id="dashboard"
+        class="section active"
+      >
+
+        <div class="pageTitle">
+
+          <h1>
+            Dashboard
+          </h1>
+
+          <p>
+            Manage OlaqVerify activity.
+          </p>
+
+        </div>
+
+
+        <div class="stats">
+
+          <div class="stat">
+
+            <div class="statLabel">
+              Users
+            </div>
+
+            <div
+              id="statUsers"
+              class="statValue"
+            >
+              0
+            </div>
+
+          </div>
+
+
+          <div class="stat">
+
+            <div class="statLabel">
+              Pending Payments
+            </div>
+
+            <div
+              id="statPayments"
+              class="statValue"
+            >
+              0
+            </div>
+
+          </div>
+
+
+          <div class="stat">
+
+            <div class="statLabel">
+              Pending Orders
+            </div>
+
+            <div
+              id="statOrders"
+              class="statValue"
+            >
+              0
+            </div>
+
+          </div>
+
+
+          <div class="stat">
+
+            <div class="statLabel">
+              Available Numbers
+            </div>
+
+            <div
+              id="statNumbers"
+              class="statValue"
+            >
+              0
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="card">
+
+          <div class="cardHeader">
+
+            <h2>
+              Recent Activity
+            </h2>
+
+            <button
+              class="btn btnPurple"
+              onclick="loadDashboard()"
+            >
+              Refresh
+            </button>
+
+          </div>
+
+          <div id="dashboardActivity">
+            <div class="loading">
+              Loading...
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- PAYMENTS -->
+
+      <section
+        id="payments"
+        class="section"
+      >
+
+        <div class="pageTitle">
+
+          <h1>
+            Payments
+          </h1>
+
+          <p>
+            Review customer wallet top-up requests.
+          </p>
+
+        </div>
+
+
+        <div class="card">
+
+          <div class="cardHeader">
+
+            <h2>
+              Payment Requests
+            </h2>
+
+            <button
+              class="btn btnPurple"
+              onclick="loadPayments()"
+            >
+              Refresh
+            </button>
+
+          </div>
+
+
+          <div class="tableWrap">
+
+            <table>
+
+              <thead>
+
+                <tr>
+
+                  <th>User</th>
+                  <th>Amount</th>
+                  <th>Reference</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                  <th>Action</th>
+
+                </tr>
+
+              </thead>
+
+              <tbody id="paymentsTable"></tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- ORDER FULFILLMENT -->
+
+      <section
+        id="fulfillment"
+        class="section"
+      >
+
+        <div class="pageTitle">
+
+          <h1>
+            Order Fulfillment
+          </h1>
+
+          <p>
+            Manually assign authorized inventory numbers to pending orders.
+          </p>
+
+        </div>
+
+
+        <div class="card">
+
+          <div class="cardHeader">
+
+            <h2>
+              Pending Orders
+            </h2>
+
+            <button
+              class="btn btnPurple"
+              onclick="loadFulfillment()"
+            >
+              Refresh
+            </button>
+
+          </div>
+
+
+          <div
+            id="fulfillmentList"
+          >
+            <div class="loading">
+              Loading pending orders...
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- ORDERS -->
+
+      <section
+        id="orders"
+        class="section"
+      >
+
+        <div class="pageTitle">
+
+          <h1>
+            All Orders
+          </h1>
+
+          <p>
+            View customer order history.
+          </p>
+
+        </div>
+
+
+        <div class="card">
+
+          <input
+            id="orderSearch"
+            class="search"
+            placeholder="Search order, country, service or number..."
+            oninput="filterOrders()"
+          >
+
+
+          <div class="tableWrap">
+
+            <table>
+
+              <thead>
+
+                <tr>
+
+                  <th>Order</th>
+                  <th>Customer</th>
+                  <th>Country</th>
+                  <th>Service</th>
+                  <th>Price</th>
+                  <th>Status</th>
+                  <th>Number</th>
+                  <th>Date</th>
+
+                </tr>
+
+              </thead>
+
+              <tbody id="ordersTable"></tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- NUMBERS -->
+
+      <section
+        id="numbers"
+        class="section"
+      >
+
+        <div class="pageTitle">
+
+          <h1>
+            Number Inventory
+          </h1>
+
+          <p>
+            Manage authorized numbers available for assignment.
+          </p>
+
+        </div>
+
+
+        <div class="card">
+
+          <div class="cardHeader">
+
+            <h2>
+              Inventory
+            </h2>
+
+            <button
+              class="btn btnPurple"
+              onclick="openNumberModal()"
+            >
+              + Add Number
+            </button>
+
+          </div>
+
+
+          <div class="tableWrap">
+
+            <table>
+
+              <thead>
+
+                <tr>
+
+                  <th>Country</th>
+                  <th>Number</th>
+                  <th>Service</th>
+                  <th>Status</th>
+                  <th>Action</th>
+
+                </tr>
+
+              </thead>
+
+              <tbody id="numbersTable"></tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- USERS -->
+
+      <section
+        id="users"
+        class="section"
+      >
+
+        <div class="pageTitle">
+
+          <h1>
+            Users
+          </h1>
+
+          <p>
+            Customer accounts and balances.
+          </p>
+
+        </div>
+
+
+        <div class="card">
+
+          <input
+            id="userSearch"
+            class="search"
+            placeholder="Search users..."
+            oninput="filterUsers()"
+          >
+
+
+          <div class="tableWrap">
+
+            <table>
+
+              <thead>
+
+                <tr>
+
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Balance</th>
+                  <th>Role</th>
+                  <th>Created</th>
+
+                </tr>
+
+              </thead>
+
+              <tbody id="usersTable"></tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- MESSAGES -->
+
+      <section
+        id="messages"
+        class="section"
+      >
+
+        <div class="pageTitle">
+
+          <h1>
+            Messages
+          </h1>
+
+          <p>
+            Customer support messages.
+          </p>
+
+        </div>
+
+
+        <div class="card">
+
+          <div class="cardHeader">
+
+            <h2>
+              Support Inbox
+            </h2>
+
+            <button
+              class="btn btnPurple"
+              onclick="loadMessages()"
+            >
+              Refresh
+            </button>
+
+          </div>
+
+
+          <div
+            id="messagesList"
+          >
+            <div class="loading">
+              Loading messages...
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+
+    </main>
+
+  </div>
+
+</div>
+
+
+<!-- NUMBER MODAL -->
+
+<div
+  id="numberModal"
+  class="modal hidden"
+>
+
+  <div class="modalBox">
+
+    <div class="modalHead">
+
+      <h2>
+        Add Number
+      </h2>
+
+      <button
+        class="close"
+        onclick="closeNumberModal()"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <div class="field">
+
+      <label>Country</label>
+
+      <input
+        id="numberCountry"
+        placeholder="e.g. Nigeria"
+      >
+
+    </div>
+
+
+    <div class="field">
+
+      <label>Phone Number</label>
+
+      <input
+        id="numberValue"
+        placeholder="Enter authorized number"
+      >
+
+    </div>
+
+
+    <div class="field">
+
+      <label>Service</label>
+
+      <input
+        id="numberService"
+        value="Authorized SMS Service"
+      >
+
+    </div>
+
+
+    <button
+      class="primary"
+      onclick="addNumber()"
+    >
+      Add Number
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- ASSIGN MODAL -->
+
+<div
+  id="assignModal"
+  class="modal hidden"
+>
+
+  <div class="modalBox">
+
+    <div class="modalHead">
+
+      <h2>
+        Assign Number
+      </h2>
+
+      <button
+        class="close"
+        onclick="closeAssignModal()"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <div
+      id="assignOrderInfo"
+      style="margin-bottom:15px"
+    ></div>
+
+
+    <div class="field">
+
+      <label>
+        Select Available Number
+      </label>
+
+      <select id="assignNumberSelect">
+        <option value="">
+          Select number
+        </option>
+      </select>
+
+    </div>
+
+
+    <div class="field">
+
+      <label>
+        Or manually enter authorized number
+      </label>
+
+      <input
+        id="manualNumber"
+        placeholder="Phone number"
+      >
+
+    </div>
+
+
+    <button
+      class="primary"
+      onclick="assignOrderNumber()"
+    >
+      Assign Number & Fulfill Order
+    </button>
+
+  </div>
+
+</div>
+
+
+<div
+  id="toast"
+  class="toast hidden"
+></div>
+
+
+<script>
+
+/* =====================================
+   SUPABASE
+===================================== */
+
+const SUPABASE_URL =
+"https://alemtvfchysptzgzhaap.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_UEnF6pfZ2ORRcuIQUzgbRw_6bWNDnKm";
+
+const db =
+supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+
+/* =====================================
+   STATE
+===================================== */
+
+let adminUser = null;
+let currentOrders = [];
+let currentUsers = [];
+let currentNumbers = [];
+let selectedOrder = null;
+
+
+/* =====================================
+   INIT
+===================================== */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  async ()=>{
+
+    const {
+      data:{
+        session
+      }
+    } = await db.auth.getSession();
+
+    if(session){
+
+      const ok =
+        await verifyAdmin(session.user);
+
+      if(ok){
+
+        adminUser =
+          session.user;
+
+        showAdmin();
+
+      }
+
+    }
+
+  }
+);
+
+
+/* =====================================
+   ADMIN LOGIN
+===================================== */
+
+async function adminLogin(){
+
+  const email =
+    document
+      .getElementById("adminEmail")
+      .value
+      .trim();
+
+  const password =
+    document
+      .getElementById("adminPassword")
+      .value;
+
+
+  if(!email || !password){
+
+    toast("Enter email and password.");
+
+    return;
+  }
+
+
+  toast("Signing in...");
+
+
+  const {
+    data,
+    error
+  } =
+    await db.auth.signInWithPassword({
+
+      email,
+      password
+
+    });
+
+
+  if(error){
+
+    toast(error.message);
+
+    return;
+  }
+
+
+  const isAdmin =
+    await verifyAdmin(data.user);
+
+
+  if(!isAdmin){
+
+    await db.auth.signOut();
+
+    toast("This account is not an admin.");
+
+    return;
+  }
+
+
+  adminUser =
+    data.user;
+
+  showAdmin();
+
+}
+
+
+/* =====================================
+   VERIFY ADMIN
+===================================== */
+
+async function verifyAdmin(user){
+
+  if(!user)
+    return false;
+
+
+  const {
+    data,
+    error
+  } =
+    await db
+      .from("profiles")
+      .select("role")
+      .eq("id",user.id)
+      .maybeSingle();
+
+
+  if(error){
+
+    console.error(error);
+
+    return false;
+  }
+
+
+  return data?.role === "admin";
+
+}
+
+
+/* =====================================
+   SHOW ADMIN
+===================================== */
+
+async function showAdmin(){
+
+  document
+    .getElementById("loginScreen")
+    .classList.add("hidden");
+
+  document
+    .getElementById("adminApp")
+    .classList.remove("hidden");
+
+
+  await loadDashboard();
+
+}
+
+
+/* =====================================
+   LOGOUT
+===================================== */
+
+async function adminLogout(){
+
+  await db.auth.signOut();
+
+  adminUser = null;
+
+  document
+    .getElementById("adminApp")
+    .classList.add("hidden");
+
+  document
+    .getElementById("loginScreen")
+    .classList.remove("hidden");
+
+}
+
+
+/* =====================================
+   NAVIGATION
+===================================== */
+
+function showSection(id,button){
+
+  document
+    .querySelectorAll(".section")
+    .forEach(section=>{
+      section.classList.remove("active");
+    });
+
+
+  document
+    .getElementById(id)
+    .classList.add("active");
+
+
+  document
+    .querySelectorAll(".menuBtn")
+    .forEach(btn=>{
+      btn.classList.remove("active");
+    });
+
+
+  if(button)
+    button.classList.add("active");
+
+
+  document
+    .getElementById("sidebar")
+    .classList.remove("open");
+
+
+  if(id === "dashboard")
+    loadDashboard();
+
+  if(id === "payments")
+    loadPayments();
+
+  if(id === "fulfillment")
+    loadFulfillment();
+
+  if(id === "orders")
+    loadOrders();
+
+  if(id === "numbers")
+    loadNumbers();
+
+  if(id === "users")
+    loadUsers();
+
+  if(id === "messages")
+    loadMessages();
+
+}
+
+
+function toggleSidebar(){
+
+  document
+    .getElementById("sidebar")
+    .classList.toggle("open");
+
+}
+
+
+/* =====================================
+   DASHBOARD
+===================================== */
+
+async function loadDashboard(){
+
+  const [
+    users,
+    payments,
+    orders,
+    numbers
+  ] =
+  await Promise.all([
+
+    db
+      .from("profiles")
+      .select("id",{count:"exact",head:true}),
+
+    db
+      .from("payment_requests")
+      .select("id",{count:"exact",head:true})
+      .eq("status","pending"),
+
+    db
+      .from("orders")
+      .select("id",{count:"exact",head:true})
+      .eq("status","pending"),
+
+    db
+      .from("numbers")
+      .select("id",{count:"exact",head:true})
+      .eq("status","available")
+
+  ]);
+
+
+  document
+    .getElementById("statUsers")
+    .textContent =
+    users.count || 0;
+
+
+  document
+    .getElementById("statPayments")
+    .textContent =
+    payments.count || 0;
+
+
+  document
+    .getElementById("statOrders")
+    .textContent =
+    orders.count || 0;
+
+
+  document
+    .getElementById("statNumbers")
+    .textContent =
+    numbers.count || 0;
+
+
+  const {
+    data:recentOrders
+  } =
+    await db
+      .from("orders")
+      .select("*")
+      .order("created_at",{ascending:false})
+      .limit(8);
+
+
+  const box =
+    document
+      .getElementById("dashboardActivity");
+
+
+  if(!recentOrders?.length){
+
+    box.innerHTML =
+      `<div class="empty">
+        No recent activity.
+      </div>`;
+
+    return;
+  }
+
+
+  box.innerHTML =
+    recentOrders
+      .map(order=>`
+
+        <div class="orderCard">
+
+          <div class="orderHeader">
+
+            <div>
+
+              <div class="orderId">
+                Order #${String(order.id).slice(0,8)}
+              </div>
+
+              <div class="orderMain">
+                ${escapeHTML(order.country || "Unknown")}
+              </div>
+
+            </div>
+
+            <span class="status ${statusClass(order.status)}">
+              ${capitalize(order.status || "pending")}
+            </span>
+
+          </div>
+
+          <div class="orderMeta">
+            ${escapeHTML(order.service || "Authorized SMS Service")}
+            · ₦${Number(order.price || 0).toLocaleString("en-NG")}
+          </div>
+
+        </div>
+
+      `)
+      .join("");
+
+}
+
+
+/* =====================================
+   PAYMENTS
+===================================== */
+
+async function loadPayments(){
+
+  const tbody =
+    document
+      .getElementById("paymentsTable");
+
+
+  tbody.innerHTML =
+    `<tr>
+      <td colspan="6">Loading...</td>
+    </tr>`;
+
+
+  const {
+    data,
+    error
+  } =
+    await db
+      .from("payment_requests")
+      .select("*")
+      .order("created_at",{ascending:false});
+
+
+  if(error){
+
+    tbody.innerHTML =
+      `<tr>
+        <td colspan="6">
+          ${escapeHTML(error.message)}
+        </td>
+      </tr>`;
+
+    return;
+  }
+
+
+  if(!data?.length){
+
+    tbody.innerHTML =
+      `<tr>
+        <td colspan="6">
+          No payment requests.
+        </td>
+      </tr>`;
+
+    return;
+  }
+
+
+  tbody.innerHTML =
+    data.map(payment=>`
+
+      <tr>
+
+        <td>
+          ${String(payment.user_id || "").slice(0,8)}
+        </td>
+
+        <td>
+          <b>
+            ₦${Number(payment.amount || 0).toLocaleString("en-NG")}
+          </b>
+        </td>
+
+        <td>
+          ${escapeHTML(payment.reference || "-")}
+        </td>
+
+        <td>
+          <span class="status ${statusClass(payment.status)}">
+            ${capitalize(payment.status || "pending")}
+          </span>
+        </td>
+
+        <td>
+          ${payment.created_at
+            ? new Date(payment.created_at).toLocaleString()
+            : "-"}
+        </td>
+
+        <td>
+
+          ${
+            payment.status === "pending"
+            ?
+            `
+              <button
+                class="btn btnGreen"
+                onclick="approvePayment('${payment.id}')"
+              >
+                Approve
+              </button>
+
+              <button
+                class="btn btnRed"
+                onclick="declinePayment('${payment.id}')"
+              >
+                Decline
+              </button>
+            `
+            :
+            "-"
+          }
+
+        </td>
+
+      </tr>
+
+    `).join("");
+
+}
+
+
+/* =====================================
+   APPROVE PAYMENT
+===================================== */
+
+async function approvePayment(id){
+
+  if(!confirm("Approve this payment?"))
+    return;
+
+
+  const {
+    error
+  } =
+    await db.rpc(
+      "approve_payment",
+      {
+        p_payment_id:id
+      }
+    );
+
+
+  if(error){
+
+    toast(
+      "Approval failed: "
+      + error.message
+    );
+
+    return;
+  }
+
+
+  toast("Payment approved.");
+
+  await loadPayments();
+
+  await loadDashboard();
+
+}
+
+
+/* =====================================
+   DECLINE PAYMENT
+===================================== */
+
+async function declinePayment(id){
+
+  if(!confirm("Decline this payment?"))
+    return;
+
+
+  const {
+    error
+  } =
+    await db
+      .from("payment_requests")
+      .update({
+        status:"declined"
+      })
+      .eq("id",id)
+      .eq("status","pending");
+
+
+  if(error){
+
+    toast(error.message);
+
+    return;
+  }
+
+
+  toast("Payment declined.");
+
+  await loadPayments();
+
+  await loadDashboard();
+
+}
+
+
+/* =====================================
+   FULFILLMENT
+===================================== */
+
+async function loadFulfillment(){
+
+  const container =
+    document
+      .getElementById("fulfillmentList");
+
+
+  container.innerHTML =
+    `<div class="loading">
+      Loading pending orders...
+    </div>`;
+
+
+  const {
+    data,
+    error
+  } =
+    await db
+      .from("orders")
+      .select("*")
+      .eq("status","pending")
+      .order("created_at",{ascending:true});
+
+
+  if(error){
+
+    container.innerHTML =
+      `<div class="empty">
+        ${escapeHTML(error.message)}
+      </div>`;
+
+    return;
+  }
+
+
+  if(!data?.length){
+
+    container.innerHTML =
+      `<div class="empty">
+        No pending orders.
+      </div>`;
+
+    return;
+  }
+
+
+  container.innerHTML =
+    data.map(order=>`
+
+      <div class="orderCard">
+
+        <div class="orderHeader">
+
+          <div>
+
+            <div class="orderId">
+              Order #${String(order.id).slice(0,8)}
+            </div>
+
+            <div class="orderMain">
+              ${escapeHTML(order.country || "Unknown country")}
+            </div>
+
+          </div>
+
+          <span class="status pending">
+            Pending
+          </span>
+
+        </div>
+
+
+        <div class="orderMeta">
+
+          Service:
+          ${escapeHTML(order.service || "Authorized SMS Service")}
+
+          · Price:
+          ₦${Number(order.price || 0).toLocaleString("en-NG")}
+
+        </div>
+
+
+        <div class="orderMeta">
+
+          Customer:
+          ${String(order.user_id || "").slice(0,12)}
+
+        </div>
+
+
+        <div class="assignBox">
+
+          <button
+            class="btn btnPurple"
+            onclick="openAssignModal('${order.id}')"
+          >
+            Assign Number
+          </button>
+
+        </div>
+
+      </div>
+
+    `).join("");
+
+}
+
+
+/* =====================================
+   ASSIGN NUMBER MODAL
+===================================== */
+
+async function openAssignModal(orderId){
+
+  const {
+    data:order,
+    error
+  } =
+    await db
+      .from("orders")
+      .select("*")
+      .eq("id",orderId)
+      .single();
+
+
+  if(error){
+
+    toast(error.message);
+
+    return;
+  }
+
+
+  selectedOrder =
+    order;
+
+
+  document
+    .getElementById("assignOrderInfo")
+    .innerHTML = `
+
+      <div style="background:#f5f3ff;padding:12px;border-radius:11px">
+
+        <b>
+          Order #${String(order.id).slice(0,8)}
+        </b>
+
+        <div style="font-size:12px;color:#737373;margin-top:5px">
+
+          ${escapeHTML(order.country || "Unknown")}
+          ·
+          ${escapeHTML(order.service || "Authorized SMS Service")}
+
+        </div>
+
+      </div>
+
+  `;
+
+
+  document
+    .getElementById("manualNumber")
+    .value = "";
+
+
+  const select =
+    document
+      .getElementById("assignNumberSelect");
+
+
+  select.innerHTML =
+    `<option value="">
+      Select number
+    </option>`;
+
+
+  const {
+    data:numbers
+  } =
+    await db
+      .from("numbers")
+      .select("*")
+      .eq("status","available")
+      .eq("country",order.country)
+      .order("created_at",{ascending:true});
+
+
+  (numbers || []).forEach(number=>{
+
+    const option =
+      document.createElement("option");
+
+    option.value =
+      number.id;
+
+    option.textContent =
+      `${number.number} — ${number.service || "SMS"}`;
+
+    select.appendChild(option);
+
+  });
+
+
+  document
+    .getElementById("assignModal")
+    .classList.remove("hidden");
+
+}
+
+
+function closeAssignModal(){
+
+  selectedOrder = null;
+
+  document
+    .getElementById("assignModal")
+    .classList.add("hidden");
+
+}
+
+
+/* =====================================
+   ASSIGN ORDER
+===================================== */
+
+async function assignOrderNumber(){
+
+  if(!selectedOrder){
+
+    toast("No order selected.");
+
+    return;
+  }
+
+
+  const inventoryId =
+    document
+      .getElementById("assignNumberSelect")
+      .value;
+
+
+  const manualNumber =
+    document
+      .getElementById("manualNumber")
+      .value
+      .trim();
+
+
+  if(!inventoryId && !manualNumber){
+
+    toast("Select a number or enter an authorized number.");
+
+    return;
+  }
+
+
+  if(inventoryId){
+
+    /*
+      Use existing inventory number.
+      First mark it assigned, then update
+      the order.
+    */
+
+    const {
+      data:number,
+      error:numberError
+    } =
+      await db
+        .from("numbers")
+        .select("*")
+        .eq("id",inventoryId)
+        .eq("status","available")
+        .single();
+
+
+    if(numberError || !number){
+
+      toast("That number is no longer available.");
+
+      await loadFulfillment();
+
+      return;
+    }
+
+
+    const {
+      error:inventoryError
+    } =
+      await db
+        .from("numbers")
+        .update({
+          status:"assigned"
+        })
+        .eq("id",inventoryId)
+        .eq("status","available");
+
+
+    if(inventoryError){
+
+      toast(
+        "Could not reserve number: "
+        + inventoryError.message
+      );
+
+      return;
+    }
+
+
+    const {
+      error:orderError
+    } =
+      await db
+        .from("orders")
+        .update({
+
+          status:"fulfilled",
+
+          assigned_number:
+            number.number,
+
+          assigned_by:
+            adminUser.id,
+
+          fulfilled_at:
+            new Date().toISOString(),
+
+          number_id:
+            number.id
+
+        })
+        .eq("id",selectedOrder.id)
+        .eq("status","pending");
+
+
+    if(orderError){
+
+      /*
+        Try to return inventory to available
+        if order update fails.
+      */
+
+      await db
+        .from("numbers")
+        .update({
+          status:"available"
+        })
+        .eq("id",inventoryId);
+
+
+      toast(
+        "Order update failed: "
+        + orderError.message
+      );
+
+      return;
+    }
+
+
+  }else{
+
+    /*
+      Manual authorized number.
+
+      This is intended for numbers that you
+      are legitimately authorized to provide.
+    */
+
+    const {
+      error
+    } =
+      await db
+        .from("orders")
+        .update({
+
+          status:"fulfilled",
+
+          assigned_number:
+            manualNumber,
+
+          assigned_by:
+            adminUser.id,
+
+          fulfilled_at:
+            new Date().toISOString()
+
+        })
+        .eq("id",selectedOrder.id)
+        .eq("status","pending");
+
+
+    if(error){
+
+      toast(
+        "Could not fulfill order: "
+        + error.message
+      );
+
+      return;
+    }
+
+  }
+
+
+  closeAssignModal();
+
+  toast("Order fulfilled successfully.");
+
+  await loadFulfillment();
+
+  await loadOrders();
+
+  await loadNumbers();
+
+  await loadDashboard();
+
+}
+
+
+/* =====================================
+   ALL ORDERS
+===================================== */
+
+async function loadOrders(){
+
+  const tbody =
+    document
+      .getElementById("ordersTable");
+
+
+  tbody.innerHTML =
+    `<tr>
+      <td colspan="8">Loading...</td>
+    </tr>`;
+
+
+  const {
+    data,
+    error
+  } =
+    await db
+      .from("orders")
+      .select("*")
+      .order("created_at",{ascending:false});
+
+
+  if(error){
+
+    tbody.innerHTML =
+      `<tr>
+        <td colspan="8">
+          ${escapeHTML(error.message)}
+        </td>
+      </tr>`;
+
+    return;
+  }
+
+
+  currentOrders =
+    data || [];
+
+
+  renderOrders(currentOrders);
+
+}
+
+
+function renderOrders(data){
+
+  const tbody =
+    document
+      .getElementById("ordersTable");
+
+
+  if(!data.length){
+
+    tbody.innerHTML =
+      `<tr>
+        <td colspan="8">
+          No orders.
+        </td>
+      </tr>`;
+
+    return;
+  }
+
+
+  tbody.innerHTML =
+    data.map(order=>`
+
+      <tr>
+
+        <td>
+          #${String(order.id).slice(0,8)}
+        </td>
+
+        <td>
+          ${String(order.user_id || "").slice(0,8)}
+        </td>
+
+        <td>
+          ${escapeHTML(order.country || "-")}
+        </td>
+
+        <td>
+          ${escapeHTML(order.service || "-")}
+        </td>
+
+        <td>
+          ₦${Number(order.price || 0).toLocaleString("en-NG")}
+        </td>
+
+        <td>
+          <span class="status ${statusClass(order.status)}">
+            ${capitalize(order.status || "pending")}
+          </span>
+        </td>
+
+        <td>
+          ${escapeHTML(order.assigned_number || "-")}
+        </td>
+
+        <td>
+          ${order.created_at
+            ? new Date(order.created_at).toLocaleString()
+            : "-"}
+        </td>
+
+      </tr>
+
+    `).join("");
+
+}
+
+
+function filterOrders(){
+
+  const q =
+    document
+      .getElementById("orderSearch")
+      .value
+      .toLowerCase()
+      .trim();
+
+
+  if(!q){
+
+    renderOrders(currentOrders);
+
+    return;
+  }
+
+
+  renderOrders(
+    currentOrders.filter(order=>
+
+      String(order.id || "")
+        .toLowerCase()
+        .includes(q)
+
+      ||
+
+      String(order.country || "")
+        .toLowerCase()
+        .includes(q)
+
+      ||
+
+      String(order.service || "")
+        .toLowerCase()
+        .includes(q)
+
+      ||
+
+      String(order.assigned_number || "")
+        .toLowerCase()
+        .includes(q)
+
+    )
+  );
+
+}
+
+
+/* =====================================
+   NUMBERS
+===================================== */
+
+async function loadNumbers(){
+
+  const tbody =
+    document
+      .getElementById("numbersTable");
+
+
+  tbody.innerHTML =
+    `<tr>
+      <td colspan="5">
+        Loading...
+      </td>
+    </tr>`;
+
+
+  const {
+    data,
+    error
+  } =
+    await db
+      .from("numbers")
+      .select("*")
+      .order("created_at",{ascending:false});
+
+
+  if(error){
+
+    tbody.innerHTML =
+      `<tr>
+        <td colspan="5">
+          ${escapeHTML(error.message)}
+        </td>
+      </tr>`;
+
+    return;
+  }
+
+
+  currentNumbers =
+    data || [];
+
+
+  if(!currentNumbers.length){
+
+    tbody.innerHTML =
+      `<tr>
+        <td colspan="5">
+          No numbers in inventory.
+        </td>
+      </tr>`;
+
+    return;
+  }
+
+
+  tbody.innerHTML =
+    currentNumbers.map(number=>`
+
+      <tr>
+
+        <td>
+          ${escapeHTML(number.country || "-")}
+        </td>
+
+        <td>
+          <b>
+            ${escapeHTML(number.number || "-")}
+          </b>
+        </td>
+
+        <td>
+          ${escapeHTML(number.service || "-")}
+        </td>
+
+        <td>
+          <span class="status ${statusClass(number.status)}">
+            ${capitalize(number.status || "available")}
+          </span>
+        </td>
+
+        <td>
+
+          ${
+            number.status === "available"
+            ?
+            `
+              <button
+                class="btn btnRed"
+                onclick="deleteNumber('${number.id}')"
+              >
+                Delete
+              </button>
+            `
+            :
+            "-"
+          }
+
+        </td>
+
+      </tr>
+
+    `).join("");
+
+}
+
+
+/* =====================================
+   ADD NUMBER
+===================================== */
+
+function openNumberModal(){
+
+  document
+    .getElementById("numberModal")
+    .classList.remove("hidden");
+
+}
+
+
+function closeNumberModal(){
+
+  document
+    .getElementById("numberModal")
+    .classList.add("hidden");
+
+}
+
+
+async function addNumber(){
+
+  const country =
+    document
+      .getElementById("numberCountry")
+      .value
+      .trim();
+
+  const number =
+    document
+      .getElementById("numberValue")
+      .value
+      .trim();
+
+  const service =
+    document
+      .getElementById("numberService")
+      .value
+      .trim();
+
+
+  if(!country || !number){
+
+    toast("Country and number are required.");
+
+    return;
+  }
+
+
+  const {
+    error
+  } =
+    await db
+      .from("numbers")
+      .insert({
+
+        country,
+
+        number,
+
+        service:
+          service || "Authorized SMS Service",
+
+        status:
+          "available"
+
+      });
+
+
+  if(error){
+
+    toast(error.message);
+
+    return;
+  }
+
+
+  document
+    .getElementById("numberCountry")
+    .value = "";
+
+  document
+    .getElementById("numberValue")
+    .value = "";
+
+  closeNumberModal();
+
+  toast("Number added.");
+
+  await loadNumbers();
+
+  await loadDashboard();
+
+}
+
+
+/* =====================================
+   DELETE NUMBER
+===================================== */
+
+async function deleteNumber(id){
+
+  if(!confirm("Delete this available number?"))
+    return;
+
+
+  const {
+    error
+  } =
+    await db
+      .from("numbers")
+      .delete()
+      .eq("id",id)
+      .eq("status","available");
+
+
+  if(error){
+
+    toast(error.message);
+
+    return;
+  }
+
+
+  toast("Number deleted.");
+
+  await loadNumbers();
+
+  await loadDashboard();
+
+}
+
+
+/* =====================================
+   USERS
+===================================== */
+
+async function loadUsers(){
+
+  const tbody =
+    document
+      .getElementById("usersTable");
+
+
+  tbody.innerHTML =
+    `<tr>
+      <td colspan="5">Loading...</td>
+    </tr>`;
+
+
+  const {
+    data,
+    error
+  } =
+    await db
+      .from("profiles")
+      .select("*")
+      .order("created_at",{ascending:false});
+
+
+  if(error){
+
+    tbody.innerHTML =
+      `<tr>
+        <td colspan="5">
+          ${escapeHTML(error.message)}
+        </td>
+      </tr>`;
+
+    return;
+  }
+
+
+  currentUsers =
+    data || [];
+
+
+  renderUsers(currentUsers);
+
+}
+
+
+function renderUsers(data){
+
+  const tbody =
+    document
+      .getElementById("usersTable");
+
+
+  if(!data.length){
+
+    tbody.innerHTML =
+      `<tr>
+        <td colspan="5">
+          No users.
+        </td>
+      </tr>`;
+
+    return;
+  }
+
+
+  tbody.innerHTML =
+    data.map(user=>`
+
+      <tr>
+
+        <td>
+          ${escapeHTML(
+            user.full_name ||
+            user.name ||
+            "-"
+          )}
+        </td>
+
+        <td>
+          ${escapeHTML(user.email || "-")}
+        </td>
+
+        <td>
+          <b>
+            ₦${Number(user.balance || 0)
+              .toLocaleString("en-NG")}
+          </b>
+        </td>
+
+        <td>
+          ${escapeHTML(user.role || "user")}
+        </td>
+
+        <td>
+          ${user.created_at
+            ? new Date(user.created_at).toLocaleDateString()
+            : "-"}
+        </td>
+
+      </tr>
+
+    `).join("");
+
+}
+
+
+function filterUsers(){
+
+  const q =
+    document
+      .getElementById("userSearch")
+      .value
+      .toLowerCase()
+      .trim();
+
+
+  if(!q){
+
+    renderUsers(currentUsers);
+
+    return;
+  }
+
+
+  renderUsers(
+    currentUsers.filter(user=>
+
+      String(user.full_name || "")
+        .toLowerCase()
+        .includes(q)
+
+      ||
+
+      String(user.email || "")
+        .toLowerCase()
+        .includes(q)
+
+      ||
+
+      String(user.role || "")
+        .toLowerCase()
+        .includes(q)
+
+    )
+  );
+
+}
+
+
+/* =====================================
+   MESSAGES
+===================================== */
+
+async function loadMessages(){
+
+  const container =
+    document
+      .getElementById("messagesList");
+
+
+  container.innerHTML =
+    `<div class="loading">
+      Loading messages...
+    </div>`;
+
+
+  const {
+    data,
+    error
+  } =
+    await db
+      .from("messages")
+      .select("*")
+      .order("created_at",{ascending:false});
+
+
+  if(error){
+
+    container.innerHTML =
+      `<div class="empty">
+        ${escapeHTML(error.message)}
+      </div>`;
+
+    return;
+  }
+
+
+  if(!data?.length){
+
+    container.innerHTML =
+      `<div class="empty">
+        No messages.
+      </div>`;
+
+    return;
+  }
+
+
+  container.innerHTML =
+    data.map(message=>`
+
+      <div class="orderCard">
+
+        <div class="orderHeader">
+
+          <div>
+
+            <div class="orderId">
+              User #${String(message.user_id || "").slice(0,8)}
+            </div>
+
+            <div class="orderMain">
+              Customer Message
+            </div>
+
+          </div>
+
+          <div class="orderId">
+            ${message.created_at
+              ? new Date(message.created_at).toLocaleString()
+              : ""}
+          </div>
+
+        </div>
+
+
+        <div
+          style="margin-top:12px;font-size:13px;line-height:1.5"
+        >
+          ${escapeHTML(
+            message.message ||
+            message.content ||
+            ""
+          )}
+        </div>
+
+      </div>
+
+    `).join("");
+
+}
+
+
+/* =====================================
+   HELPERS
+===================================== */
+
+function statusClass(status){
+
+  status =
+    String(status || "pending")
+      .toLowerCase();
+
+  if(
+    status === "approved" ||
+    status === "fulfilled" ||
+    status === "available"
+  )
+    return status;
+
+  if(
+    status === "declined" ||
+    status === "cancelled" ||
+    status === "sold"
+  )
+    return status;
+
+  if(status === "assigned")
+    return "assigned";
+
+  return "pending";
+
+}
+
+
+function capitalize(value){
+
+  value =
+    String(value || "");
+
+  return value.charAt(0).toUpperCase()
+    + value.slice(1);
+
+}
+
+
+function escapeHTML(value){
+
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
+}
+
+
+function toast(message){
+
+  const box =
+    document
+      .getElementById("toast");
+
+  box.textContent =
+    message;
+
+  box.classList.remove("hidden");
+
+  clearTimeout(window.toastTimer);
+
+  window.toastTimer =
+    setTimeout(()=>{
+      box.classList.add("hidden");
+    },3500);
+
+}
+
+</script>
+
+</body>
+</html>
