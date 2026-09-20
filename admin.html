@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>OlaqVerify Admin</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#f6f4fb;
+  color:#17121f;
+}
+
+header{
+  background:linear-gradient(135deg,#5b21b6,#3b0764);
+  color:white;
+  padding:18px;
+  position:sticky;
+  top:0;
+  z-index:20;
+  box-shadow:0 3px 15px #0002;
+}
+
+.header-row{
+  max-width:1100px;
+  margin:auto;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.logo{
+  font-size:22px;
+  font-weight:800;
+}
+
+.admin-tag{
+  background:#ffffff22;
+  padding:7px 12px;
+  border-radius:20px;
+  font-size:12px;
+}
+
+main{
+  max-width:1100px;
+  margin:auto;
+  padding:18px;
+}
+
+.tabs{
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding-bottom:12px;
+  scrollbar-width:none;
+}
+
+.tabs button{
+  border:0;
+  background:white;
+  color:#4c3a61;
+  padding:11px 15px;
+  border-radius:12px;
+  white-space:nowrap;
+  font-weight:700;
+  cursor:pointer;
+  box-shadow:0 2px 8px #0000000d;
+}
+
+.tabs button.active{
+  background:#5b21b6;
+  color:white;
+}
+
+.section{
+  display:none;
+}
+
+.section.active{
+  display:block;
+}
+
+.card{
+  background:white;
+  border-radius:18px;
+  padding:18px;
+  margin-bottom:14px;
+  box-shadow:0 3px 15px #0000000b;
+}
+
+.card h2{
+  margin:0 0 5px;
+  font-size:19px;
+}
+
+.muted{
+  color:#777;
+  font-size:13px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:14px;
+}
+
+input,
+select,
+textarea{
+  width:100%;
+  padding:12px;
+  border:1px solid #ddd;
+  border-radius:10px;
+  outline:none;
+  font-size:14px;
+  background:white;
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+  border-color:#5b21b6;
+}
+
+label{
+  display:block;
+  font-size:12px;
+  font-weight:700;
+  margin:10px 0 6px;
+}
+
+.primary,
+.success,
+.danger,
+.secondary{
+  border:0;
+  padding:10px 14px;
+  border-radius:9px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.primary{
+  background:#5b21b6;
+  color:white;
+}
+
+.success{
+  background:#15803d;
+  color:white;
+}
+
+.danger{
+  background:#dc2626;
+  color:white;
+}
+
+.secondary{
+  background:#eee8f7;
+  color:#4c1d95;
+}
+
+.actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:14px;
+}
+
+.status{
+  display:inline-block;
+  padding:5px 9px;
+  border-radius:20px;
+  font-size:11px;
+  font-weight:800;
+}
+
+.pending{
+  background:#fff7d6;
+  color:#92400e;
+}
+
+.approved{
+  background:#dcfce7;
+  color:#166534;
+}
+
+.declined{
+  background:#fee2e2;
+  color:#991b1b;
+}
+
+.item{
+  border:1px solid #eee;
+  border-radius:14px;
+  padding:15px;
+  margin-top:12px;
+}
+
+.item-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:10px;
+}
+
+.amount{
+  font-size:21px;
+  font-weight:800;
+  color:#4c1d95;
+}
+
+.row{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  padding:6px 0;
+  font-size:14px;
+}
+
+.empty{
+  text-align:center;
+  padding:35px 15px;
+  color:#777;
+}
+
+.loading{
+  text-align:center;
+  padding:30px;
+  color:#777;
+}
+
+.message{
+  position:fixed;
+  right:15px;
+  bottom:15px;
+  max-width:330px;
+  padding:14px 16px;
+  background:#17121f;
+  color:white;
+  border-radius:12px;
+  display:none;
+  z-index:100;
+  box-shadow:0 5px 20px #0003;
+}
+
+.message.show{
+  display:block;
+}
+
+.stat{
+  padding:18px;
+  border-radius:16px;
+  background:white;
+  box-shadow:0 3px 15px #0000000b;
+}
+
+.stat-title{
+  color:#777;
+  font-size:12px;
+}
+
+.stat-value{
+  margin-top:6px;
+  font-size:25px;
+  font-weight:800;
+  color:#4c1d95;
+}
+
+.flag{
+  font-size:27px;
+}
+
+.small{
+  font-size:12px;
+  word-break:break-all;
+}
+
+.price-card{
+  border:1px solid #eee;
+  border-radius:14px;
+  padding:14px;
+  margin-top:10px;
+}
+
+.edit-box{
+  margin-top:15px;
+  padding:15px;
+  background:#faf8ff;
+  border:1px solid #e8def7;
+  border-radius:13px;
+}
+
+.edit-box h3{
+  margin:0 0 8px;
+  color:#4c1d95;
+}
+
+.balance{
+  font-size:24px;
+  font-weight:800;
+  color:#4c1d95;
+}
+
+hr{
+  border:0;
+  border-top
