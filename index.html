@@ -1,0 +1,2397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#6417c8">
+<title>OlaqVerify</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:Arial,Helvetica,sans-serif;
+}
+
+:root{
+  --purple:#6417c8;
+  --purple2:#3b0878;
+  --red:#ef233c;
+  --green:#16a34a;
+  --bg:#f5f4f8;
+  --white:#fff;
+  --text:#17131f;
+  --muted:#77717f;
+  --border:#e8e4ed;
+  --shadow:0 8px 25px rgba(55,20,90,.08);
+}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+}
+
+button,
+input,
+textarea{
+  font:inherit;
+}
+
+button{
+  border:0;
+  cursor:pointer;
+}
+
+.hidden{
+  display:none!important;
+}
+
+/* AUTH */
+
+#auth{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:linear-gradient(135deg,#300662,#6417c8 55%,#ef233c);
+}
+
+.auth-card{
+  width:100%;
+  max-width:420px;
+  background:#fff;
+  padding:30px;
+  border-radius:24px;
+  box-shadow:0 25px 70px rgba(0,0,0,.25);
+}
+
+.logo{
+  text-align:center;
+  font-size:31px;
+  font-weight:900;
+  color:var(--purple);
+}
+
+.logo span{
+  color:var(--red);
+}
+
+.subtitle{
+  text-align:center;
+  color:var(--muted);
+  margin:8px 0 25px;
+}
+
+.auth-card h2{
+  margin-bottom:18px;
+}
+
+.field{
+  margin-bottom:14px;
+}
+
+.field label{
+  display:block;
+  margin-bottom:7px;
+  font-size:13px;
+  font-weight:bold;
+}
+
+.field input,
+.field textarea{
+  width:100%;
+  padding:13px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  outline:none;
+  background:#faf9fc;
+}
+
+.field input:focus,
+.field textarea:focus{
+  border-color:var(--purple);
+}
+
+.primary{
+  width:100%;
+  padding:14px;
+  color:#fff;
+  border-radius:12px;
+  font-weight:bold;
+  background:linear-gradient(135deg,var(--purple),var(--red));
+}
+
+.switch{
+  text-align:center;
+  margin-top:17px;
+  color:var(--muted);
+  font-size:14px;
+}
+
+.switch button{
+  background:none;
+  color:var(--purple);
+  font-weight:bold;
+}
+
+/* APP */
+
+#app{
+  min-height:100vh;
+}
+
+.topbar{
+  height:68px;
+  background:#fff;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 25px;
+  position:sticky;
+  top:0;
+  z-index:20;
+}
+
+.brand{
+  font-size:23px;
+  font-weight:900;
+  color:var(--purple);
+}
+
+.brand span{
+  color:var(--red);
+}
+
+.user{
+  padding:9px 14px;
+  border-radius:30px;
+  background:#f0e8ff;
+  color:var(--purple);
+  font-size:13px;
+  font-weight:bold;
+}
+
+.layout{
+  display:flex;
+  min-height:calc(100vh - 68px);
+}
+
+.sidebar{
+  width:225px;
+  background:#fff;
+  border-right:1px solid var(--border);
+  padding:18px 12px;
+  flex-shrink:0;
+}
+
+.nav{
+  width:100%;
+  text-align:left;
+  padding:13px;
+  margin-bottom:6px;
+  border-radius:11px;
+  background:#fff;
+  color:#6f6877;
+  font-weight:bold;
+}
+
+.nav.active{
+  background:#eee5ff;
+  color:var(--purple);
+}
+
+.main{
+  flex:1;
+  padding:25px;
+  max-width:1200px;
+}
+
+.page{
+  display:none;
+}
+
+.page.active{
+  display:block;
+}
+
+.heading{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+  gap:10px;
+}
+
+.heading h1{
+  font-size:27px;
+}
+
+.back{
+  padding:10px 14px;
+  background:#ece8f1;
+  color:#443c4e;
+  border-radius:10px;
+  font-weight:bold;
+}
+
+/* HOME */
+
+.hero{
+  background:linear-gradient(135deg,var(--purple2),var(--purple),var(--red));
+  color:#fff;
+  padding:28px;
+  border-radius:23px;
+  margin-bottom:20px;
+}
+
+.hero small{
+  opacity:.8;
+}
+
+.hero h1{
+  margin-top:7px;
+  font-size:28px;
+}
+
+.balance-box{
+  margin-top:20px;
+  padding:18px;
+  border-radius:15px;
+  background:rgba(255,255,255,.14);
+}
+
+.balance{
+  font-size:31px;
+  font-weight:900;
+  margin-top:6px;
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:14px;
+  margin-bottom:20px;
+}
+
+.card{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:17px;
+  padding:18px;
+  box-shadow:var(--shadow);
+}
+
+.stat small{
+  color:var(--muted);
+}
+
+.stat strong{
+  display:block;
+  font-size:25px;
+  margin-top:7px;
+}
+
+.support{
+  display:flex;
+  align-items:center;
+  gap:15px;
+}
+
+.whatsapp{
+  width:52px;
+  height:52px;
+  flex-shrink:0;
+  border-radius:50%;
+  background:#20c56a;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.whatsapp svg{
+  width:29px;
+  height:29px;
+  fill:#fff;
+}
+
+.support-text{
+  flex:1;
+}
+
+.support-text strong{
+  display:block;
+  margin-bottom:5px;
+}
+
+.support-text small{
+  color:var(--muted);
+}
+
+.secondary{
+  padding:11px 15px;
+  background:#eee7ff;
+  color:var(--purple);
+  border-radius:10px;
+  font-weight:bold;
+}
+
+/* NUMBERS */
+
+.number-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:15px;
+}
+
+.number-card{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:17px;
+  padding:18px;
+  box-shadow:var(--shadow);
+}
+
+.country{
+  color:var(--purple);
+  font-size:12px;
+  font-weight:bold;
+  margin-bottom:8px;
+}
+
+.phone{
+  font-size:19px;
+  font-weight:900;
+  margin-bottom:7px;
+}
+
+.service{
+  color:var(--muted);
+  font-size:13px;
+  margin-bottom:14px;
+}
+
+.price{
+  font-size:19px;
+  font-weight:900;
+  margin-bottom:12px;
+}
+
+.buy{
+  width:100%;
+  padding:12px;
+  color:#fff;
+  background:var(--purple);
+  border-radius:10px;
+  font-weight:bold;
+}
+
+/* LIST */
+
+.list{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.item{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:15px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+}
+
+.item strong{
+  display:block;
+  margin-bottom:5px;
+}
+
+.item small{
+  color:var(--muted);
+}
+
+.status{
+  padding:7px 10px;
+  border-radius:20px;
+  font-size:12px;
+  font-weight:bold;
+  background:#eee7ff;
+  color:var(--purple);
+}
+
+.status.pending{
+  background:#fff3cf;
+  color:#956300;
+}
+
+.status.approved{
+  background:#dcfce7;
+  color:#15803d;
+}
+
+.status.declined{
+  background:#fee2e2;
+  color:#b91c1c;
+}
+
+/* WALLET */
+
+.wallet{
+  padding:25px;
+  border-radius:20px;
+  background:linear-gradient(135deg,var(--purple2),var(--purple));
+  color:#fff;
+  margin-bottom:18px;
+}
+
+.wallet-amount{
+  font-size:37px;
+  font-weight:900;
+  margin:8px 0 20px;
+}
+
+.wallet button{
+  padding:12px 17px;
+  border-radius:10px;
+  color:var(--purple);
+  background:#fff;
+  font-weight:bold;
+}
+
+.line{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  padding:11px 0;
+  border-bottom:1px solid var(--border);
+}
+
+.line:last-child{
+  border-bottom:0;
+}
+
+/* SETTINGS */
+
+.profile{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:20px;
+}
+
+.profile-line{
+  padding:14px 0;
+  border-bottom:1px solid var(--border);
+}
+
+.profile-line:last-child{
+  border-bottom:0;
+}
+
+.profile-line small{
+  display:block;
+  color:var(--muted);
+  margin-bottom:5px;
+}
+
+.logout{
+  margin-top:20px;
+  padding:12px 17px;
+  border-radius:10px;
+  background:#fee2e2;
+  color:#b91c1c;
+  font-weight:bold;
+}
+
+.founder{
+  text-align:center;
+  margin-top:28px;
+  color:#aaa4b2;
+  font-size:11px;
+}
+
+/* MODAL */
+
+.modal-bg{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:100;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  background:rgba(0,0,0,.55);
+}
+
+.modal-bg.show{
+  display:flex;
+}
+
+.modal{
+  width:100%;
+  max-width:430px;
+  max-height:90vh;
+  overflow:auto;
+  padding:22px;
+  background:#fff;
+  border-radius:20px;
+}
+
+.modal-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:18px;
+}
+
+.close{
+  width:35px;
+  height:35px;
+  border-radius:50%;
+  background:#eee9f3;
+  font-size:20px;
+}
+
+.payment{
+  background:#f6f0ff;
+  border:1px solid #e4d7ff;
+  border-radius:14px;
+  padding:16px;
+  margin-bottom:16px;
+}
+
+.payment strong{
+  color:var(--purple);
+}
+
+.payment .line{
+  border-bottom:0;
+  padding:7px 0;
+}
+
+/* MOBILE */
+
+.bottom{
+  display:none;
+}
+
+@media(max-width:850px){
+
+  .sidebar{
+    display:none;
+  }
+
+  .main{
+    padding:16px;
+    padding-bottom:90px;
+  }
+
+  .stats{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .number-grid{
+    grid-template-columns:1fr;
+  }
+
+  .topbar{
+    padding:0 16px;
+  }
+
+  .bottom{
+    position:fixed;
+    bottom:0;
+    left:0;
+    right:0;
+    height:67px;
+    display:flex;
+    background:#fff;
+    border-top:1px solid var(--border);
+    z-index:50;
+  }
+
+  .bottom button{
+    flex:1;
+    background:#fff;
+    color:#77717f;
+    font-size:11px;
+    font-weight:bold;
+  }
+
+  .bottom button.active{
+    color:var(--purple);
+  }
+
+  .support{
+    align-items:flex-start;
+  }
+}
+
+@media(max-width:430px){
+
+  .hero h1{
+    font-size:23px;
+  }
+
+  .balance{
+    font-size:27px;
+  }
+
+  .stats{
+    gap:9px;
+  }
+
+  .card{
+    padding:14px;
+  }
+
+  .stat strong{
+    font-size:21px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- AUTH -->
+<div id="auth">
+
+  <div class="auth-card">
+
+    <div class="logo">
+      Olaq<span>Verify</span>
+    </div>
+
+    <div class="subtitle">
+      Secure account dashboard
+    </div>
+
+    <div id="loginBox">
+
+      <h2>Welcome back</h2>
+
+      <div class="field">
+        <label>Email</label>
+        <input id="loginEmail" type="email" placeholder="Email">
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <input id="loginPassword" type="password" placeholder="Password">
+      </div>
+
+      <button class="primary" onclick="login()">
+        Sign In
+      </button>
+
+      <div class="switch">
+        Don't have an account?
+        <button onclick="showSignup()">Create account</button>
+      </div>
+
+    </div>
+
+
+    <div id="signupBox" class="hidden">
+
+      <h2>Create account</h2>
+
+      <div class="field">
+        <label>Name</label>
+        <input id="signupName" type="text" placeholder="Your name">
+      </div>
+
+      <div class="field">
+        <label>Email</label>
+        <input id="signupEmail" type="email" placeholder="Email">
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <input id="signupPassword" type="password" placeholder="Minimum 6 characters">
+      </div>
+
+      <button class="primary" onclick="signup()">
+        Create Account
+      </button>
+
+      <div class="switch">
+        Already have an account?
+        <button onclick="showLogin()">Sign in</button>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- APP -->
+<div id="app" class="hidden">
+
+  <header class="topbar">
+
+    <div class="brand">
+      Olaq<span>Verify</span>
+    </div>
+
+    <div class="user" id="topUser">
+      Account
+    </div>
+
+  </header>
+
+
+  <div class="layout">
+
+    <aside class="sidebar">
+
+      <button class="nav active" data-page="home" onclick="go('home')">
+        Home
+      </button>
+
+      <button class="nav" data-page="buy" onclick="go('buy')">
+        Buy Number
+      </button>
+
+      <button class="nav" data-page="orders" onclick="go('orders')">
+        My Orders
+      </button>
+
+      <button class="nav" data-page="wallet" onclick="go('wallet')">
+        Wallet
+      </button>
+
+      <button class="nav" data-page="transactions" onclick="go('transactions')">
+        Transactions
+      </button>
+
+      <button class="nav" data-page="support" onclick="go('support')">
+        Support
+      </button>
+
+      <button class="nav" data-page="settings" onclick="go('settings')">
+        Settings
+      </button>
+
+    </aside>
+
+
+    <main class="main">
+
+      <!-- HOME -->
+      <section id="page-home" class="page active">
+
+        <div class="hero">
+
+          <small>Welcome back</small>
+
+          <h1 id="welcomeName">
+            OlaqVerify
+          </h1>
+
+          <div class="balance-box">
+
+            <small>Available balance</small>
+
+            <div class="balance" id="homeBalance">
+              ₦0.00
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="stats">
+
+          <div class="card stat">
+            <small>Orders</small>
+            <strong id="ordersCount">0</strong>
+          </div>
+
+          <div class="card stat">
+            <small>Available Numbers</small>
+            <strong id="numbersCount">0</strong>
+          </div>
+
+          <div class="card stat">
+            <small>Pending Payments</small>
+            <strong id="pendingCount">0</strong>
+          </div>
+
+          <div class="card stat">
+            <small>Account</small>
+            <strong>Active</strong>
+          </div>
+
+        </div>
+
+
+        <div class="card support">
+
+          <div class="whatsapp">
+
+            <svg viewBox="0 0 32 32">
+              <path d="M16 3a13 13 0 0 0-11.2 19.6L3 29l6.7-1.8A13 13 0 1 0 16 3zm0 23.5c-2.1 0-4.1-.6-5.8-1.8l-.4-.3-4 .9 1.1-3.9-.3-.4A10.5 10.5 0 1 1 16 26.5zm5.8-7.9c-.3-.2-1.8-.9-2.1-1-.3-.1-.5-.2-.7.2-.2.3-.8 1-.9 1.2-.2.2-.3.3-.6.1-1.7-.8-2.8-1.5-3.9-3.3-.3-.5.3-.4.8-1.3.1-.2.1-.4 0-.6l-.6-1.5c-.2-.4-.4-.4-.7-.4h-.6c-.2 0-.6.1-.9.4-.3.3-1.1 1-1.1 2.5s1.1 2.9 1.3 3.1c.2.2 2.2 3.4 5.4 4.7 2 .8 2.8.9 3.8.7.6-.1 1.8-.7 2.1-1.4.3-.7.3-1.3.2-1.4-.1-.2-.3-.2-.6-.4z"/>
+            </svg>
+
+          </div>
+
+          <div class="support-text">
+
+            <strong>Need help?</strong>
+
+            <small>
+              Chat with OlaqVerify support on WhatsApp.
+            </small>
+
+          </div>
+
+          <button class="secondary" onclick="whatsapp()">
+            WhatsApp
+          </button>
+
+        </div>
+
+      </section>
+
+
+      <!-- BUY -->
+      <section id="page-buy" class="page">
+
+        <div class="heading">
+
+          <h1>Buy Number</h1>
+
+          <button class="back" onclick="go('home')">
+            ← Back
+          </button>
+
+        </div>
+
+        <div id="numbersList" class="number-grid">
+          <div class="card">Loading...</div>
+        </div>
+
+      </section>
+
+
+      <!-- ORDERS -->
+      <section id="page-orders" class="page">
+
+        <div class="heading">
+
+          <h1>My Orders</h1>
+
+          <button class="back" onclick="go('home')">
+            ← Back
+          </button>
+
+        </div>
+
+        <div id="ordersList" class="list">
+          <div class="card">Loading...</div>
+        </div>
+
+      </section>
+
+
+      <!-- WALLET -->
+      <section id="page-wallet" class="page">
+
+        <div class="heading">
+
+          <h1>Wallet</h1>
+
+          <button class="back" onclick="go('home')">
+            ← Back
+          </button>
+
+        </div>
+
+        <div class="wallet">
+
+          <small>Available balance</small>
+
+          <div class="wallet-amount" id="walletBalance">
+            ₦0.00
+          </div>
+
+          <button onclick="openTopup()">
+            Add Money
+          </button>
+
+        </div>
+
+
+        <div class="card">
+
+          <h3>Payment account</h3>
+
+          <div class="line">
+            <span>Bank</span>
+            <strong>PalmPay</strong>
+          </div>
+
+          <div class="line">
+            <span>Account</span>
+            <strong>8164886717</strong>
+          </div>
+
+          <div class="line">
+            <span>Name</span>
+            <strong>Adekunle</strong>
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- TRANSACTIONS -->
+      <section id="page-transactions" class="page">
+
+        <div class="heading">
+
+          <h1>Transactions</h1>
+
+          <button class="back" onclick="go('home')">
+            ← Back
+          </button>
+
+        </div>
+
+        <div id="transactionsList" class="list">
+          <div class="card">Loading...</div>
+        </div>
+
+      </section>
+
+
+      <!-- SUPPORT -->
+      <section id="page-support" class="page">
+
+        <div class="heading">
+
+          <h1>Support</h1>
+
+          <button class="back" onclick="go('home')">
+            ← Back
+          </button>
+
+        </div>
+
+
+        <div class="card support">
+
+          <div class="whatsapp">
+
+            <svg viewBox="0 0 32 32">
+              <path d="M16 3a13 13 0 0 0-11.2 19.6L3 29l6.7-1.8A13 13 0 1 0 16 3zm0 23.5c-2.1 0-4.1-.6-5.8-1.8l-.4-.3-4 .9 1.1-3.9-.3-.4A10.5 10.5 0 1 1 16 26.5z"/>
+            </svg>
+
+          </div>
+
+          <div class="support-text">
+
+            <strong>WhatsApp Support</strong>
+
+            <small>
+              Contact OlaqVerify support.
+            </small>
+
+          </div>
+
+          <button class="secondary" onclick="whatsapp()">
+            Chat
+          </button>
+
+        </div>
+
+
+        <br>
+
+        <div class="card">
+
+          <h3>Send a message</h3>
+
+          <br>
+
+          <div class="field">
+
+            <textarea
+              id="supportMessage"
+              rows="5"
+              placeholder="Describe your issue..."
+            ></textarea>
+
+          </div>
+
+          <button class="primary" onclick="sendMessage()">
+            Send Message
+          </button>
+
+        </div>
+
+      </section>
+
+
+      <!-- SETTINGS -->
+      <section id="page-settings" class="page">
+
+        <div class="heading">
+
+          <h1>Settings</h1>
+
+          <button class="back" onclick="go('home')">
+            ← Back
+          </button>
+
+        </div>
+
+
+        <div class="profile">
+
+          <div class="profile-line">
+            <small>Name</small>
+            <strong id="profileName">-</strong>
+          </div>
+
+          <div class="profile-line">
+            <small>Email</small>
+            <strong id="profileEmail">-</strong>
+          </div>
+
+          <div class="profile-line">
+            <small>Payment Account</small>
+            <strong>PalmPay • 8164886717</strong>
+          </div>
+
+        </div>
+
+
+        <button class="logout" onclick="logout()">
+          Sign Out
+        </button>
+
+
+        <div class="founder">
+          Founder: Olayiwola Qurwiy
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+
+  <!-- MOBILE NAV -->
+  <nav class="bottom">
+
+    <button data-page="home" onclick="go('home')">
+      Home
+    </button>
+
+    <button data-page="buy" onclick="go('buy')">
+      Buy
+    </button>
+
+    <button data-page="orders" onclick="go('orders')">
+      Orders
+    </button>
+
+    <button data-page="wallet" onclick="go('wallet')">
+      Wallet
+    </button>
+
+    <button data-page="settings" onclick="go('settings')">
+      Settings
+    </button>
+
+  </nav>
+
+</div>
+
+
+<!-- TOPUP -->
+<div id="topupModal" class="modal-bg">
+
+  <div class="modal">
+
+    <div class="modal-head">
+
+      <h2>Add Money</h2>
+
+      <button class="close" onclick="closeTopup()">×</button>
+
+    </div>
+
+
+    <div class="payment">
+
+      <strong>Send payment to PalmPay</strong>
+
+      <div class="line">
+        <span>Account</span>
+        <b>8164886717</b>
+      </div>
+
+      <div class="line">
+        <span>Name</span>
+        <b>Adekunle</b>
+      </div>
+
+    </div>
+
+
+    <div class="field">
+
+      <label>Amount</label>
+
+      <input
+        id="topupAmount"
+        type="number"
+        min="1"
+        placeholder="Amount"
+      >
+
+    </div>
+
+
+    <div class="field">
+
+      <label>Payment reference</label>
+
+      <input
+        id="topupReference"
+        type="text"
+        placeholder="Transaction reference"
+      >
+
+    </div>
+
+
+    <button class="primary" onclick="submitTopup()">
+      Submit Payment
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- ORDER -->
+<div id="orderModal" class="modal-bg">
+
+  <div class="modal">
+
+    <div class="modal-head">
+
+      <h2>Confirm Order</h2>
+
+      <button class="close" onclick="closeOrder()">×</button>
+
+    </div>
+
+    <div id="orderDetails" class="payment"></div>
+
+    <button class="primary" onclick="confirmOrder()">
+      Confirm Order
+    </button>
+
+  </div>
+
+</div>
+
+
+<script>
+
+/* ===============================
+   SUPABASE
+================================ */
+
+const SUPABASE_URL =
+"https://alemtvfchysptzgzhaap.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_UEnF6pfZ2ORRcuIQUzgbRw_6bWNDnKm";
+
+const db =
+supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+
+/* ===============================
+   STATE
+================================ */
+
+let user = null;
+let profile = null;
+let selectedNumber = null;
+
+
+/* ===============================
+   HELPERS
+================================ */
+
+function money(value){
+
+  return "₦" +
+    Number(value || 0).toLocaleString(
+      "en-NG",
+      {
+        minimumFractionDigits:2,
+        maximumFractionDigits:2
+      }
+    );
+
+}
+
+
+function safe(value){
+
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
+}
+
+
+/* ===============================
+   AUTH UI
+================================ */
+
+function showSignup(){
+
+  document
+    .getElementById("loginBox")
+    .classList.add("hidden");
+
+  document
+    .getElementById("signupBox")
+    .classList.remove("hidden");
+
+}
+
+
+function showLogin(){
+
+  document
+    .getElementById("signupBox")
+    .classList.add("hidden");
+
+  document
+    .getElementById("loginBox")
+    .classList.remove("hidden");
+
+}
+
+
+/* ===============================
+   SIGNUP
+================================ */
+
+async function signup(){
+
+  const name =
+    document.getElementById("signupName")
+      .value.trim();
+
+  const email =
+    document.getElementById("signupEmail")
+      .value.trim();
+
+  const password =
+    document.getElementById("signupPassword")
+      .value;
+
+  if(!name || !email || !password){
+
+    alert("Please complete all fields.");
+
+    return;
+  }
+
+  if(password.length < 6){
+
+    alert("Password must contain at least 6 characters.");
+
+    return;
+  }
+
+  const result =
+    await db.auth.signUp({
+      email:email,
+      password:password,
+      options:{
+        data:{
+          name:name
+        }
+      }
+    });
+
+  if(result.error){
+
+    alert(result.error.message);
+
+    return;
+  }
+
+  if(result.data.user){
+
+    await createProfile(
+      result.data.user,
+      name
+    );
+
+  }
+
+  alert(
+    "Account created successfully. If email confirmation is enabled, confirm your email before signing in."
+  );
+
+  showLogin();
+
+}
+
+
+/* ===============================
+   LOGIN
+================================ */
+
+async function login(){
+
+  const email =
+    document.getElementById("loginEmail")
+      .value.trim();
+
+  const password =
+    document.getElementById("loginPassword")
+      .value;
+
+  if(!email || !password){
+
+    alert("Enter your email and password.");
+
+    return;
+  }
+
+  const result =
+    await db.auth.signInWithPassword({
+      email:email,
+      password:password
+    });
+
+  if(result.error){
+
+    alert(result.error.message);
+
+    return;
+  }
+
+  user = result.data.user;
+
+  await openApp();
+
+}
+
+
+/* ===============================
+   PROFILE
+================================ */
+
+async function createProfile(
+  authUser,
+  name
+){
+
+  const check =
+    await db
+      .from("profiles")
+      .select("id")
+      .eq("id",authUser.id)
+      .maybeSingle();
+
+  if(check.error){
+
+    console.log(check.error);
+
+    return;
+  }
+
+  if(!check.data){
+
+    const result =
+      await db
+        .from("profiles")
+        .insert({
+          id:authUser.id,
+          name:name,
+          email:authUser.email,
+          balance:0
+        });
+
+    if(result.error){
+
+      console.log(
+        "Profile creation error:",
+        result.error
+      );
+
+    }
+
+  }
+
+}
+
+
+async function loadProfile(){
+
+  if(!user) return;
+
+  let result =
+    await db
+      .from("profiles")
+      .select("*")
+      .eq("id",user.id)
+      .maybeSingle();
+
+  if(result.error){
+
+    console.log(result.error);
+
+    profile = {
+      id:user.id,
+      name:
+        user.user_metadata?.name ||
+        user.email?.split("@")[0],
+      email:user.email,
+      balance:0
+    };
+
+    return;
+  }
+
+  if(!result.data){
+
+    await createProfile(
+      user,
+      user.user_metadata?.name ||
+      user.email?.split("@")[0]
+    );
+
+    result =
+      await db
+        .from("profiles")
+        .select("*")
+        .eq("id",user.id)
+        .maybeSingle();
+
+  }
+
+  profile =
+    result.data || {
+      id:user.id,
+      name:user.email?.split("@")[0],
+      email:user.email,
+      balance:0
+    };
+
+}
+
+
+/* ===============================
+   OPEN APP
+================================ */
+
+async function openApp(){
+
+  document
+    .getElementById("auth")
+    .classList.add("hidden");
+
+  document
+    .getElementById("app")
+    .classList.remove("hidden");
+
+  await loadProfile();
+
+  updateUI();
+
+  await dashboard();
+
+}
+
+
+/* ===============================
+   UPDATE UI
+================================ */
+
+function updateUI(){
+
+  const name =
+    profile?.name ||
+    user?.user_metadata?.name ||
+    user?.email?.split("@")[0] ||
+    "User";
+
+  const email =
+    profile?.email ||
+    user?.email ||
+    "";
+
+  document.getElementById("welcomeName")
+    .textContent = name;
+
+  document.getElementById("topUser")
+    .textContent = name;
+
+  document.getElementById("profileName")
+    .textContent = name;
+
+  document.getElementById("profileEmail")
+    .textContent = email;
+
+  document.getElementById("homeBalance")
+    .textContent = money(profile?.balance);
+
+  document.getElementById("walletBalance")
+    .textContent = money(profile?.balance);
+
+}
+
+
+/* ===============================
+   NAVIGATION
+================================ */
+
+function go(page){
+
+  document
+    .querySelectorAll(".page")
+    .forEach(p =>
+      p.classList.remove("active")
+    );
+
+  const target =
+    document.getElementById(
+      "page-" + page
+    );
+
+  if(target){
+    target.classList.add("active");
+  }
+
+  document
+    .querySelectorAll(
+      ".nav,.bottom button"
+    )
+    .forEach(btn => {
+
+      btn.classList.toggle(
+        "active",
+        btn.dataset.page === page
+      );
+
+    });
+
+  if(page === "home"){
+    dashboard();
+  }
+
+  if(page === "buy"){
+    loadNumbers();
+  }
+
+  if(page === "orders"){
+    loadOrders();
+  }
+
+  if(page === "transactions"){
+    loadTransactions();
+  }
+
+  window.scrollTo(0,0);
+
+}
+
+
+/* ===============================
+   DASHBOARD
+================================ */
+
+async function dashboard(){
+
+  if(!user) return;
+
+  await loadProfile();
+
+  updateUI();
+
+
+  const orders =
+    await db
+      .from("orders")
+      .select("id",{
+        count:"exact",
+        head:true
+      })
+      .eq("user_id",user.id);
+
+  const numbers =
+    await db
+      .from("numbers")
+      .select("id",{
+        count:"exact",
+        head:true
+      })
+      .eq("status","available");
+
+  const payments =
+    await db
+      .from("payment_requests")
+      .select("id",{
+        count:"exact",
+        head:true
+      })
+      .eq("user_id",user.id)
+      .eq("status","pending");
+
+
+  document.getElementById("ordersCount")
+    .textContent =
+      orders.error ? 0 : (orders.count || 0);
+
+  document.getElementById("numbersCount")
+    .textContent =
+      numbers.error ? 0 : (numbers.count || 0);
+
+  document.getElementById("pendingCount")
+    .textContent =
+      payments.error ? 0 : (payments.count || 0);
+
+}
+
+
+/* ===============================
+   NUMBERS
+================================ */
+
+async function loadNumbers(){
+
+  const box =
+    document.getElementById("numbersList");
+
+  box.innerHTML =
+    `<div class="card">Loading available numbers...</div>`;
+
+  const result =
+    await db
+      .from("numbers")
+      .select("*")
+      .eq("status","available")
+      .order("created_at",{
+        ascending:false
+      });
+
+  if(result.error){
+
+    box.innerHTML =
+      `<div class="card">
+        Unable to load numbers.<br><br>
+        <small>${safe(result.error.message)}</small>
+      </div>`;
+
+    return;
+  }
+
+  if(!result.data?.length){
+
+    box.innerHTML =
+      `<div class="card">
+        No numbers are currently available.
+      </div>`;
+
+    return;
+  }
+
+  box.innerHTML = "";
+
+  result.data.forEach(number => {
+
+    const country =
+      number.country ||
+      number.country_name ||
+      "International";
+
+    const phone =
+      number.number ||
+      number.phone_number ||
+      "Number unavailable";
+
+    const service =
+      number.service ||
+      number.platform ||
+      "SMS";
+
+    const price =
+      number.price || 0;
+
+
+    const card =
+      document.createElement("div");
+
+    card.className = "number-card";
+
+    card.innerHTML = `
+
+      <div class="country">
+        ${safe(country)}
+      </div>
+
+      <div class="phone">
+        ${safe(phone)}
+      </div>
+
+      <div class="service">
+        ${safe(service)}
+      </div>
+
+      <div class="price">
+        ${money(price)}
+      </div>
+
+      <button class="buy">
+        Buy Number
+      </button>
+
+    `;
+
+
+    card
+      .querySelector(".buy")
+      .onclick =
+      () => openOrder(number);
+
+
+    box.appendChild(card);
+
+  });
+
+}
+
+
+/* ===============================
+   ORDER
+================================ */
+
+function openOrder(number){
+
+  selectedNumber = number;
+
+  const country =
+    number.country ||
+    number.country_name ||
+    "International";
+
+  const phone =
+    number.number ||
+    number.phone_number ||
+    "Number";
+
+  const service =
+    number.service ||
+    number.platform ||
+    "SMS";
+
+  const price =
+    number.price || 0;
+
+
+  document.getElementById("orderDetails")
+    .innerHTML = `
+
+      <strong>Order details</strong>
+
+      <div class="line">
+        <span>Country</span>
+        <b>${safe(country)}</b>
+      </div>
+
+      <div class="line">
+        <span>Number</span>
+        <b>${safe(phone)}</b>
+      </div>
+
+      <div class="line">
+        <span>Service</span>
+        <b>${safe(service)}</b>
+      </div>
+
+      <div class="line">
+        <span>Price</span>
+        <b>${money(price)}</b>
+      </div>
+
+    `;
+
+
+  document
+    .getElementById("orderModal")
+    .classList.add("show");
+
+}
+
+
+function closeOrder(){
+
+  document
+    .getElementById("orderModal")
+    .classList.remove("show");
+
+  selectedNumber = null;
+
+}
+
+
+async function confirmOrder(){
+
+  if(!selectedNumber || !user){
+
+    return;
+  }
+
+  await loadProfile();
+
+  const price =
+    Number(selectedNumber.price || 0);
+
+  const balance =
+    Number(profile?.balance || 0);
+
+
+  if(price <= 0){
+
+    alert("Invalid number price.");
+
+    return;
+  }
+
+
+  if(balance < price){
+
+    alert(
+      "Insufficient balance. Please add money first."
+    );
+
+    closeOrder();
+
+    go("wallet");
+
+    return;
+  }
+
+
+  const result =
+    await db
+      .from("orders")
+      .insert({
+        user_id:user.id,
+        number_id:selectedNumber.id,
+        status:"pending"
+      });
+
+
+  if(result.error){
+
+    alert(
+      "Could not create order: " +
+      result.error.message
+    );
+
+    return;
+  }
+
+
+  alert(
+    "Order submitted successfully."
+  );
+
+  closeOrder();
+
+  go("orders");
+
+}
+
+
+/* ===============================
+   ORDERS LIST
+================================ */
+
+async function loadOrders(){
+
+  const box =
+    document.getElementById("ordersList");
+
+  box.innerHTML =
+    `<div class="card">Loading orders...</div>`;
+
+
+  const result =
+    await db
+      .from("orders")
+      .select("*")
+      .eq("user_id",user.id)
+      .order("created_at",{
+        ascending:false
+      });
+
+
+  if(result.error){
+
+    box.innerHTML =
+      `<div class="card">
+        ${safe(result.error.message)}
+      </div>`;
+
+    return;
+  }
+
+
+  if(!result.data?.length){
+
+    box.innerHTML =
+      `<div class="card">
+        You don't have any orders yet.
+      </div>`;
+
+    return;
+  }
+
+
+  box.innerHTML = "";
+
+
+  result.data.forEach(order => {
+
+    const status =
+      String(
+        order.status || "pending"
+      ).toLowerCase();
+
+
+    const item =
+      document.createElement("div");
+
+    item.className = "item";
+
+    item.innerHTML = `
+
+      <div>
+
+        <strong>
+          Order #${safe(order.id)}
+        </strong>
+
+        <small>
+          ${
+            order.created_at
+              ? new Date(
+                  order.created_at
+                ).toLocaleString()
+              : ""
+          }
+        </small>
+
+      </div>
+
+      <div class="status ${safe(status)}">
+        ${safe(order.status || "pending")}
+      </div>
+
+    `;
+
+
+    box.appendChild(item);
+
+  });
+
+}
+
+
+/* ===============================
+   TOP UP
+================================ */
+
+function openTopup(){
+
+  document.getElementById("topupAmount")
+    .value = "";
+
+  document.getElementById("topupReference")
+    .value = "";
+
+  document
+    .getElementById("topupModal")
+    .classList.add("show");
+
+}
+
+
+function closeTopup(){
+
+  document
+    .getElementById("topupModal")
+    .classList.remove("show");
+
+}
+
+
+async function submitTopup(){
+
+  const amount =
+    Number(
+      document
+        .getElementById("topupAmount")
+        .value
+    );
+
+  const reference =
+    document
+      .getElementById("topupReference")
+      .value
+      .trim();
+
+
+  if(!amount || amount <= 0){
+
+    alert("Enter a valid amount.");
+
+    return;
+  }
+
+
+  if(!reference){
+
+    alert("Enter the payment reference.");
+
+    return;
+  }
+
+
+  const result =
+    await db
+      .from("payment_requests")
+      .insert({
+        user_id:user.id,
+        amount:amount,
+        reference:reference,
+        status:"pending"
+      });
+
+
+  if(result.error){
+
+    alert(
+      "Could not submit payment: " +
+      result.error.message
+    );
+
+    return;
+  }
+
+
+  alert(
+    "Payment submitted and marked as pending."
+  );
+
+
+  closeTopup();
+
+  go("transactions");
+
+}
+
+
+/* ===============================
+   TRANSACTIONS
+================================ */
+
+async function loadTransactions(){
+
+  const box =
+    document.getElementById("transactionsList");
+
+  box.innerHTML =
+    `<div class="card">Loading transactions...</div>`;
+
+
+  const result =
+    await db
+      .from("payment_requests")
+      .select("*")
+      .eq("user_id",user.id)
+      .order("created_at",{
+        ascending:false
+      });
+
+
+  if(result.error){
+
+    box.innerHTML =
+      `<div class="card">
+        ${safe(result.error.message)}
+      </div>`;
+
+    return;
+  }
+
+
+  if(!result.data?.length){
+
+    box.innerHTML =
+      `<div class="card">
+        No transactions yet.
+      </div>`;
+
+    return;
+  }
+
+
+  box.innerHTML = "";
+
+
+  result.data.forEach(payment => {
+
+    const status =
+      String(
+        payment.status || "pending"
+      ).toLowerCase();
+
+
+    const item =
+      document.createElement("div");
+
+    item.className = "item";
+
+    item.innerHTML = `
+
+      <div>
+
+        <strong>
+          ${money(payment.amount)}
+        </strong>
+
+        <small>
+          Ref:
+          ${safe(payment.reference || "N/A")}
+        </small>
+
+      </div>
+
+      <div class="status ${safe(status)}">
+        ${safe(payment.status || "pending")}
+      </div>
+
+    `;
+
+
+    box.appendChild(item);
+
+  });
+
+}
+
+
+/* ===============================
+   WHATSAPP
+================================ */
+
+function whatsapp(){
+
+  window.open(
+    "https://wa.me/2348164886717",
+    "_blank"
+  );
+
+}
+
+
+/* ===============================
+   SUPPORT MESSAGE
+================================ */
+
+async function sendMessage(){
+
+  const input =
+    document.getElementById("supportMessage");
+
+  const message =
+    input.value.trim();
+
+
+  if(!message){
+
+    alert("Write your message first.");
+
+    return;
+  }
+
+
+  const result =
+    await db
+      .from("messages")
+      .insert({
+        user_id:user.id,
+        message:message
+      });
+
+
+  if(result.error){
+
+    alert(
+      "Message failed: " +
+      result.error.message
+    );
+
+    return;
+  }
+
+
+  input.value = "";
+
+  alert("Message sent.");
+
+}
+
+
+/* ===============================
+   LOGOUT
+================================ */
+
+async function logout(){
+
+  await db.auth.signOut();
+
+  user = null;
+  profile = null;
+
+  document
+    .getElementById("app")
+    .classList.add("hidden");
+
+  document
+    .getElementById("auth")
+    .classList.remove("hidden");
+
+  showLogin();
+
+}
+
+
+/* ===============================
+   AUTH SESSION
+================================ */
+
+async function start(){
+
+  const result =
+    await db.auth.getSession();
+
+
+  if(result.data.session){
+
+    user =
+      result.data.session.user;
+
+    await openApp();
+
+  }else{
+
+    document
+      .getElementById("auth")
+      .classList.remove("hidden");
+
+  }
+
+}
+
+
+db.auth.onAuthStateChange(
+  async (event,session) => {
+
+    if(
+      session &&
+      !user
+    ){
+
+      user = session.user;
+
+      await openApp();
+
+    }
+
+  }
+);
+
+
+/* ===============================
+   MODAL BACKGROUND
+================================ */
+
+document
+  .getElementById("topupModal")
+  .addEventListener(
+    "click",
+    function(e){
+
+      if(e.target === this){
+        closeTopup();
+      }
+
+    }
+  );
+
+
+document
+  .getElementById("orderModal")
+  .addEventListener(
+    "click",
+    function(e){
+
+      if(e.target === this){
+        closeOrder();
+      }
+
+    }
+  );
+
+
+/* ===============================
+   START
+================================ */
+
+start();
+
+</script>
+
+</body>
+  </html>
