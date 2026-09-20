@@ -1,0 +1,2520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>OlaqVerify</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root{
+    --purple:#5b21b6;
+    --purple2:#3b0764;
+    --purple3:#7c3aed;
+    --red:#dc2626;
+    --green:#16a34a;
+    --blue:#2563eb;
+    --bg:#f6f3ff;
+    --card:#fff;
+    --text:#171717;
+    --muted:#737373;
+    --border:#e5e7eb;
+    --shadow:0 10px 30px rgba(0,0,0,.07);
+}
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    font-family:Arial,Helvetica,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+}
+
+button,input,select{
+    font:inherit;
+}
+
+button{
+    cursor:pointer;
+}
+
+.hidden{
+    display:none!important;
+}
+
+.app{
+    min-height:100vh;
+}
+
+/* =========================
+   AUTH
+========================= */
+
+.auth{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    background:
+    radial-gradient(circle at top left,#7c3aed,#3b0764 45%,#160021);
+}
+
+.auth-card{
+    width:100%;
+    max-width:430px;
+    background:#fff;
+    border-radius:24px;
+    padding:28px;
+    box-shadow:0 25px 70px rgba(0,0,0,.25);
+}
+
+.logo{
+    width:64px;
+    height:64px;
+    border-radius:18px;
+    background:linear-gradient(135deg,var(--purple),var(--red));
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:900;
+    font-size:23px;
+    margin-bottom:18px;
+}
+
+.auth-card h1{
+    margin:0 0 7px;
+}
+
+.auth-card p{
+    color:var(--muted);
+}
+
+.form-group{
+    display:flex;
+    flex-direction:column;
+    gap:7px;
+    margin-bottom:14px;
+}
+
+label{
+    font-size:13px;
+    font-weight:700;
+}
+
+input,select{
+    width:100%;
+    border:1px solid #d4d4d8;
+    border-radius:12px;
+    padding:12px 13px;
+    background:#fff;
+    outline:none;
+}
+
+input:focus,select:focus{
+    border-color:var(--purple);
+    box-shadow:0 0 0 3px rgba(91,33,182,.1);
+}
+
+.btn{
+    border:0;
+    border-radius:12px;
+    padding:12px 16px;
+    font-weight:800;
+}
+
+.btn-primary{
+    background:var(--purple);
+    color:#fff;
+}
+
+.btn-primary:hover{
+    background:var(--purple2);
+}
+
+.btn-red{
+    background:var(--red);
+    color:#fff;
+}
+
+.btn-green{
+    background:var(--green);
+    color:#fff;
+}
+
+.btn-gray{
+    background:#f3f4f6;
+    color:#222;
+}
+
+.btn-blue{
+    background:var(--blue);
+    color:#fff;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.header{
+    position:sticky;
+    top:0;
+    z-index:1000;
+    height:68px;
+    background:#fff;
+    border-bottom:1px solid var(--border);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 18px;
+}
+
+.header-brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.header-logo{
+    width:42px;
+    height:42px;
+    border-radius:12px;
+    background:linear-gradient(135deg,var(--purple),var(--red));
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:900;
+}
+
+.header-title{
+    font-weight:900;
+}
+
+.header-sub{
+    color:var(--muted);
+    font-size:11px;
+}
+
+.balance-mini{
+    background:#f5f3ff;
+    border-radius:12px;
+    padding:8px 12px;
+    text-align:right;
+}
+
+.balance-mini small{
+    display:block;
+    color:var(--muted);
+    font-size:10px;
+}
+
+.balance-mini strong{
+    color:var(--purple);
+}
+
+/* =========================
+   CONTENT
+========================= */
+
+.content{
+    max-width:1000px;
+    margin:auto;
+    padding:20px 16px 100px;
+}
+
+.page{
+    display:none;
+}
+
+.page.active{
+    display:block;
+}
+
+.back-row{
+    margin-bottom:15px;
+}
+
+.back-btn{
+    border:0;
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:11px;
+    padding:9px 13px;
+    font-weight:700;
+}
+
+/* =========================
+   HERO
+========================= */
+
+.hero{
+    background:
+    linear-gradient(135deg,#5b21b6,#3b0764);
+    color:#fff;
+    border-radius:22px;
+    padding:24px;
+    box-shadow:var(--shadow);
+    margin-bottom:18px;
+}
+
+.hero h1{
+    margin:0 0 7px;
+}
+
+.hero p{
+    margin:0;
+    opacity:.85;
+}
+
+.hero-balance{
+    margin-top:20px;
+}
+
+.hero-balance small{
+    opacity:.75;
+}
+
+.hero-balance strong{
+    display:block;
+    font-size:32px;
+    margin-top:3px;
+}
+
+/* =========================
+   QUICK ACTIONS
+========================= */
+
+.quick-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:12px;
+    margin-bottom:18px;
+}
+
+.quick{
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:17px;
+    padding:17px 12px;
+    box-shadow:var(--shadow);
+    text-align:center;
+    font-weight:800;
+}
+
+.quick span{
+    display:block;
+    font-size:25px;
+    margin-bottom:7px;
+}
+
+/* =========================
+   CARDS
+========================= */
+
+.card{
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:19px;
+    box-shadow:var(--shadow);
+    margin-bottom:17px;
+}
+
+.card h2,
+.card h3{
+    margin-top:0;
+}
+
+/* =========================
+   ORDER
+========================= */
+
+.order-price{
+    margin-top:12px;
+    padding:15px;
+    background:#faf5ff;
+    border:1px dashed #c4b5fd;
+    border-radius:14px;
+}
+
+.order-price small{
+    color:var(--muted);
+}
+
+.order-price strong{
+    display:block;
+    font-size:25px;
+    color:var(--purple);
+    margin-top:4px;
+}
+
+.price-status{
+    font-size:12px;
+    margin-top:5px;
+}
+
+.available{
+    color:var(--green);
+}
+
+.unavailable{
+    color:var(--red);
+}
+
+/* =========================
+   ORDERS
+========================= */
+
+.order-item{
+    border:1px solid var(--border);
+    border-radius:15px;
+    padding:15px;
+    margin-bottom:10px;
+}
+
+.order-top{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+}
+
+.order-id{
+    font-weight:800;
+}
+
+.order-meta{
+    color:var(--muted);
+    font-size:13px;
+    margin-top:7px;
+}
+
+.order-number{
+    margin-top:10px;
+    background:#f0fdf4;
+    border-radius:10px;
+    padding:10px;
+    color:#166534;
+    font-weight:800;
+}
+
+.status{
+    display:inline-flex;
+    border-radius:999px;
+    padding:5px 9px;
+    font-size:10px;
+    font-weight:900;
+}
+
+.status.pending{
+    background:#ffedd5;
+    color:#9a3412;
+}
+
+.status.fulfilled{
+    background:#dcfce7;
+    color:#166534;
+}
+
+.status.cancelled{
+    background:#fee2e2;
+    color:#991b1b;
+}
+
+/* =========================
+   TRANSACTIONS
+========================= */
+
+.transaction{
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    padding:13px 0;
+    border-bottom:1px solid var(--border);
+}
+
+.transaction:last-child{
+    border-bottom:0;
+}
+
+.transaction-title{
+    font-weight:700;
+}
+
+.transaction-date{
+    color:var(--muted);
+    font-size:11px;
+}
+
+.credit{
+    color:var(--green);
+    font-weight:900;
+}
+
+.debit{
+    color:var(--red);
+    font-weight:900;
+}
+
+/* =========================
+   WHATSAPP
+========================= */
+
+.whatsapp-card{
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+
+.whatsapp-icon{
+    width:48px;
+    height:48px;
+    border-radius:50%;
+    background:#25D366;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+}
+
+.whatsapp-icon svg{
+    width:28px;
+    height:28px;
+    fill:#fff;
+}
+
+.whatsapp-card h3{
+    margin:0 0 4px;
+}
+
+.whatsapp-card p{
+    margin:0;
+    color:var(--muted);
+    font-size:13px;
+}
+
+/* =========================
+   BOTTOM NAV
+========================= */
+
+.bottom-nav{
+    position:fixed;
+    bottom:0;
+    left:0;
+    right:0;
+    z-index:1000;
+    background:#fff;
+    border-top:1px solid var(--border);
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    padding:8px 5px calc(8px + env(safe-area-inset-bottom));
+}
+
+.bottom-nav button{
+    border:0;
+    background:transparent;
+    padding:7px 4px;
+    color:#737373;
+    font-size:11px;
+    font-weight:700;
+}
+
+.bottom-nav button.active{
+    color:var(--purple);
+}
+
+.bottom-nav span{
+    display:block;
+    font-size:21px;
+    margin-bottom:2px;
+}
+
+/* =========================
+   MODAL
+========================= */
+
+.modal{
+    position:fixed;
+    inset:0;
+    z-index:3000;
+    background:rgba(0,0,0,.55);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:18px;
+}
+
+.modal.show{
+    display:flex;
+}
+
+.modal-box{
+    width:100%;
+    max-width:500px;
+    max-height:90vh;
+    overflow:auto;
+    background:#fff;
+    border-radius:20px;
+    padding:20px;
+}
+
+.modal-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:18px;
+}
+
+.modal-head h3{
+    margin:0;
+}
+
+.close{
+    border:0;
+    background:#f3f4f6;
+    width:36px;
+    height:36px;
+    border-radius:10px;
+}
+
+/* =========================
+   EMPTY
+========================= */
+
+.empty{
+    text-align:center;
+    padding:35px 15px;
+    color:var(--muted);
+}
+
+/* =========================
+   TOAST
+========================= */
+
+#toast{
+    position:fixed;
+    left:50%;
+    bottom:80px;
+    transform:translate(-50%,20px);
+    background:#171717;
+    color:#fff;
+    padding:12px 16px;
+    border-radius:12px;
+    z-index:5000;
+    opacity:0;
+    pointer-events:none;
+    transition:.25s;
+    max-width:90%;
+    text-align:center;
+}
+
+#toast.show{
+    opacity:1;
+    transform:translate(-50%,0);
+}
+
+/* =========================
+   FOOTER
+========================= */
+
+.footer{
+    text-align:center;
+    color:var(--muted);
+    font-size:12px;
+    padding:20px;
+}
+
+@media(max-width:650px){
+
+    .quick-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .hero{
+        padding:20px;
+    }
+
+    .hero-balance strong{
+        font-size:28px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+
+<!-- =====================================================
+     AUTH SCREEN
+===================================================== -->
+
+<div id="authScreen" class="auth">
+
+    <div class="auth-card">
+
+        <div class="logo">
+            OQ
+        </div>
+
+        <h1>OlaqVerify</h1>
+
+        <p id="authDescription">
+            Sign in to your account
+        </p>
+
+
+        <div id="loginForm">
+
+            <div class="form-group">
+
+                <label>Email</label>
+
+                <input
+                    id="loginEmail"
+                    type="email"
+                    placeholder="Email address"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>Password</label>
+
+                <input
+                    id="loginPassword"
+                    type="password"
+                    placeholder="Password"
+                >
+
+            </div>
+
+
+            <button
+                class="btn btn-primary"
+                style="width:100%"
+                onclick="login()"
+            >
+                Sign In
+            </button>
+
+
+            <p style="text-align:center">
+
+                Don't have an account?
+
+                <button
+                    class="btn"
+                    style="padding:0;color:#5b21b6;background:none"
+                    onclick="showSignup()"
+                >
+                    Create account
+                </button>
+
+            </p>
+
+        </div>
+
+
+        <div id="signupForm" class="hidden">
+
+            <div class="form-group">
+
+                <label>Full name</label>
+
+                <input
+                    id="signupName"
+                    placeholder="Your name"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>Email</label>
+
+                <input
+                    id="signupEmail"
+                    type="email"
+                    placeholder="Email address"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>Password</label>
+
+                <input
+                    id="signupPassword"
+                    type="password"
+                    placeholder="Create password"
+                >
+
+            </div>
+
+
+            <button
+                class="btn btn-primary"
+                style="width:100%"
+                onclick="signup()"
+            >
+                Create Account
+            </button>
+
+
+            <p style="text-align:center">
+
+                Already have an account?
+
+                <button
+                    class="btn"
+                    style="padding:0;color:#5b21b6;background:none"
+                    onclick="showLogin()"
+                >
+                    Sign in
+                </button>
+
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     APP
+===================================================== -->
+
+<div id="app" class="hidden">
+
+    <header class="header">
+
+        <div class="header-brand">
+
+            <div class="header-logo">
+                OQ
+            </div>
+
+            <div>
+
+                <div class="header-title">
+                    OlaqVerify
+                </div>
+
+                <div class="header-sub">
+                    Secure customer dashboard
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="balance-mini">
+
+            <small>Balance</small>
+
+            <strong id="miniBalance">
+                ₦0.00
+            </strong>
+
+        </div>
+
+    </header>
+
+
+    <main class="content">
+
+
+        <!-- =================================================
+             HOME
+        ================================================= -->
+
+        <section id="homePage" class="page active">
+
+            <div class="hero">
+
+                <h1>
+                    Welcome, <span id="welcomeName">Customer</span>
+                </h1>
+
+                <p>
+                    Manage your balance and authorized number orders.
+                </p>
+
+
+                <div class="hero-balance">
+
+                    <small>
+                        Available balance
+                    </small>
+
+                    <strong id="heroBalance">
+                        ₦0.00
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="quick-grid">
+
+                <button
+                    class="quick"
+                    onclick="openPage('orderPage')"
+                >
+
+                    <span>📱</span>
+
+                    Order Number
+
+                </button>
+
+
+                <button
+                    class="quick"
+                    onclick="openPage('ordersPage')"
+                >
+
+                    <span>📦</span>
+
+                    My Orders
+
+                </button>
+
+
+                <button
+                    class="quick"
+                    onclick="openPage('walletPage')"
+                >
+
+                    <span>💳</span>
+
+                    Wallet
+
+                </button>
+
+
+                <button
+                    class="quick"
+                    onclick="openPage('supportPage')"
+                >
+
+                    <span>💬</span>
+
+                    Support
+
+                </button>
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>
+                    Need help?
+                </h3>
+
+                <p style="color:#737373">
+                    Chat with OlaqVerify support on WhatsApp.
+                </p>
+
+
+                <a
+                    href="https://wa.me/2348164886717"
+                    target="_blank"
+                    style="text-decoration:none"
+                >
+
+                    <div class="whatsapp-card">
+
+                        <div class="whatsapp-icon">
+
+                            <svg viewBox="0 0 24 24">
+
+                                <path d="M12 2a10 10 0 0 0-8.66 15L2 22l5.16-1.31A10 10 0 1 0 12 2Zm0 18a8 8 0 0 1-4.08-1.12l-.29-.17-3.06.78.82-2.98-.19-.31A8 8 0 1 1 12 20Zm4.63-5.98c-.25-.13-1.48-.73-1.71-.81-.23-.08-.4-.13-.57.13-.17.25-.65.81-.8.98-.15.17-.3.19-.55.06-.25-.13-1.03-.38-1.96-1.21-.72-.64-1.21-1.43-1.35-1.68-.14-.25-.01-.39.11-.52.11-.11.25-.3.38-.45.13-.15.17-.25.25-.42.08-.17.04-.32-.02-.45-.06-.13-.57-1.37-.78-1.88-.21-.5-.42-.43-.57-.44h-.49c-.17 0-.44.06-.67.32-.23.25-.88.86-.88 2.09s.9 2.42 1.03 2.59c.13.17 1.77 2.7 4.29 3.79.6.26 1.07.42 1.43.54.6.19 1.14.16 1.57.1.48-.07 1.48-.61 1.69-1.2.21-.59.21-1.1.15-1.2-.06-.1-.23-.17-.48-.3Z"/>
+
+                            </svg>
+
+                        </div>
+
+
+                        <div>
+
+                            <h3>
+                                WhatsApp Support
+                            </h3>
+
+                            <p>
+                                +234 816 488 6717
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </a>
+
+            </div>
+
+
+            <div class="footer">
+                Founder: Olayiwola Qurwiy
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             ORDER
+        ================================================= -->
+
+        <section id="orderPage" class="page">
+
+            <div class="back-row">
+
+                <button
+                    class="back-btn"
+                    onclick="goBack()"
+                >
+                    ← Back
+                </button>
+
+            </div>
+
+
+            <div class="card">
+
+                <h2>
+                    Order Number
+                </h2>
+
+                <p style="color:#737373">
+                    Select a country and service. The current customer price comes directly from OlaqVerify pricing.
+                </p>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Country
+                    </label>
+
+                    <select
+                        id="orderCountry"
+                        onchange="updateOrderPrice()"
+                    >
+
+                        <option value="">
+                            Select country
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Service
+                    </label>
+
+                    <select
+                        id="orderService"
+                        onchange="updateOrderPrice()"
+                    >
+
+                        <option value="">
+                            Select service
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="order-price">
+
+                    <small>
+                        Current price
+                    </small>
+
+                    <strong id="orderPrice">
+                        —
+                    </strong>
+
+                    <div
+                        id="priceStatus"
+                        class="price-status"
+                    >
+                        Select a country and service.
+                    </div>
+
+                </div>
+
+
+                <br>
+
+
+                <button
+                    id="placeOrderButton"
+                    class="btn btn-primary"
+                    style="width:100%"
+                    onclick="placeOrder()"
+                    disabled
+                >
+                    Place Order
+                </button>
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>
+                    How it works
+                </h3>
+
+                <p>
+                    1. Select an available country.
+                </p>
+
+                <p>
+                    2. Select an available service.
+                </p>
+
+                <p>
+                    3. Confirm the displayed price.
+                </p>
+
+                <p>
+                    4. Your order is created as pending.
+                </p>
+
+                <p>
+                    5. An authorized number can then be assigned by the admin.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             ORDERS
+        ================================================= -->
+
+        <section id="ordersPage" class="page">
+
+            <div class="back-row">
+
+                <button
+                    class="back-btn"
+                    onclick="goBack()"
+                >
+                    ← Back
+                </button>
+
+            </div>
+
+
+            <div class="card">
+
+                <h2>
+                    My Orders
+                </h2>
+
+                <div id="ordersList">
+                    Loading...
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             WALLET
+        ================================================= -->
+
+        <section id="walletPage" class="page">
+
+            <div class="back-row">
+
+                <button
+                    class="back-btn"
+                    onclick="goBack()"
+                >
+                    ← Back
+                </button>
+
+            </div>
+
+
+            <div class="card">
+
+                <h2>
+                    Wallet
+                </h2>
+
+                <p style="color:#737373">
+                    Current available balance
+                </p>
+
+                <h1
+                    id="walletBalance"
+                    style="color:#5b21b6"
+                >
+                    ₦0.00
+                </h1>
+
+
+                <button
+                    class="btn btn-primary"
+                    onclick="openTopup()"
+                >
+                    Add Money
+                </button>
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>
+                    PalmPay Deposit
+                </h3>
+
+                <p>
+                    Account number:
+                    <strong>8164886717</strong>
+                </p>
+
+                <p>
+                    Account name:
+                    <strong>Adekunle</strong>
+                </p>
+
+                <p style="color:#737373;font-size:13px">
+                    After making a legitimate deposit, submit your payment reference below. Your wallet is updated after admin approval.
+                </p>
+
+                <button
+                    class="btn btn-primary"
+                    onclick="openTopup()"
+                >
+                    Submit Deposit
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             TRANSACTIONS
+        ================================================= -->
+
+        <section id="transactionsPage" class="page">
+
+            <div class="back-row">
+
+                <button
+                    class="back-btn"
+                    onclick="goBack()"
+                >
+                    ← Back
+                </button>
+
+            </div>
+
+
+            <div class="card">
+
+                <h2>
+                    Transactions
+                </h2>
+
+                <div id="transactionsList">
+                    Loading...
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             SUPPORT
+        ================================================= -->
+
+        <section id="supportPage" class="page">
+
+            <div class="back-row">
+
+                <button
+                    class="back-btn"
+                    onclick="goBack()"
+                >
+                    ← Back
+                </button>
+
+            </div>
+
+
+            <div class="card">
+
+                <h2>
+                    Support
+                </h2>
+
+                <p style="color:#737373">
+                    Send a message to OlaqVerify support.
+                </p>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Message
+                    </label>
+
+                    <textarea
+                        id="supportMessage"
+                        rows="5"
+                        style="width:100%;padding:12px;border:1px solid #d4d4d8;border-radius:12px;resize:vertical"
+                        placeholder="How can we help?"
+                    ></textarea>
+
+                </div>
+
+
+                <button
+                    class="btn btn-primary"
+                    onclick="sendSupportMessage()"
+                >
+                    Send Message
+                </button>
+
+            </div>
+
+
+            <div class="card">
+
+                <a
+                    href="https://wa.me/2348164886717"
+                    target="_blank"
+                    style="text-decoration:none"
+                >
+
+                    <div class="whatsapp-card">
+
+                        <div class="whatsapp-icon">
+
+                            <svg viewBox="0 0 24 24">
+
+                                <path d="M12 2a10 10 0 0 0-8.66 15L2 22l5.16-1.31A10 10 0 1 0 12 2Zm0 18a8 8 0 0 1-4.08-1.12l-.29-.17-3.06.78.82-2.98-.19-.31A8 8 0 1 1 12 20Zm4.63-5.98c-.25-.13-1.48-.73-1.71-.81-.23-.08-.4-.13-.57.13-.17.25-.65.81-.8.98-.15.17-.3.19-.55.06-.25-.13-1.03-.38-1.96-1.21-.72-.64-1.21-1.43-1.35-1.68-.14-.25-.01-.39.11-.52.11-.11.25-.3.38-.45.13-.15.17-.25.25-.42.08-.17.04-.32-.02-.45-.06-.13-.57-1.37-.78-1.88-.21-.5-.42-.43-.57-.44h-.49c-.17 0-.44.06-.67.32-.23.25-.88.86-.88 2.09s.9 2.42 1.03 2.59c.13.17 1.77 2.7 4.29 3.79.6.26 1.07.42 1.43.54.6.19 1.14.16 1.57.1.48-.07 1.48-.61 1.69-1.2.21-.59.21-1.1.15-1.2-.06-.1-.23-.17-.48-.3Z"/>
+
+                            </svg>
+
+                        </div>
+
+                        <div>
+
+                            <h3>
+                                Chat on WhatsApp
+                            </h3>
+
+                            <p>
+                                +234 816 488 6717
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </a>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             SETTINGS
+        ================================================= -->
+
+        <section id="settingsPage" class="page">
+
+            <div class="back-row">
+
+                <button
+                    class="back-btn"
+                    onclick="goBack()"
+                >
+                    ← Back
+                </button>
+
+            </div>
+
+
+            <div class="card">
+
+                <h2>
+                    Settings
+                </h2>
+
+                <p>
+                    <strong>Name:</strong>
+                    <span id="settingsName">—</span>
+                </p>
+
+                <p>
+                    <strong>Email:</strong>
+                    <span id="settingsEmail">—</span>
+                </p>
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>
+                    Support
+                </h3>
+
+                <p>
+                    WhatsApp:
+                    <strong>
+                        8164886717
+                    </strong>
+                </p>
+
+            </div>
+
+
+            <div class="footer">
+                Founder: Olayiwola Qurwiy
+            </div>
+
+
+            <button
+                class="btn btn-red"
+                style="width:100%"
+                onclick="logout()"
+            >
+                Sign Out
+            </button>
+
+        </section>
+
+
+    </main>
+
+
+    <!-- =================================================
+         BOTTOM NAV
+    ================================================= -->
+
+    <nav class="bottom-nav">
+
+        <button
+            id="navHome"
+            class="active"
+            onclick="openPage('homePage')"
+        >
+
+            <span>⌂</span>
+            Home
+
+        </button>
+
+
+        <button
+            id="navOrders"
+            onclick="openPage('ordersPage')"
+        >
+
+            <span>▣</span>
+            Orders
+
+        </button>
+
+
+        <button
+            id="navWallet"
+            onclick="openPage('walletPage')"
+        >
+
+            <span>₦</span>
+            Wallet
+
+        </button>
+
+
+        <button
+            id="navSettings"
+            onclick="openPage('settingsPage')"
+        >
+
+            <span>⚙</span>
+            Settings
+
+        </button>
+
+    </nav>
+
+</div>
+
+
+<!-- =====================================================
+     TOP UP MODAL
+===================================================== -->
+
+<div
+    id="topupModal"
+    class="modal"
+>
+
+    <div class="modal-box">
+
+        <div class="modal-head">
+
+            <h3>
+                Add Money
+            </h3>
+
+            <button
+                class="close"
+                onclick="closeModal('topupModal')"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <div
+            style="background:#faf5ff;border-radius:14px;padding:15px;margin-bottom:15px"
+        >
+
+            <strong>
+                PalmPay
+            </strong>
+
+            <br><br>
+
+            Account number:
+            <strong>
+                8164886717
+            </strong>
+
+            <br>
+
+            Account name:
+            <strong>
+                Adekunle
+            </strong>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Amount
+            </label>
+
+            <input
+                id="topupAmount"
+                type="number"
+                min="1"
+                placeholder="Amount"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Payment reference
+            </label>
+
+            <input
+                id="topupReference"
+                placeholder="Payment reference"
+            >
+
+        </div>
+
+
+        <button
+            class="btn btn-primary"
+            style="width:100%"
+            onclick="submitTopup()"
+        >
+            Submit Payment
+        </button>
+
+    </div>
+
+</div>
+
+
+<div id="toast"></div>
+
+
+<script>
+
+/* =====================================================
+   SUPABASE
+===================================================== */
+
+const SUPABASE_URL =
+    "https://alemtvfchysptzgzhaap.supabase.co";
+
+const SUPABASE_KEY =
+    "sb_publishable_UEnF6pfZ2ORRcuIQUzgbRw_6bWNDnKm";
+
+const db =
+    supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+
+/* =====================================================
+   STATE
+===================================================== */
+
+let currentUser = null;
+let profile = null;
+
+let prices = [];
+let orders = [];
+
+let currentPage = "homePage";
+let previousPage = "homePage";
+
+
+/* =====================================================
+   HELPERS
+===================================================== */
+
+function escapeHtml(value){
+
+    if(value === null || value === undefined){
+        return "";
+    }
+
+    return String(value)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+}
+
+
+function money(amount,currency="NGN"){
+
+    const symbols = {
+        NGN:"₦",
+        USD:"$",
+        GBP:"£",
+        EUR:"€"
+    };
+
+    return (
+        symbols[currency] || currency + " "
+    ) +
+    Number(amount || 0).toLocaleString(
+        "en-NG",
+        {
+            minimumFractionDigits:2,
+            maximumFractionDigits:2
+        }
+    );
+
+}
+
+
+function dateFormat(value){
+
+    if(!value){
+        return "-";
+    }
+
+    return new Date(value).toLocaleString();
+
+}
+
+
+function showToast(message){
+
+    const toast =
+        document.getElementById("toast");
+
+    toast.textContent = message;
+
+    toast.classList.add("show");
+
+    setTimeout(()=>{
+        toast.classList.remove("show");
+    },3000);
+
+}
+
+
+function closeModal(id){
+
+    document
+        .getElementById(id)
+        .classList.remove("show");
+
+}
+
+
+/* =====================================================
+   AUTH UI
+===================================================== */
+
+function showSignup(){
+
+    document
+        .getElementById("loginForm")
+        .classList.add("hidden");
+
+    document
+        .getElementById("signupForm")
+        .classList.remove("hidden");
+
+    document
+        .getElementById("authDescription")
+        .textContent =
+        "Create your OlaqVerify account";
+
+}
+
+
+function showLogin(){
+
+    document
+        .getElementById("signupForm")
+        .classList.add("hidden");
+
+    document
+        .getElementById("loginForm")
+        .classList.remove("hidden");
+
+    document
+        .getElementById("authDescription")
+        .textContent =
+        "Sign in to your account";
+
+}
+
+
+/* =====================================================
+   LOGIN
+===================================================== */
+
+async function login(){
+
+    const email =
+        document
+            .getElementById("loginEmail")
+            .value
+            .trim();
+
+    const password =
+        document
+            .getElementById("loginPassword")
+            .value;
+
+
+    if(!email || !password){
+
+        showToast(
+            "Enter your email and password."
+        );
+
+        return;
+    }
+
+
+    const {data,error} =
+        await db.auth.signInWithPassword({
+            email,
+            password
+        });
+
+
+    if(error){
+
+        showToast(
+            error.message
+        );
+
+        return;
+    }
+
+
+    await loadUser(data.user);
+
+}
+
+
+/* =====================================================
+   SIGNUP
+===================================================== */
+
+async function signup(){
+
+    const name =
+        document
+            .getElementById("signupName")
+            .value
+            .trim();
+
+    const email =
+        document
+            .getElementById("signupEmail")
+            .value
+            .trim();
+
+    const password =
+        document
+            .getElementById("signupPassword")
+            .value;
+
+
+    if(!name || !email || !password){
+
+        showToast(
+            "Complete all fields."
+        );
+
+        return;
+    }
+
+
+    const {data,error} =
+        await db.auth.signUp({
+            email,
+            password
+        });
+
+
+    if(error){
+
+        showToast(
+            error.message
+        );
+
+        return;
+    }
+
+
+    if(data.user){
+
+        const {error:profileError} =
+            await db
+                .from("profiles")
+                .upsert({
+
+                    id:data.user.id,
+                    full_name:name,
+                    email:email,
+                    balance:0
+
+                });
+
+
+        if(profileError){
+
+            showToast(
+                profileError.message
+            );
+
+            return;
+        }
+
+    }
+
+
+    showToast(
+        "Account created. Check your email if confirmation is required."
+    );
+
+
+    if(data.session){
+
+        await loadUser(data.user);
+
+    }else{
+
+        showLogin();
+
+    }
+
+}
+
+
+/* =====================================================
+   LOAD USER
+===================================================== */
+
+async function loadUser(user){
+
+    currentUser = user;
+
+
+    const {data,error} =
+        await db
+            .from("profiles")
+            .select("*")
+            .eq("id",user.id)
+            .single();
+
+
+    if(error){
+
+        showToast(
+            "Could not load profile: " +
+            error.message
+        );
+
+        return;
+    }
+
+
+    profile = data;
+
+
+    document
+        .getElementById("authScreen")
+        .classList.add("hidden");
+
+
+    document
+        .getElementById("app")
+        .classList.remove("hidden");
+
+
+    updateProfileUI();
+
+    await loadPrices();
+
+    await loadOrders();
+
+}
+
+
+/* =====================================================
+   PROFILE UI
+===================================================== */
+
+function updateProfileUI(){
+
+    const balance =
+        Number(
+            profile?.balance || 0
+        );
+
+
+    document
+        .getElementById("miniBalance")
+        .textContent =
+        money(balance);
+
+
+    document
+        .getElementById("heroBalance")
+        .textContent =
+        money(balance);
+
+
+    document
+        .getElementById("walletBalance")
+        .textContent =
+        money(balance);
+
+
+    document
+        .getElementById("welcomeName")
+        .textContent =
+        profile?.full_name ||
+        "Customer";
+
+
+    document
+        .getElementById("settingsName")
+        .textContent =
+        profile?.full_name ||
+        "—";
+
+
+    document
+        .getElementById("settingsEmail")
+        .textContent =
+        profile?.email ||
+        currentUser?.email ||
+        "—";
+
+}
+
+
+/* =====================================================
+   SESSION
+===================================================== */
+
+async function checkSession(){
+
+    const {
+        data:{
+            session
+        }
+    } = await db.auth.getSession();
+
+
+    if(session){
+
+        await loadUser(
+            session.user
+        );
+
+    }
+
+}
+
+
+checkSession();
+
+
+/* =====================================================
+   AUTH STATE
+===================================================== */
+
+db.auth.onAuthStateChange(
+    async(event,session)=>{
+
+        if(
+            event === "SIGNED_OUT"
+        ){
+
+            currentUser = null;
+            profile = null;
+
+            document
+                .getElementById("app")
+                .classList.add("hidden");
+
+            document
+                .getElementById("authScreen")
+                .classList.remove("hidden");
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   LOGOUT
+===================================================== */
+
+async function logout(){
+
+    await db.auth.signOut();
+
+}
+
+
+/* =====================================================
+   PRICES
+===================================================== */
+
+async function loadPrices(){
+
+    const {data,error} =
+        await db
+            .from("prices")
+            .select(
+                "id,country,service,customer_price,currency,active"
+            )
+            .eq("active",true)
+            .order("country",{
+                ascending:true
+            });
+
+
+    if(error){
+
+        console.error(error);
+
+        showToast(
+            "Could not load current prices."
+        );
+
+        return;
+    }
+
+
+    prices = data || [];
+
+    populatePriceSelectors();
+
+}
+
+
+function populatePriceSelectors(){
+
+    const countrySelect =
+        document
+            .getElementById(
+                "orderCountry"
+            );
+
+
+    const serviceSelect =
+        document
+            .getElementById(
+                "orderService"
+            );
+
+
+    const currentCountry =
+        countrySelect.value;
+
+
+    const currentService =
+        serviceSelect.value;
+
+
+    const countries =
+        [...new Set(
+            prices.map(
+                p=>p.country
+            )
+        )]
+        .sort(
+            (a,b)=>
+                a.localeCompare(b)
+        );
+
+
+    countrySelect.innerHTML =
+        `<option value="">
+            Select country
+        </option>` +
+        countries.map(country=>`
+
+            <option value="${escapeHtml(country)}">
+                ${escapeHtml(country)}
+            </option>
+
+        `).join("");
+
+
+    if(
+        countries.includes(
+            currentCountry
+        )
+    ){
+
+        countrySelect.value =
+            currentCountry;
+
+    }
+
+
+    populateServices();
+
+
+    if(
+        [...serviceSelect.options]
+            .some(
+                option =>
+                    option.value === currentService
+            )
+    ){
+
+        serviceSelect.value =
+            currentService;
+
+    }
+
+
+    updateOrderPrice();
+
+}
+
+
+function populateServices(){
+
+    const country =
+        document
+            .getElementById(
+                "orderCountry"
+            )
+            .value;
+
+
+    const serviceSelect =
+        document
+            .getElementById(
+                "orderService"
+            );
+
+
+    let filtered =
+        prices;
+
+
+    if(country){
+
+        filtered =
+            prices.filter(
+                p =>
+                    p.country === country
+            );
+
+    }
+
+
+    const services =
+        [...new Set(
+            filtered.map(
+                p=>p.service
+            )
+        )]
+        .sort(
+            (a,b)=>
+                a.localeCompare(b)
+        );
+
+
+    const current =
+        serviceSelect.value;
+
+
+    serviceSelect.innerHTML =
+        `<option value="">
+            Select service
+        </option>` +
+        services.map(service=>`
+
+            <option value="${escapeHtml(service)}">
+                ${escapeHtml(service)}
+            </option>
+
+        `).join("");
+
+
+    if(
+        services.includes(current)
+    ){
+
+        serviceSelect.value =
+            current;
+
+    }else if(
+        services.length === 1
+    ){
+
+        serviceSelect.value =
+            services[0];
+
+    }
+
+}
+
+
+function findSelectedPrice(){
+
+    const country =
+        document
+            .getElementById(
+                "orderCountry"
+            )
+            .value;
+
+
+    const service =
+        document
+            .getElementById(
+                "orderService"
+            )
+            .value;
+
+
+    if(!country || !service){
+
+        return null;
+
+    }
+
+
+    return prices.find(
+        p =>
+            p.country === country &&
+            p.service === service &&
+            p.active === true
+    ) || null;
+
+}
+
+
+function updateOrderPrice(){
+
+    populateServicesOnly();
+
+    const selected =
+        findSelectedPrice();
+
+
+    const priceElement =
+        document
+            .getElementById(
+                "orderPrice"
+            );
+
+
+    const statusElement =
+        document
+            .getElementById(
+                "priceStatus"
+            );
+
+
+    const button =
+        document
+            .getElementById(
+                "placeOrderButton"
+            );
+
+
+    if(!selected){
+
+        priceElement.textContent =
+            "—";
+
+        statusElement.textContent =
+            "Select an available country and service.";
+
+        statusElement.className =
+            "price-status unavailable";
+
+        button.disabled = true;
+
+        return;
+    }
+
+
+    priceElement.textContent =
+        money(
+            selected.customer_price,
+            selected.currency
+        );
+
+
+    statusElement.textContent =
+        "Price available";
+
+    statusElement.className =
+        "price-status available";
+
+
+    button.disabled = false;
+
+}
+
+
+function populateServicesOnly(){
+
+    const country =
+        document
+            .getElementById(
+                "orderCountry"
+            )
+            .value;
+
+
+    const serviceSelect =
+        document
+            .getElementById(
+                "orderService"
+            );
+
+
+    const current =
+        serviceSelect.value;
+
+
+    let filtered =
+        prices;
+
+
+    if(country){
+
+        filtered =
+            prices.filter(
+                p =>
+                    p.country === country
+            );
+
+    }
+
+
+    const services =
+        [...new Set(
+            filtered.map(
+                p=>p.service
+            )
+        )]
+        .sort();
+
+
+    serviceSelect.innerHTML =
+        `<option value="">
+            Select service
+        </option>` +
+        services.map(service=>`
+
+            <option value="${escapeHtml(service)}">
+                ${escapeHtml(service)}
+            </option>
+
+        `).join("");
+
+
+    if(
+        services.includes(current)
+    ){
+
+        serviceSelect.value =
+            current;
+
+    }else if(
+        services.length === 1
+    ){
+
+        serviceSelect.value =
+            services[0];
+
+    }
+
+}
+
+
+/* =====================================================
+   PLACE ORDER
+===================================================== */
+
+async function placeOrder(){
+
+    if(!currentUser){
+
+        showToast(
+            "Please sign in first."
+        );
+
+        return;
+    }
+
+
+    const country =
+        document
+            .getElementById(
+                "orderCountry"
+            )
+            .value;
+
+
+    const service =
+        document
+            .getElementById(
+                "orderService"
+            )
+            .value;
+
+
+    if(!country || !service){
+
+        showToast(
+            "Select a country and service."
+        );
+
+        return;
+    }
+
+
+    const selected =
+        findSelectedPrice();
+
+
+    if(!selected){
+
+        showToast(
+            "That price is no longer available. Refresh and try again."
+        );
+
+        await loadPrices();
+
+        return;
+    }
+
+
+    const displayedPrice =
+        Number(
+            selected.customer_price
+        );
+
+
+    if(
+        Number(profile.balance || 0)
+        < displayedPrice
+    ){
+
+        showToast(
+            "Insufficient balance. Please add money to your wallet."
+        );
+
+        return;
+    }
+
+
+    const confirmed =
+        confirm(
+            `Place ${service} order for ${country} at ${money(displayedPrice,selected.currency)}?`
+        );
+
+
+    if(!confirmed){
+        return;
+    }
+
+
+    /*
+       IMPORTANT:
+
+       Do NOT deduct balance here with JavaScript.
+
+       The final price must be checked by a secure
+       Sup
