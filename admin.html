@@ -1,0 +1,2484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>OlaqVerify Admin</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#f6f4fb;
+  color:#17121f;
+}
+
+header{
+  background:linear-gradient(135deg,#5b21b6,#3b0764);
+  color:white;
+  padding:18px;
+  position:sticky;
+  top:0;
+  z-index:20;
+  box-shadow:0 3px 15px #0002;
+}
+
+.header-row{
+  max-width:1100px;
+  margin:auto;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.logo{
+  font-size:22px;
+  font-weight:800;
+}
+
+.admin-tag{
+  background:#ffffff22;
+  padding:7px 12px;
+  border-radius:20px;
+  font-size:12px;
+}
+
+main{
+  max-width:1100px;
+  margin:auto;
+  padding:18px;
+}
+
+.tabs{
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding-bottom:12px;
+  scrollbar-width:none;
+}
+
+.tabs button{
+  border:0;
+  background:white;
+  color:#4c3a61;
+  padding:11px 15px;
+  border-radius:12px;
+  white-space:nowrap;
+  font-weight:700;
+  cursor:pointer;
+  box-shadow:0 2px 8px #0000000d;
+}
+
+.tabs button.active{
+  background:#5b21b6;
+  color:white;
+}
+
+.section{
+  display:none;
+}
+
+.section.active{
+  display:block;
+}
+
+.card{
+  background:white;
+  border-radius:18px;
+  padding:18px;
+  margin-bottom:14px;
+  box-shadow:0 3px 15px #0000000b;
+}
+
+.card h2{
+  margin:0 0 5px;
+  font-size:19px;
+}
+
+.muted{
+  color:#777;
+  font-size:13px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:14px;
+}
+
+input,
+select,
+textarea{
+  width:100%;
+  padding:12px;
+  border:1px solid #ddd;
+  border-radius:10px;
+  outline:none;
+  font-size:14px;
+  background:white;
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+  border-color:#5b21b6;
+}
+
+label{
+  display:block;
+  font-size:12px;
+  font-weight:700;
+  margin:10px 0 6px;
+}
+
+.primary,
+.success,
+.danger,
+.secondary{
+  border:0;
+  padding:10px 14px;
+  border-radius:9px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.primary{
+  background:#5b21b6;
+  color:white;
+}
+
+.success{
+  background:#15803d;
+  color:white;
+}
+
+.danger{
+  background:#dc2626;
+  color:white;
+}
+
+.secondary{
+  background:#eee8f7;
+  color:#4c1d95;
+}
+
+.actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:14px;
+}
+
+.status{
+  display:inline-block;
+  padding:5px 9px;
+  border-radius:20px;
+  font-size:11px;
+  font-weight:800;
+}
+
+.pending{
+  background:#fff7d6;
+  color:#92400e;
+}
+
+.approved{
+  background:#dcfce7;
+  color:#166534;
+}
+
+.declined{
+  background:#fee2e2;
+  color:#991b1b;
+}
+
+.item{
+  border:1px solid #eee;
+  border-radius:14px;
+  padding:15px;
+  margin-top:12px;
+}
+
+.item-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:10px;
+}
+
+.amount{
+  font-size:21px;
+  font-weight:800;
+  color:#4c1d95;
+}
+
+.row{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  padding:6px 0;
+  font-size:14px;
+}
+
+.empty{
+  text-align:center;
+  padding:35px 15px;
+  color:#777;
+}
+
+.loading{
+  text-align:center;
+  padding:30px;
+  color:#777;
+}
+
+.message{
+  position:fixed;
+  right:15px;
+  bottom:15px;
+  max-width:330px;
+  padding:14px 16px;
+  background:#17121f;
+  color:white;
+  border-radius:12px;
+  display:none;
+  z-index:100;
+  box-shadow:0 5px 20px #0003;
+}
+
+.message.show{
+  display:block;
+}
+
+.stat{
+  padding:18px;
+  border-radius:16px;
+  background:white;
+  box-shadow:0 3px 15px #0000000b;
+}
+
+.stat-title{
+  color:#777;
+  font-size:12px;
+}
+
+.stat-value{
+  margin-top:6px;
+  font-size:25px;
+  font-weight:800;
+  color:#4c1d95;
+}
+
+.flag{
+  font-size:27px;
+}
+
+.small{
+  font-size:12px;
+  word-break:break-all;
+}
+
+.price-card{
+  border:1px solid #eee;
+  border-radius:14px;
+  padding:14px;
+  margin-top:10px;
+}
+
+.edit-box{
+  margin-top:15px;
+  padding:15px;
+  background:#faf8ff;
+  border:1px solid #e8def7;
+  border-radius:13px;
+}
+
+.edit-box h3{
+  margin:0 0 8px;
+  color:#4c1d95;
+}
+
+.balance{
+  font-size:24px;
+  font-weight:800;
+  color:#4c1d95;
+}
+
+hr{
+  border:0;
+  border-top:1px solid #eee;
+  margin:15px 0;
+}
+
+@media(max-width:600px){
+  main{
+    padding:12px;
+  }
+
+  .card{
+    padding:14px;
+  }
+
+  .item-top{
+    flex-direction:column;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="header-row">
+    <div class="logo">OlaqVerify</div>
+    <div class="admin-tag">ADMIN PANEL</div>
+  </div>
+</header>
+
+<main>
+
+<div class="tabs">
+
+<button class="active"
+onclick="showSection('dashboard',this)">
+Dashboard
+</button>
+
+<button onclick="showSection('payments',this)">
+Payments
+</button>
+
+<button onclick="showSection('prices',this)">
+Prices
+</button>
+
+<button onclick="showSection('orders',this)">
+Orders
+</button>
+
+<button onclick="showSection('numbers',this)">
+Numbers
+</button>
+
+<button onclick="showSection('messages',this)">
+Messages
+</button>
+
+<button onclick="showSection('wallets',this)">
+Wallet Balances
+</button>
+
+</div>
+
+
+<!-- ================= DASHBOARD ================= -->
+
+<section id="dashboard" class="section active">
+
+<div class="grid">
+
+<div class="stat">
+<div class="stat-title">Users</div>
+<div class="stat-value" id="userCount">0</div>
+</div>
+
+<div class="stat">
+<div class="stat-title">Pending Payments</div>
+<div class="stat-value" id="pendingCount">0</div>
+</div>
+
+<div class="stat">
+<div class="stat-title">Orders</div>
+<div class="stat-value" id="orderCount">0</div>
+</div>
+
+<div class="stat">
+<div class="stat-title">Available Numbers</div>
+<div class="stat-value" id="numberCount">0</div>
+</div>
+
+</div>
+
+<div class="card" style="margin-top:14px">
+
+<h2>Admin Dashboard</h2>
+
+<div class="muted">
+Manage OlaqVerify users, payments, prices,
+orders, numbers, messages and wallet balances.
+</div>
+
+</div>
+
+</section>
+
+
+<!-- ================= PAYMENTS ================= -->
+
+<section id="payments" class="section">
+
+<div class="card">
+
+<h2>Payments</h2>
+
+<div class="muted">
+Approve or decline customer payment requests.
+</div>
+
+<div id="paymentsList" class="loading">
+Loading payments...
+</div>
+
+</div>
+
+</section>
+
+
+<!-- ================= PRICES ================= -->
+
+<section id="prices" class="section">
+
+<div class="card">
+
+<h2>Add Price</h2>
+
+<div class="muted">
+Add a country/service price to OlaqVerify.
+</div>
+
+<div class="grid">
+
+<div>
+<label>Country</label>
+<input id="priceCountry" placeholder="Nigeria">
+</div>
+
+<div>
+<label>Flag</label>
+<input id="priceFlag" placeholder="🇳🇬">
+</div>
+
+<div>
+<label>Service</label>
+<input id="priceService" placeholder="WhatsApp">
+</div>
+
+<div>
+<label>Provider Cost</label>
+<input id="providerCost"
+type="number"
+step="0.01"
+placeholder="0">
+</div>
+
+<div>
+<label>Customer Price</label>
+<input id="customerPrice"
+type="number"
+step="0.01"
+placeholder="500">
+</div>
+
+<div>
+<label>Currency</label>
+<input id="priceCurrency" value="NGN">
+</div>
+
+</div>
+
+<button
+class="primary"
+style="margin-top:15px"
+onclick="savePrice()">
+Add Price
+</button>
+
+</div>
+
+
+<div class="card">
+
+<h2>All Prices</h2>
+
+<div id="pricesList" class="loading">
+Loading prices...
+</div>
+
+</div>
+
+</section>
+
+
+<!-- ================= ORDERS ================= -->
+
+<section id="orders" class="section">
+
+<div class="card">
+
+<h2>Orders</h2>
+
+<div class="muted">
+Accept orders and assign available numbers.
+</div>
+
+<div id="ordersList" class="loading">
+Loading orders...
+</div>
+
+</div>
+
+</section>
+
+
+<!-- ================= NUMBERS ================= -->
+
+<section id="numbers" class="section">
+
+<div class="card">
+
+<h2>Add Number</h2>
+
+<div class="grid">
+
+<div>
+<label>Country</label>
+<input id="numberCountry"
+placeholder="Nigeria">
+</div>
+
+<div>
+<label>Service</label>
+<input id="numberService"
+placeholder="WhatsApp">
+</div>
+
+<div>
+<label>Phone Number</label>
+<input id="phoneNumber"
+placeholder="+234...">
+</div>
+
+</div>
+
+<button
+class="primary"
+style="margin-top:15px"
+onclick="addNumber()">
+Add Number
+</button>
+
+</div>
+
+
+<div class="card">
+
+<h2>Numbers</h2>
+
+<div id="numbersList" class="loading">
+Loading numbers...
+</div>
+
+</div>
+
+</section>
+
+
+<!-- ================= MESSAGES ================= -->
+
+<section id="messages" class="section">
+
+<div class="card">
+
+<h2>Send SMS</h2>
+
+<label>Order ID</label>
+
+<input id="smsOrderId"
+placeholder="Order ID">
+
+<label>Phone Number</label>
+
+<input id="smsPhone"
+placeholder="+234...">
+
+<label>Sender</label>
+
+<input id="smsSender"
+placeholder="SMS">
+
+<label>Message</label>
+
+<textarea
+id="smsMessage"
+rows="4"
+placeholder="Enter message">
+</textarea>
+
+<button
+class="primary"
+style="margin-top:15px"
+onclick="sendSMS()">
+Add SMS
+</button>
+
+</div>
+
+</section>
+
+
+<!-- ================= WALLET BALANCES ================= -->
+
+<section id="wallets" class="section">
+
+<div class="card">
+
+<h2>Wallet Balances</h2>
+
+<div class="muted">
+Search for a customer and adjust their wallet
+balance individually.
+</div>
+
+<label>Search User</label>
+
+<input
+id="walletSearch"
+placeholder="Search by name or email..."
+oninput="searchUsers()">
+
+<div id="walletUsers" class="loading">
+Loading users...
+</div>
+
+</div>
+
+</section>
+
+</main>
+
+<div id="messageBox" class="message"></div>
+
+
+<script>
+
+/* =====================================================
+   SUPABASE
+===================================================== */
+
+const SUPABASE_URL =
+"https://alemtvfchysptzgzhaap.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_UEnF6pfZ2ORRcuIQUzgbRw_6bWNDnKm";
+
+const db =
+supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
+
+
+/* =====================================================
+   HELPERS
+===================================================== */
+
+function notify(text){
+
+const box =
+document.getElementById("messageBox");
+
+box.textContent = text;
+
+box.classList.add("show");
+
+setTimeout(()=>{
+box.classList.remove("show");
+},3500);
+
+}
+
+
+function esc(value){
+
+return String(value ?? "")
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
+
+}
+
+
+function money(value,currency="NGN"){
+
+const n=Number(value||0);
+
+if(currency==="NGN"){
+
+return "₦"+
+n.toLocaleString("en-NG",{
+minimumFractionDigits:2,
+maximumFractionDigits:2
+});
+
+}
+
+return currency+" "+
+n.toLocaleString("en-US",{
+minimumFractionDigits:2,
+maximumFractionDigits:2
+});
+
+}
+
+
+/* =====================================================
+   NAVIGATION
+===================================================== */
+
+function showSection(id,button){
+
+document
+.querySelectorAll(".section")
+.forEach(x=>{
+x.classList.remove("active");
+});
+
+document
+.querySelectorAll(".tabs button")
+.forEach(x=>{
+x.classList.remove("active");
+});
+
+document
+.getElementById(id)
+.classList.add("active");
+
+button.classList.add("active");
+
+if(id==="dashboard")
+loadDashboard();
+
+if(id==="payments")
+loadPayments();
+
+if(id==="prices")
+loadPrices();
+
+if(id==="orders")
+loadOrders();
+
+if(id==="numbers")
+loadNumbers();
+
+if(id==="wallets")
+loadUsers();
+
+}
+
+
+/* =====================================================
+   ADMIN CHECK
+===================================================== */
+
+async function checkAdmin(){
+
+const {
+data:{user},
+error
+}=await db.auth.getUser();
+
+if(error||!user){
+
+document.body.innerHTML=`
+
+<div style="
+padding:50px;
+text-align:center;
+font-family:Arial;
+">
+
+<h2>Login required</h2>
+
+<p>
+Please log in to the OlaqVerify admin account.
+</p>
+
+</div>
+
+`;
+
+return false;
+
+}
+
+
+const {
+data:profile,
+error:profileError
+}=await db
+.from("profiles")
+.select("*")
+.eq("id",user.id)
+.maybeSingle();
+
+
+if(profileError){
+
+notify(
+"Could not load admin profile: "+
+profileError.message
+);
+
+return false;
+
+}
+
+
+if(!profile||profile.role!=="admin"){
+
+document.body.innerHTML=`
+
+<div style="
+padding:50px;
+text-align:center;
+font-family:Arial;
+">
+
+<h2>Access denied</h2>
+
+<p>
+This account is not an administrator.
+</p>
+
+</div>
+
+`;
+
+return false;
+
+}
+
+return true;
+
+}
+
+
+/* =====================================================
+   DASHBOARD
+===================================================== */
+
+async function loadDashboard(){
+
+const [
+users,
+payments,
+orders,
+numbers
+]=await Promise.all([
+
+db
+.from("profiles")
+.select("id",{count:"exact",head:true}),
+
+db
+.from("payment_requests")
+.select("id",{count:"exact",head:true})
+.eq("status","pending"),
+
+db
+.from("orders")
+.select("id",{count:"exact",head:true}),
+
+db
+.from("numbers")
+.select("id",{count:"exact",head:true})
+.eq("status","available")
+
+]);
+
+
+document.getElementById("userCount")
+.textContent=users.count||0;
+
+document.getElementById("pendingCount")
+.textContent=payments.count||0;
+
+document.getElementById("orderCount")
+.textContent=orders.count||0;
+
+document.getElementById("numberCount")
+.textContent=numbers.count||0;
+
+}
+
+
+/* =====================================================
+   PAYMENTS
+===================================================== */
+
+async function loadPayments(){
+
+const box=
+document.getElementById("paymentsList");
+
+box.innerHTML=
+`<div class="loading">
+Loading payments...
+</div>`;
+
+
+const {
+data,
+error
+}=await db
+.from("payment_requests")
+.select("*")
+.order("created_at",{ascending:false});
+
+
+if(error){
+
+box.innerHTML=`
+<div class="empty">
+${esc(error.message)}
+</div>
+`;
+
+return;
+
+}
+
+
+if(!data||!data.length){
+
+box.innerHTML=`
+<div class="empty">
+No payment requests found.
+</div>
+`;
+
+return;
+
+}
+
+
+box.innerHTML=data.map(payment=>{
+
+const status=
+String(payment.status||"pending")
+.toLowerCase();
+
+const statusClass=
+status==="approved"
+?"approved"
+:status==="declined"
+?"declined"
+:"pending";
+
+const amount=
+payment.amount||
+payment.customer_amount||
+payment.price||
+0;
+
+return `
+
+<div class="item">
+
+<div class="item-top">
+
+<div>
+
+<div class="amount">
+${money(amount,"NGN")}
+</div>
+
+<div class="muted">
+${esc(
+payment.email||
+payment.user_email||
+payment.user_id||
+"Unknown user"
+)}
+</div>
+
+</div>
+
+<span class="status ${statusClass}">
+${esc(status.toUpperCase())}
+</span>
+
+</div>
+
+<hr>
+
+<div class="row">
+<span>Reference</span>
+<strong>
+${esc(
+payment.reference||
+payment.payment_reference||
+payment.id
+)}
+</strong>
+</div>
+
+<div class="row">
+<span>Date</span>
+<span>
+${
+payment.created_at
+?new Date(payment.created_at)
+.toLocaleString()
+:"-"
+}
+</span>
+</div>
+
+${
+status==="pending"
+?`
+
+<div class="actions">
+
+<button
+class="success"
+onclick="approvePayment(
+'${esc(payment.id)}'
+)">
+✓ Approve
+</button>
+
+<button
+class="danger"
+onclick="declinePayment(
+'${esc(payment.id)}'
+)">
+✕ Decline
+</button>
+
+</div>
+
+`
+:""
+}
+
+</div>
+
+`;
+
+}).join("");
+
+}
+
+
+/* =====================================================
+   APPROVE PAYMENT
+===================================================== */
+
+async function approvePayment(id){
+
+if(!confirm("Approve this payment?"))
+return;
+
+const {error}=await db.rpc(
+"approve_payment",
+{
+p_payment_id:id
+}
+);
+
+if(error){
+
+notify(
+"Failed to approve payment: "+
+error.message
+);
+
+return;
+
+}
+
+notify("Payment approved.");
+
+await loadPayments();
+await loadDashboard();
+
+}
+
+
+/* =====================================================
+   DECLINE PAYMENT
+===================================================== */
+
+async function declinePayment(id){
+
+if(!confirm("Decline this payment?"))
+return;
+
+const {error}=await db.rpc(
+"decline_payment",
+{
+p_payment_id:id
+}
+);
+
+if(error){
+
+notify(
+"Failed to decline payment: "+
+error.message
+);
+
+return;
+
+}
+
+notify("Payment declined.");
+
+await loadPayments();
+await loadDashboard();
+
+}
+
+
+/* =====================================================
+   PRICES
+===================================================== */
+
+async function loadPrices(){
+
+const box=
+document.getElementById("pricesList");
+
+box.innerHTML=
+`<div class="loading">
+Loading prices...
+</div>`;
+
+
+const {
+data,
+error
+}=await db
+.from("prices")
+.select("*")
+.order("country")
+.order("service");
+
+
+if(error){
+
+box.innerHTML=`
+<div class="empty">
+Failed to load prices.<br>
+<span class="small">
+${esc(error.message)}
+</span>
+</div>
+`;
+
+return;
+
+}
+
+
+if(!data||!data.length){
+
+box.innerHTML=`
+<div class="empty">
+No prices found.
+</div>
+`;
+
+return;
+
+}
+
+
+box.innerHTML=data.map(p=>`
+
+<div class="price-card">
+
+<div style="
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:10px;
+">
+
+<div style="
+display:flex;
+align-items:center;
+gap:10px;
+">
+
+<div class="flag">
+${esc(p.flag||"🌐")}
+</div>
+
+<div>
+
+<strong>
+${esc(p.country)}
+</strong>
+
+<div class="muted">
+${esc(p.service)}
+</div>
+
+</div>
+
+</div>
+
+<button
+class="secondary"
+onclick="toggleEdit('${esc(p.id)}')">
+✎ Edit
+</button>
+
+</div>
+
+
+<hr>
+
+
+<div class="row">
+<span>Provider Cost</span>
+<strong>
+${money(
+p.provider_cost,
+p.currency||"NGN"
+)}
+</strong>
+</div>
+
+
+<div class="row">
+<span>Customer Price</span>
+<strong>
+${money(
+p.customer_price,
+p.currency||"NGN"
+)}
+</strong>
+</div>
+
+
+<div class="row">
+<span>Currency</span>
+<strong>
+${esc(p.currency||"NGN")}
+</strong>
+</div>
+
+
+<div class="row">
+<span>Status</span>
+
+<span class="status ${
+p.active
+?"approved"
+:"declined"
+}">
+
+${
+p.active
+?"ACTIVE"
+:"INACTIVE"
+}
+
+</span>
+
+</div>
+
+
+<div
+id="edit-${esc(p.id)}"
+class="edit-box"
+style="display:none">
+
+<h3>Edit Price</h3>
+
+
+<label>Country</label>
+
+<input
+id="edit-country-${esc(p.id)}"
+value="${esc(p.country)}">
+
+
+<label>Flag</label>
+
+<input
+id="edit-flag-${esc(p.id)}"
+value="${esc(p.flag||"🌐")}">
+
+
+<label>Service</label>
+
+<input
+id="edit-service-${esc(p.id)}"
+value="${esc(p.service)}">
+
+
+<label>Provider Cost</label>
+
+<input
+id="edit-provider-${esc(p.id)}"
+type="number"
+step="0.01"
+value="${esc(p.provider_cost||0)}">
+
+
+<label>Customer Price</label>
+
+<input
+id="edit-customer-${esc(p.id)}"
+type="number"
+step="0.01"
+value="${esc(p.customer_price||0)}">
+
+
+<label>Currency</label>
+
+<input
+id="edit-currency-${esc(p.id)}"
+value="${esc(p.currency||"NGN")}">
+
+
+<label>Status</label>
+
+<select id="edit-active-${esc(p.id)}">
+
+<option value="true"
+${p.active!==false?"selected":""}>
+Active
+</option>
+
+<option value="false"
+${p.active===false?"selected":""}>
+Inactive
+</option>
+
+</select>
+
+
+<div class="actions">
+
+<button
+class="primary"
+onclick="updatePrice('${esc(p.id)}')">
+Save Changes
+</button>
+
+<button
+class="secondary"
+onclick="toggleEdit('${esc(p.id)}')">
+Cancel
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+`).join("");
+
+}
+
+
+/* =====================================================
+   PRICE EDIT
+===================================================== */
+
+function toggleEdit(id){
+
+const box=
+document.getElementById("edit-"+id);
+
+if(!box)return;
+
+box.style.display=
+box.style.display==="none"
+?"block"
+:"none";
+
+}
+
+
+async function updatePrice(id){
+
+const country=
+document.getElementById(
+"edit-country-"+id
+).value.trim();
+
+const flag=
+document.getElementById(
+"edit-flag-"+id
+).value.trim();
+
+const service=
+document.getElementById(
+"edit-service-"+id
+).value.trim();
+
+const providerCost=
+Number(
+document.getElementById(
+"edit-provider-"+id
+).value
+);
+
+const customerPrice=
+Number(
+document.getElementById(
+"edit-customer-"+id
+).value
+);
+
+const currency=
+document.getElementById(
+"edit-currency-"+id
+).value.trim()
+.toUpperCase();
+
+const active=
+document.getElementById(
+"edit-active-"+id
+).value==="true";
+
+
+const {error}=await db
+.from("prices")
+.update({
+
+country,
+flag:flag||"🌐",
+service,
+provider_cost:providerCost,
+customer_price:customerPrice,
+currency:currency||"NGN",
+active,
+updated_at:new Date().toISOString()
+
+})
+.eq("id",id);
+
+
+if(error){
+
+notify(
+"Failed to update price: "+
+error.message
+);
+
+return;
+
+}
+
+notify("Price updated.");
+
+await loadPrices();
+
+}
+
+
+/* =====================================================
+   ADD PRICE
+===================================================== */
+
+async function savePrice(){
+
+const country=
+document.getElementById(
+"priceCountry"
+).value.trim();
+
+const flag=
+document.getElementById(
+"priceFlag"
+).value.trim();
+
+const service=
+document.getElementById(
+"priceService"
+).value.trim();
+
+const providerCost=
+Number(
+document.getElementById(
+"providerCost"
+).value
+);
+
+const customerPrice=
+Number(
+document.getElementById(
+"customerPrice"
+).value
+);
+
+const currency=
+document.getElementById(
+"priceCurrency"
+).value.trim()
+.toUpperCase()||"NGN";
+
+
+if(!country||!service){
+
+notify(
+"Country and service are required."
+);
+
+return;
+
+}
+
+
+const {error}=await db
+.from("prices")
+.upsert({
+
+country,
+flag:flag||"🌐",
+service,
+provider_cost:
+Number.isFinite(providerCost)
+?providerCost
+:0,
+customer_price:
+Number.isFinite(customerPrice)
+?customerPrice
+:0,
+currency,
+active:true
+
+},{
+onConflict:"country,service"
+});
+
+
+if(error){
+
+notify(
+"Failed to save price: "+
+error.message
+);
+
+return;
+
+}
+
+notify("Price saved.");
+
+document.getElementById(
+"priceCountry"
+).value="";
+
+document.getElementById(
+"priceFlag"
+).value="";
+
+document.getElementById(
+"priceService"
+).value="";
+
+document.getElementById(
+"providerCost"
+).value="";
+
+document.getElementById(
+"customerPrice"
+).value="";
+
+await loadPrices();
+
+}
+
+
+/* =====================================================
+   ORDERS
+===================================================== */
+
+async function loadOrders(){
+
+const box=
+document.getElementById("ordersList");
+
+box.innerHTML=
+`<div class="loading">
+Loading orders...
+</div>`;
+
+
+const {
+data,
+error
+}=await db
+.from("orders")
+.select("*")
+.order("created_at",{ascending:false});
+
+
+if(error){
+
+box.innerHTML=`
+<div class="empty">
+${esc(error.message)}
+</div>
+`;
+
+return;
+
+}
+
+
+if(!data||!data.length){
+
+box.innerHTML=`
+<div class="empty">
+No orders found.
+</div>
+`;
+
+return;
+
+}
+
+
+box.innerHTML=data.map(order=>{
+
+const status=
+String(order.status||"pending")
+.toLowerCase();
+
+const assigned=
+order.assigned_number||
+order.phone_number||
+"";
+
+const pending=
+[
+"pending",
+"waiting",
+"paid",
+"processing"
+].includes(status);
+
+
+return `
+
+<div class="item">
+
+<div class="item-top">
+
+<div>
+
+<strong>
+${esc(order.country||"Unknown")}
+</strong>
+
+<div class="muted">
+${esc(order.service||"Unknown")}
+</div>
+
+</div>
+
+<span class="status ${
+status==="completed"||
+status==="fulfilled"
+?"approved"
+:"pending"
+}">
+${esc(status.toUpperCase())}
+</span>
+
+</div>
+
+<hr>
+
+<div class="row">
+<span>Order ID</span>
+<span class="small">
+${esc(order.id)}
+</span>
+</div>
+
+<div class="row">
+<span>Phone</span>
+<strong>
+${esc(assigned||"-")}
+</strong>
+</div>
+
+${
+pending
+?`
+
+<div class="actions">
+
+<button
+class="success"
+onclick="acceptOrder(
+'${esc(order.id)}'
+)">
+✓ Accept Order
+</button>
+
+</div>
+
+`
+:""
+}
+
+</div>
+
+`;
+
+}).join("");
+
+}
+
+
+/* =====================================================
+   ACCEPT ORDER
+===================================================== */
+
+async function acceptOrder(orderId){
+
+const {
+data:order,
+error
+}=await db
+.from("orders")
+.select("*")
+.eq("id",orderId)
+.maybeSingle();
+
+
+if(error||!order){
+
+notify(
+"Order could not be loaded."
+);
+
+return;
+
+}
+
+
+const {
+data:numbers,
+error:numberError
+}=await db
+.from("numbers")
+.select("*")
+.eq("status","available")
+.eq("country",order.country)
+.eq("service",order.service)
+.order("created_at",{ascending:true})
+.limit(1);
+
+
+if(numberError){
+
+notify(numberError.message);
+
+return;
+
+}
+
+
+let number=
+numbers&&numbers.length
+?numbers[0]
+:null;
+
+
+if(!number){
+
+const manual=
+prompt(
+"No matching available number was found.\n\n"+
+"Enter a number manually:"
+);
+
+if(manual===null)return;
+
+const phone=manual.trim();
+
+if(!phone){
+
+notify("Phone number required.");
+
+return;
+
+}
+
+await fulfillOrder(
+orderId,
+phone,
+null
+);
+
+return;
+
+}
+
+
+if(!confirm(
+"Accept this order with:\n\n"+
+number.phone_number
+))return;
+
+
+await fulfillOrder(
+orderId,
+number.phone_number,
+number.id
+);
+
+}
+
+
+async function fulfillOrder(
+orderId,
+phone,
+numberId
+){
+
+notify("Accepting order...");
+
+
+const {error}=await db.rpc(
+"fulfill_order",
+{
+p_order_id:orderId,
+p_phone_number:phone,
+p_number_id:numberId||null
+}
+);
+
+
+if(error){
+
+notify(
+"Failed to accept order: "+
+error.message
+);
+
+return;
+
+}
+
+
+if(numberId){
+
+await db
+.from("numbers")
+.update({
+status:"assigned"
+})
+.eq("id",numberId);
+
+}
+
+
+notify(
+"Order accepted successfully."
+);
+
+await loadOrders();
+await loadDashboard();
+
+}
+
+
+/* =====================================================
+   NUMBERS
+===================================================== */
+
+async function loadNumbers(){
+
+const box=
+document.getElementById("numbersList");
+
+box.innerHTML=
+`<div class="loading">
+Loading numbers...
+</div>`;
+
+
+const {
+data,
+error
+}=await db
+.from("numbers")
+.select("*")
+.order("created_at",{ascending:false});
+
+
+if(error){
+
+box.innerHTML=`
+<div class="empty">
+${esc(error.message)}
+</div>
+`;
+
+return;
+
+}
+
+
+if(!data||!data.length){
+
+box.innerHTML=`
+<div class="empty">
+No numbers found.
+</div>
+`;
+
+return;
+
+}
+
+
+box.innerHTML=data.map(n=>`
+
+<div class="item">
+
+<div class="row">
+<span>Country</span>
+<strong>
+${esc(n.country||"-")}
+</strong>
+</div>
+
+<div class="row">
+<span>Service</span>
+<strong>
+${esc(n.service||"-")}
+</strong>
+</div>
+
+<div class="row">
+<span>Number</span>
+<strong>
+${esc(n.phone_number||"-")}
+</strong>
+</div>
+
+<div class="row">
+<span>Status</span>
+
+<span class="status ${
+n.status==="available"
+?"approved"
+:"pending"
+}">
+
+${esc(n.status||"-")}
+
+</span>
+
+</div>
+
+</div>
+
+`).join("");
+
+}
+
+
+async function addNumber(){
+
+const country=
+document.getElementById(
+"numberCountry"
+).value.trim();
+
+const service=
+document.getElementById(
+"numberService"
+).value.trim();
+
+const phone=
+document.getElementById(
+"phoneNumber"
+).value.trim();
+
+
+if(!country||!service||!phone){
+
+notify(
+"Fill all number fields."
+);
+
+return;
+
+}
+
+
+const {error}=await db
+.from("numbers")
+.insert({
+
+country,
+service,
+phone_number:phone,
+status:"available"
+
+});
+
+
+if(error){
+
+notify(
+"Failed to add number: "+
+error.message
+);
+
+return;
+
+}
+
+notify("Number added.");
+
+document.getElementById(
+"numberCountry"
+).value="";
+
+document.getElementById(
+"numberService"
+).value="";
+
+document.getElementById(
+"phoneNumber"
+).value="";
+
+await loadNumbers();
+await loadDashboard();
+
+}
+
+
+/* =====================================================
+   SMS
+===================================================== */
+
+async function sendSMS(){
+
+const orderId=
+document.getElementById(
+"smsOrderId"
+).value.trim();
+
+const phone=
+document.getElementById(
+"smsPhone"
+).value.trim();
+
+const sender=
+document.getElementById(
+"smsSender"
+).value.trim()||"SMS";
+
+const message=
+document.getElementById(
+"smsMessage"
+).value.trim();
+
+
+if(!orderId||!message){
+
+notify(
+"Order ID and message are required."
+);
+
+return;
+
+}
+
+
+const {
+data:order,
+error:orderError
+}=await db
+.from("orders")
+.select("id,user_id,assigned_number")
+.eq("id",orderId)
+.maybeSingle();
+
+
+if(orderError||!order){
+
+notify("Order not found.");
+
+return;
+
+}
+
+
+const {error}=await db
+.from("messages")
+.insert({
+
+order_id:order.id,
+user_id:order.user_id,
+phone_number:
+phone||
+order.assigned_number||
+null,
+sender,
+message
+
+});
+
+
+if(error){
+
+notify(
+"Failed to add SMS: "+
+error.message
+);
+
+return;
+
+}
+
+notify("SMS added.");
+
+document.getElementById(
+"smsMessage"
+).value="";
+
+}
+
+
+/* =====================================================
+   WALLET USERS
+===================================================== */
+
+async function loadUsers(){
+
+const box=
+document.getElementById(
+"walletUsers"
+);
+
+box.innerHTML=
+`<div class="loading">
+Loading users...
+</div>`;
+
+
+const {
+data,
+error
+}=await db
+.from("profiles")
+.select("id,name,email,balance,role,created_at")
+.order("created_at",{ascending:false});
+
+
+if(error){
+
+box.innerHTML=`
+<div class="empty">
+Failed to load users.<br>
+<span class="small">
+${esc(error.message)}
+</span>
+</div>
+`;
+
+return;
+
+}
+
+
+window.olaqUsers=data||[];
+
+renderWalletUsers(
+window.olaqUsers
+);
+
+}
+
+
+function searchUsers(){
+
+const input=
+document.getElementById(
+"walletSearch"
+);
+
+const search=
+input.value.trim().toLowerCase();
+
+
+const users=
+window.olaqUsers||[];
+
+
+const filtered=
+users.filter(user=>{
+
+return (
+
+String(user.name||"")
+.toLowerCase()
+.includes(search)
+
+||
+
+String(user.email||"")
+.toLowerCase()
+.includes(search)
+
+);
+
+});
+
+
+renderWalletUsers(filtered);
+
+}
+
+
+function renderWalletUsers(users){
+
+const box=
+document.getElementById(
+"walletUsers"
+);
+
+
+if(!users.length){
+
+box.innerHTML=`
+<div class="empty">
+No users found.
+</div>
+`;
+
+return;
+
+}
+
+
+box.innerHTML=users.map(user=>`
+
+<div class="item">
+
+<div class="item-top">
+
+<div>
+
+<strong>
+${esc(user.name||"User")}
+</strong>
+
+<div class="muted">
+${esc(user.email||"")}
+</div>
+
+</div>
+
+<div class="balance">
+
+${money(user.balance||0,"NGN")}
+
+</div>
+
+</div>
+
+
+<div class="row">
+
+<span>User ID</span>
+
+<span class="small">
+${esc(user.id)}
+</span>
+
+</div>
+
+
+<label>
+New Wallet Balance
+</label>
+
+<input
+id="balance-${esc(user.id)}"
+type="number"
+step="0.01"
+min="0"
+value="${esc(user.balance||0)}">
+
+
+<label>
+Reason / Note
+</label>
+
+<input
+id="reason-${esc(user.id)}"
+placeholder="e.g. Manual wallet adjustment">
+
+
+<div class="actions">
+
+<button
+class="primary"
+onclick="updateUserBalance(
+'${esc(user.id)}'
+)">
+
+Save Balance
+
+</button>
+
+</div>
+
+</div>
+
+`).join("");
+
+}
+
+
+async function updateUserBalance(userId){
+
+const input=
+document.getElementById(
+"balance-"+userId
+);
+
+const reason=
+document.getElementById(
+"reason-"+userId
+).value.trim();
+
+
+const newBalance=
+Number(input.value);
+
+
+if(!Number.isFinite(newBalance)||newBalance<0){
+
+notify(
+"Enter a valid wallet balance."
+);
+
+return;
+
+}
+
+
+const user=
+(window.olaqUsers||[])
+.find(x=>x.id===userId);
+
+
+if(!user){
+
+notify("User not found.");
+
+return;
+
+}
+
+
+const oldBalance=
+Number(user.balance||0);
+
+
+if(!confirm(
+"Update this wallet?\n\n"+
+"User: "+
+(user.name||user.email||"User")+
+"\nCurrent: "+
+money(oldBalance)+
+"\nNew: "+
+money(newBalance)
+))return;
+
+
+const {error}=await db
+.from("profiles")
+.update({
+balance:newBalance
+})
+.eq("id",userId);
+
+
+if(error){
+
+notify(
+"Failed to update balance: "+
+error.message
+);
+
+return;
+
+}
+
+
+/*
+ Optional audit message in the browser console.
+ The actual balance update is performed only
+ on the selected user's profile.
+*/
+
+console.log(
+"Wallet balance changed",
+{
+userId,
+oldBalance,
+newBalance,
+reason
+}
+);
+
+
+notify(
+"Wallet balance updated successfully."
+);
+
+
+await loadUsers();
+await loadDashboard();
+
+}
+
+
+/* =====================================================
+   START
+===================================================== */
+
+(async function(){
+
+const allowed=
+await checkAdmin();
+
+if(!allowed)return;
+
+await loadDashboard();
+
+})();
+
+</script>
+
+</body>
+</html>
