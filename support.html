@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#5b21b6">
+
+<title>OlaqVerify — Support</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+:root{
+  --purple:#5b21b6;
+  --purple2:#3b0764;
+  --purpleLight:#f0e7ff;
+  --bg:#f6f7fb;
+  --white:#ffffff;
+  --text:#171225;
+  --muted:#77728a;
+  --border:#e9e5f2;
+  --green:#16a34a;
+  --red:#dc2626;
+  --shadow:0 10px 30px rgba(48,20,90,.08);
+}
+
+body{
+  font-family:Arial,Helvetica,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+}
+
+button,
+a{
+  -webkit-tap-highlight-color:transparent;
+}
+
+a{
+  text-decoration:none;
+  color:inherit;
+}
+
+/* HEADER */
+
+.header{
+  background:linear-gradient(135deg,var(--purple2),var(--purple));
+  color:white;
+  padding:24px 18px 28px;
+  border-radius:0 0 28px 28px;
+  box-shadow:0 8px 25px rgba(59,7,100,.18);
+}
+
+.header-inner{
+  max-width:900px;
+  margin:auto;
+}
+
+.back{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  color:white;
+  font-size:14px;
+  opacity:.9;
+  margin-bottom:25px;
+}
+
+.logo-row{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.logo{
+  width:52px;
+  height:52px;
+  border-radius:16px;
+  background:white;
+  color:var(--purple);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:21px;
+  font-weight:900;
+  box-shadow:0 8px 20px rgba(0,0,0,.12);
+}
+
+.header h1{
+  font-size:27px;
+  font-weight:800;
+}
+
+.header p{
+  margin-top:5px;
+  font-size:14px;
+  opacity:.85;
+}
+
+/* MAIN */
+
+.container{
+  width:min(900px,calc(100% - 28px));
+  margin:22px auto 45px;
+}
+
+/* SUPPORT CARD */
+
+.support-card{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:22px;
+  padding:22px;
+  box-shadow:var(--shadow);
+  margin-bottom:18px;
+}
+
+.support-top{
+  display:flex;
+  align-items:center;
+  gap:16px;
+}
+
+.support-icon{
+  width:54px;
+  height:54px;
+  border-radius:17px;
+  background:#e9f9ef;
+  color:var(--green);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:25px;
+  flex-shrink:0;
+}
+
+.support-card h2{
+  font-size:20px;
+  margin-bottom:5px;
+}
+
+.support-card p{
+  color:var(--muted);
+  line-height:1.5;
+  font-size:14px;
+}
+
+.whatsapp-btn{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:100%;
+  margin-top:20px;
+  padding:15px;
+  border-radius:14px;
+  background:#16a34a;
+  color:white;
+  font-weight:800;
+  font-size:15px;
+  box-shadow:0 7px 18px rgba(22,163,74,.2);
+}
+
+.whatsapp-btn:active{
+  transform:scale(.98);
+}
+
+/* SECTION TITLE */
+
+.section-title{
+  font-size:20px;
+  font-weight:800;
+  margin:28px 2px 13px;
+}
+
+/* HELP GRID */
+
+.help-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+}
+
+.help-card{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:18px;
+  box-shadow:0 7px 22px rgba(48,20,90,.05);
+}
+
+.help-icon{
+  width:43px;
+  height:43px;
+  border-radius:13px;
+  background:var(--purpleLight);
+  color:var(--purple);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:20px;
+  margin-bottom:12px;
+}
+
+.help-card h3{
+  font-size:16px;
+  margin-bottom:6px;
+}
+
+.help-card p{
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.5;
+}
+
+/* FAQ */
+
+.faq{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:18px;
+  margin-bottom:10px;
+  overflow:hidden;
+}
+
+.faq button{
+  width:100%;
+  border:0;
+  background:white;
+  padding:18px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  text-align:left;
+  font-size:15px;
+  font-weight:700;
+  color:var(--text);
+  cursor:pointer;
+}
+
+.arrow{
+  color:var(--purple);
+  font-size:18px;
+  transition:.2s;
+}
+
+.answer{
+  display:none;
+  padding:0 18px 18px;
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.6;
+}
+
+.faq.open .answer{
+  display:block;
+}
+
+.faq.open .arrow{
+  transform:rotate(180deg);
+}
+
+/* CONTACT */
+
+.contact{
+  background:linear-gradient(135deg,#f0e7ff,#ffffff);
+  border:1px solid #dfd0ff;
+  border-radius:22px;
+  padding:22px;
+  margin-top:24px;
+}
+
+.contact h2{
+  font-size:20px;
+  margin-bottom:7px;
+}
+
+.contact p{
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.5;
+}
+
+.contact-number{
+  margin-top:16px;
+  font-weight:800;
+  color:var(--purple);
+  font-size:16px;
+}
+
+/* HOME BUTTON */
+
+.home-btn{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin-top:18px;
+  padding:15px;
+  border-radius:14px;
+  background:var(--purple);
+  color:white;
+  font-weight:800;
+  box-shadow:0 8px 20px rgba(91,33,182,.2);
+}
+
+.home-btn:active{
+  transform:scale(.98);
+}
+
+/* FOOTER */
+
+footer{
+  text-align:center;
+  color:#918ca0;
+  font-size:12px;
+  padding:10px 0 30px;
+}
+
+footer strong{
+  color:var(--purple);
+}
+
+/* MOBILE */
+
+@media(max-width:520px){
+
+  .header{
+    padding:20px 15px 25px;
+  }
+
+  .header h1{
+    font-size:24px;
+  }
+
+  .container{
+    width:calc(100% - 22px);
+  }
+
+  .support-card{
+    padding:18px;
+  }
+
+  .help-grid{
+    grid-template-columns:1fr;
+  }
+
+  .section-title{
+    font-size:18px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+
+<header class="header">
+  <div class="header-inner">
+
+    <a href="index.html" class="back">
+      ← Back to OlaqVerify
+    </a>
+
+    <div class="logo-row">
+
+      <div class="logo">
+        OV
+      </div>
+
+      <div>
+        <h1>OlaqVerify Support</h1>
+        <p>We're here to help you.</p>
+      </div>
+
+    </div>
+
+  </div>
+</header>
+
+
+<main class="container">
+
+  <!-- LIVE SUPPORT -->
+
+  <section class="support-card">
+
+    <div class="support-top">
+
+      <div class="support-icon">
+        💬
+      </div>
+
+      <div>
+        <h2>Need help?</h2>
+        <p>
+          Contact OlaqVerify support if you have a problem
+          with your account, payment or order.
+        </p>
+      </div>
+
+    </div>
+
+    <a
+      class="whatsapp-btn"
+      href="https://wa.me/2348164886717"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      💬 Chat with Support on WhatsApp
+    </a>
+
+  </section>
+
+
+  <!-- HELP CATEGORIES -->
+
+  <h2 class="section-title">How can we help?</h2>
+
+  <div class="help-grid">
+
+    <div class="help-card">
+
+      <div class="help-icon">💳</div>
+
+      <h3>Payment Help</h3>
+
+      <p>
+        Having an issue adding money or waiting for
+        a payment to be approved? Contact support
+        with your payment reference.
+      </p>
+
+    </div>
+
+
+    <div class="help-card">
+
+      <div class="help-icon">📦</div>
+
+      <h3>Order Help</h3>
+
+      <p>
+        If you have an issue with an order, provide
+        your order information so support can check it.
+      </p>
+
+    </div>
+
+
+    <div class="help-card">
+
+      <div class="help-icon">👤</div>
+
+      <h3>Account Help</h3>
+
+      <p>
+        Need help accessing your account or using
+        an OlaqVerify feature? Our support team can help.
+      </p>
+
+    </div>
+
+
+    <div class="help-card">
+
+      <div class="help-icon">🔐</div>
+
+      <h3>Security</h3>
+
+      <p>
+        Never share your password, PIN or private
+        account credentials with anyone.
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <!-- FAQ -->
+
+  <h2 class="section-title">Frequently Asked Questions</h2>
+
+
+  <div class="faq">
+
+    <button onclick="toggleFAQ(this)">
+      <span>How do I create an account?</span>
+      <span class="arrow">⌄</span>
+    </button>
+
+    <div class="answer">
+      Open OlaqVerify and select the sign-up option.
+      Enter the requested information and complete
+      the registration process.
+    </div>
+
+  </div>
+
+
+  <div class="faq">
+
+    <button onclick="toggleFAQ(this)">
+      <span>How do I add money?</span>
+      <span class="arrow">⌄</span>
+    </button>
+
+    <div class="answer">
+      Open your wallet and select Add Money.
+      Follow the payment instructions shown there.
+      After submitting your payment reference,
+      your payment can be reviewed by the platform.
+    </div>
+
+  </div>
+
+
+  <div class="faq">
+
+    <button onclick="toggleFAQ(this)">
+      <span>Why is my payment still pending?</span>
+      <span class="arrow">⌄</span>
+    </button>
+
+    <div class="answer">
+      Payments may remain pending while they are being
+      reviewed. Keep your transaction/reference details
+      available if you need to contact support.
+    </div>
+
+  </div>
+
+
+  <div class="faq">
+
+    <button onclick="toggleFAQ(this)">
+      <span>Where can I see my orders?</span>
+      <span class="arrow">⌄</span>
+    </button>
+
+    <div class="answer">
+      Log into your OlaqVerify account and open the
+      Orders section to view your order information
+      and available status updates.
+    </div>
+
+  </div>
+
+
+  <div class="faq">
+
+    <button onclick="toggleFAQ(this)">
+      <span>What should I send to support?</span>
+      <span class="arrow">⌄</span>
+    </button>
+
+    <div class="answer">
+      Tell support what happened and include relevant
+      information such as your account email, order
+      reference or payment reference. Never send your
+      password or private security credentials.
+    </div>
+
+  </div>
+
+
+  <div class="faq">
+
+    <button onclick="toggleFAQ(this)">
+      <span>Are orders always available?</span>
+      <span class="arrow">⌄</span>
+    </button>
+
+    <div class="answer">
+      Order availability can change. If transactions
+      are temporarily paused, OlaqVerify will display
+      a notice on the platform until ordering is reopened.
+    </div>
+
+  </div>
+
+
+  <!-- CONTACT -->
+
+  <section class="contact">
+
+    <h2>Still need assistance?</h2>
+
+    <p>
+      Our support channel is available for questions
+      about your OlaqVerify account, payments and orders.
+    </p>
+
+    <div class="contact-number">
+      WhatsApp: +234 816 488 6717
+    </div>
+
+    <a
+      class="whatsapp-btn"
+      href="https://wa.me/2348164886717"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      Contact OlaqVerify
+    </a>
+
+  </section>
+
+
+  <!-- BACK HOME -->
+
+  <a href="index.html" class="home-btn">
+    ← Return to OlaqVerify
+  </a>
+
+</main>
+
+
+<footer>
+  <strong>OlaqVerify</strong><br>
+  Verification made simple.
+</footer>
+
+
+<script>
+
+function toggleFAQ(button){
+
+  const faq = button.parentElement;
+
+  const allFAQs = document.querySelectorAll(".faq");
+
+  allFAQs.forEach(item => {
+
+    if(item !== faq){
+      item.classList.remove("open");
+    }
+
+  });
+
+  faq.classList.toggle("open");
+
+}
+
+</script>
+
+</body>
+  </html>
