@@ -1,0 +1,3128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>OlaqVerify</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root{
+  --purple:#5b21b6;
+  --purple2:#3b0764;
+  --light:#f5f3ff;
+  --white:#fff;
+  --text:#171717;
+  --muted:#737373;
+  --green:#16a34a;
+  --red:#dc2626;
+  --orange:#f59e0b;
+  --border:#e5e7eb;
+  --shadow:0 8px 30px rgba(0,0,0,.08);
+}
+
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+  background:#f6f7fb;
+  color:var(--text);
+}
+
+button,input,select{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+  border:0;
+}
+
+.hidden{
+  display:none!important;
+}
+
+/* AUTH */
+
+#authScreen{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:linear-gradient(145deg,#3b0764,#5b21b6,#7c3aed);
+}
+
+.authBox{
+  width:100%;
+  max-width:420px;
+  background:white;
+  border-radius:24px;
+  padding:30px 24px;
+  box-shadow:0 20px 60px rgba(0,0,0,.25);
+}
+
+.logo{
+  text-align:center;
+  font-size:32px;
+  font-weight:900;
+  color:var(--purple);
+  margin-bottom:6px;
+}
+
+.logoSub{
+  text-align:center;
+  color:var(--muted);
+  margin-bottom:25px;
+}
+
+.authTabs{
+  display:flex;
+  background:#f3f4f6;
+  border-radius:12px;
+  padding:4px;
+  margin-bottom:20px;
+}
+
+.authTabs button{
+  flex:1;
+  padding:11px;
+  border-radius:9px;
+  background:transparent;
+  color:#666;
+}
+
+.authTabs button.active{
+  background:white;
+  color:var(--purple);
+  font-weight:bold;
+  box-shadow:0 2px 8px rgba(0,0,0,.08);
+}
+
+.field{
+  margin-bottom:14px;
+}
+
+.field label{
+  display:block;
+  font-size:13px;
+  font-weight:bold;
+  margin-bottom:7px;
+}
+
+.field input,
+.field select{
+  width:100%;
+  padding:13px;
+  border:1px solid var(--border);
+  border-radius:11px;
+  outline:none;
+  background:white;
+}
+
+.field input:focus,
+.field select:focus{
+  border-color:var(--purple);
+}
+
+.primaryBtn{
+  width:100%;
+  background:var(--purple);
+  color:white;
+  padding:14px;
+  border-radius:12px;
+  font-weight:bold;
+}
+
+.primaryBtn:hover{
+  background:var(--purple2);
+}
+
+.authMsg{
+  margin-top:12px;
+  text-align:center;
+  font-size:13px;
+}
+
+/* APP */
+
+#app{
+  min-height:100vh;
+  padding-bottom:80px;
+}
+
+.topbar{
+  height:64px;
+  background:white;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 18px;
+  border-bottom:1px solid var(--border);
+  position:sticky;
+  top:0;
+  z-index:20;
+}
+
+.topLogo{
+  font-size:23px;
+  font-weight:900;
+  color:var(--purple);
+}
+
+.topEmail{
+  font-size:12px;
+  color:var(--muted);
+  max-width:160px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.content{
+  width:100%;
+  max-width:850px;
+  margin:auto;
+  padding:18px;
+}
+
+.page{
+  display:none;
+}
+
+.page.active{
+  display:block;
+}
+
+.pageTitle{
+  font-size:25px;
+  font-weight:900;
+  margin-bottom:5px;
+}
+
+.pageSub{
+  color:var(--muted);
+  font-size:14px;
+  margin-bottom:18px;
+}
+
+/* BALANCE */
+
+.balanceCard{
+  background:linear-gradient(135deg,#3b0764,#5b21b6,#7c3aed);
+  color:white;
+  border-radius:22px;
+  padding:23px;
+  box-shadow:var(--shadow);
+  margin-bottom:18px;
+}
+
+.balanceLabel{
+  opacity:.85;
+  font-size:13px;
+}
+
+.balanceAmount{
+  font-size:34px;
+  font-weight:900;
+  margin:7px 0 17px;
+}
+
+.balanceActions{
+  display:flex;
+  gap:9px;
+}
+
+.balanceActions button{
+  flex:1;
+  padding:11px;
+  border-radius:10px;
+  font-weight:bold;
+}
+
+.topupBtn{
+  background:white;
+  color:var(--purple);
+}
+
+.refreshBtn{
+  background:rgba(255,255,255,.15);
+  color:white;
+  border:1px solid rgba(255,255,255,.3);
+}
+
+/* QUICK ACTIONS */
+
+.sectionTitle{
+  font-size:17px;
+  font-weight:900;
+  margin:22px 0 12px;
+}
+
+.quickGrid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+}
+
+.quickCard{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:17px;
+  padding:18px;
+  box-shadow:0 4px 15px rgba(0,0,0,.04);
+}
+
+.quickCard strong{
+  display:block;
+  margin-bottom:6px;
+}
+
+.quickCard span{
+  color:var(--muted);
+  font-size:12px;
+}
+
+/* ORDER */
+
+.card{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:18px;
+  margin-bottom:15px;
+  box-shadow:0 4px 15px rgba(0,0,0,.04);
+}
+
+.priceBox{
+  background:#f5f3ff;
+  border:1px solid #ddd6fe;
+  border-radius:13px;
+  padding:15px;
+  margin:15px 0;
+}
+
+.priceBox .price{
+  font-size:25px;
+  font-weight:900;
+  color:var(--purple);
+}
+
+.priceBox small{
+  color:var(--muted);
+}
+
+.orderBtn{
+  width:100%;
+  padding:14px;
+  background:var(--purple);
+  color:white;
+  border-radius:12px;
+  font-weight:bold;
+}
+
+.orderBtn:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+}
+
+/* ORDER ITEMS */
+
+.orderItem{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:12px;
+}
+
+.orderTop{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.orderCountry{
+  font-weight:900;
+}
+
+.orderDate{
+  color:var(--muted);
+  font-size:11px;
+  margin-top:4px;
+}
+
+.status{
+  padding:5px 9px;
+  border-radius:20px;
+  font-size:11px;
+  font-weight:bold;
+  height:max-content;
+}
+
+.status.pending{
+  background:#fff7ed;
+  color:#c2410c;
+}
+
+.status.fulfilled,
+.status.approved{
+  background:#f0fdf4;
+  color:#15803d;
+}
+
+.status.declined{
+  background:#fef2f2;
+  color:#b91c1c;
+}
+
+.numberBox{
+  margin-top:12px;
+  background:#f5f3ff;
+  padding:12px;
+  border-radius:10px;
+  font-weight:bold;
+  word-break:break-all;
+}
+
+/* TRANSACTIONS */
+
+.transaction{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:14px 0;
+  border-bottom:1px solid #eee;
+}
+
+.transaction:last-child{
+  border-bottom:0;
+}
+
+.transactionTitle{
+  font-weight:bold;
+  font-size:14px;
+}
+
+.transactionDate{
+  color:var(--muted);
+  font-size:11px;
+  margin-top:4px;
+}
+
+.amount{
+  font-weight:bold;
+}
+
+.amount.plus{
+  color:var(--green);
+}
+
+.amount.minus{
+  color:var(--red);
+}
+
+/* SUPPORT */
+
+.supportBox{
+  text-align:center;
+  padding:25px 15px;
+}
+
+.whatsappBtn{
+  display:block;
+  background:#16a34a;
+  color:white;
+  padding:14px;
+  border-radius:12px;
+  text-decoration:none;
+  font-weight:bold;
+  margin-top:15px;
+}
+
+.messageBox{
+  margin-top:18px;
+}
+
+.messageBox textarea{
+  width:100%;
+  min-height:110px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:13px;
+  resize:vertical;
+  outline:none;
+}
+
+/* SETTINGS */
+
+.settingRow{
+  padding:15px 0;
+  border-bottom:1px solid #eee;
+}
+
+.settingLabel{
+  color:var(--muted);
+  font-size:12px;
+}
+
+.settingValue{
+  margin-top:5px;
+  font-weight:bold;
+  word-break:break-word;
+}
+
+.logoutBtn{
+  width:100%;
+  margin-top:20px;
+  padding:13px;
+  background:#fee2e2;
+  color:#b91c1c;
+  border-radius:12px;
+  font-weight:bold;
+}
+
+/* BOTTOM NAV */
+
+.bottomNav{
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  height:68px;
+  background:white;
+  border-top:1px solid var(--border);
+  display:flex;
+  justify-content:space-around;
+  z-index:30;
+}
+
+.navBtn{
+  background:white;
+  color:#737373;
+  flex:1;
+  font-size:11px;
+  font-weight:bold;
+}
+
+.navBtn.active{
+  color:var(--purple);
+}
+
+/* MODAL */
+
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.55);
+  display:none;
+  align-items:flex-end;
+  justify-content:center;
+  z-index:100;
+}
+
+.modal.show{
+  display:flex;
+}
+
+.modalBox{
+  width:100%;
+  max-width:600px;
+  background:white;
+  border-radius:23px 23px 0 0;
+  padding:22px;
+  max-height:90vh;
+  overflow:auto;
+}
+
+.modalHeader{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:18px;
+}
+
+.closeBtn{
+  width:35px;
+  height:35px;
+  border-radius:50%;
+  background:#f3f4f6;
+}
+
+/* EMPTY */
+
+.empty{
+  text-align:center;
+  padding:40px 15px;
+  color:var(--muted);
+}
+
+/* LOADING */
+
+.loading{
+  text-align:center;
+  padding:30px;
+  color:var(--muted);
+}
+
+/* TOAST */
+
+#toast{
+  position:fixed;
+  left:50%;
+  bottom:85px;
+  transform:translateX(-50%) translateY(20px);
+  background:#171717;
+  color:white;
+  padding:12px 18px;
+  border-radius:10px;
+  font-size:13px;
+  opacity:0;
+  pointer-events:none;
+  transition:.25s;
+  z-index:200;
+  max-width:90%;
+  text-align:center;
+}
+
+#toast.show{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+
+.success{
+  color:var(--green);
+}
+
+.error{
+  color:var(--red);
+}
+
+footer{
+  text-align:center;
+  color:#999;
+  font-size:11px;
+  padding:25px 0;
+}
+
+@media(max-width:500px){
+  .quickGrid{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .balanceAmount{
+    font-size:30px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- =========================================================
+     AUTH SCREEN
+========================================================= -->
+
+<section id="authScreen">
+
+  <div class="authBox">
+
+    <div class="logo">OlaqVerify</div>
+    <div class="logoSub">
+      Authorized SMS & number services
+    </div>
+
+    <div class="authTabs">
+      <button id="loginTab" class="active" onclick="showAuth('login')">
+        Login
+      </button>
+
+      <button id="signupTab" onclick="showAuth('signup')">
+        Create Account
+      </button>
+    </div>
+
+    <!-- LOGIN -->
+
+    <div id="loginForm">
+
+      <div class="field">
+        <label>Email</label>
+        <input
+          id="loginEmail"
+          type="email"
+          placeholder="you@example.com"
+          autocomplete="email"
+        >
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <input
+          id="loginPassword"
+          type="password"
+          placeholder="Password"
+          autocomplete="current-password"
+        >
+      </div>
+
+      <button class="primaryBtn" onclick="login()">
+        Login
+      </button>
+
+    </div>
+
+    <!-- SIGNUP -->
+
+    <div id="signupForm" class="hidden">
+
+      <div class="field">
+        <label>Full name</label>
+        <input
+          id="signupName"
+          type="text"
+          placeholder="Your name"
+        >
+      </div>
+
+      <div class="field">
+        <label>Email</label>
+        <input
+          id="signupEmail"
+          type="email"
+          placeholder="you@example.com"
+          autocomplete="email"
+        >
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <input
+          id="signupPassword"
+          type="password"
+          placeholder="At least 6 characters"
+          autocomplete="new-password"
+        >
+      </div>
+
+      <button class="primaryBtn" onclick="signup()">
+        Create Account
+      </button>
+
+    </div>
+
+    <div id="authMsg" class="authMsg"></div>
+
+  </div>
+
+</section>
+
+
+<!-- =========================================================
+     MAIN APP
+========================================================= -->
+
+<div id="app" class="hidden">
+
+  <header class="topbar">
+
+    <div class="topLogo">
+      OlaqVerify
+    </div>
+
+    <div id="topEmail" class="topEmail">
+      Loading...
+    </div>
+
+  </header>
+
+
+  <main class="content">
+
+    <!-- =====================================================
+         HOME
+    ====================================================== -->
+
+    <section id="page-home" class="page active">
+
+      <div class="balanceCard">
+
+        <div class="balanceLabel">
+          Available Balance
+        </div>
+
+        <div id="homeBalance" class="balanceAmount">
+          ₦0.00
+        </div>
+
+        <div class="balanceActions">
+
+          <button
+            class="topupBtn"
+            onclick="openTopup()"
+          >
+            Add Money
+          </button>
+
+          <button
+            class="refreshBtn"
+            onclick="loadAll()"
+          >
+            Refresh
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <div class="sectionTitle">
+        Quick Actions
+      </div>
+
+      <div class="quickGrid">
+
+        <button
+          class="quickCard"
+          onclick="go('order')"
+        >
+          <strong>Order Number</strong>
+          <span>Choose a country and service</span>
+        </button>
+
+        <button
+          class="quickCard"
+          onclick="go('orders')"
+        >
+          <strong>My Orders</strong>
+          <span>Track your orders</span>
+        </button>
+
+        <button
+          class="quickCard"
+          onclick="go('wallet')"
+        >
+          <strong>Wallet</strong>
+          <span>Top up and view payments</span>
+        </button>
+
+        <button
+          class="quickCard"
+          onclick="go('support')"
+        >
+          <strong>Support</strong>
+          <span>Contact OlaqVerify</span>
+        </button>
+
+      </div>
+
+
+      <div class="sectionTitle">
+        Recent Orders
+      </div>
+
+      <div id="homeOrders">
+        <div class="loading">
+          Loading...
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         ORDER PAGE
+    ====================================================== -->
+
+    <section id="page-order" class="page">
+
+      <div class="pageTitle">
+        Order Number
+      </div>
+
+      <div class="pageSub">
+        Select an available country and authorized SMS service.
+      </div>
+
+
+      <div class="card">
+
+        <div class="field">
+
+          <label>
+            Country
+          </label>
+
+          <select
+            id="countrySelect"
+            onchange="countryChanged()"
+          >
+
+            <option value="">
+              Select country
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            Service
+          </label>
+
+          <select
+            id="serviceSelect"
+            onchange="serviceChanged()"
+          >
+
+            <option value="">
+              Select service
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div id="priceBox" class="priceBox">
+
+          <div class="price">
+            Select a service
+          </div>
+
+          <small>
+            The official price is checked securely by the server.
+          </small>
+
+        </div>
+
+
+        <button
+          id="placeOrderBtn"
+          class="orderBtn"
+          onclick="placeOrder()"
+          disabled
+        >
+          Place Order
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         ORDERS
+    ====================================================== -->
+
+    <section id="page-orders" class="page">
+
+      <div class="pageTitle">
+        My Orders
+      </div>
+
+      <div class="pageSub">
+        View your order status and assigned numbers.
+      </div>
+
+      <div id="ordersList">
+        <div class="loading">
+          Loading orders...
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         WALLET
+    ====================================================== -->
+
+    <section id="page-wallet" class="page">
+
+      <div class="pageTitle">
+        Wallet
+      </div>
+
+      <div class="pageSub">
+        Manage your OlaqVerify balance.
+      </div>
+
+
+      <div class="balanceCard">
+
+        <div class="balanceLabel">
+          Current Balance
+        </div>
+
+        <div id="walletBalance" class="balanceAmount">
+          ₦0.00
+        </div>
+
+        <div class="balanceActions">
+
+          <button
+            class="topupBtn"
+            onclick="openTopup()"
+          >
+            Add Money
+          </button>
+
+          <button
+            class="refreshBtn"
+            onclick="loadProfile()"
+          >
+            Refresh
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <div class="sectionTitle">
+        Transactions
+      </div>
+
+      <div id="transactionsList">
+        <div class="loading">
+          Loading transactions...
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         SUPPORT
+    ====================================================== -->
+
+    <section id="page-support" class="page">
+
+      <div class="pageTitle">
+        Support
+      </div>
+
+      <div class="pageSub">
+        Need help? Contact OlaqVerify support.
+      </div>
+
+
+      <div class="card supportBox">
+
+        <h2>
+          WhatsApp Support
+        </h2>
+
+        <p style="color:#737373;margin-top:8px">
+          Contact support directly on WhatsApp.
+        </p>
+
+        <a
+          class="whatsappBtn"
+          href="https://wa.me/2348164886717"
+          target="_blank"
+        >
+          Chat on WhatsApp
+        </a>
+
+      </div>
+
+
+      <div class="card messageBox">
+
+        <h3 style="margin-bottom:12px">
+          Send a message
+        </h3>
+
+        <textarea
+          id="supportMessage"
+          placeholder="Describe your issue..."
+        ></textarea>
+
+        <button
+          class="primaryBtn"
+          style="margin-top:10px"
+          onclick="sendSupportMessage()"
+        >
+          Send Message
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         SETTINGS
+    ====================================================== -->
+
+    <section id="page-settings" class="page">
+
+      <div class="pageTitle">
+        Settings
+      </div>
+
+      <div class="pageSub">
+        Your OlaqVerify account.
+      </div>
+
+
+      <div class="card">
+
+        <div class="settingRow">
+
+          <div class="settingLabel">
+            Full Name
+          </div>
+
+          <div
+            id="settingName"
+            class="settingValue"
+          >
+            —
+          </div>
+
+        </div>
+
+
+        <div class="settingRow">
+
+          <div class="settingLabel">
+            Email
+          </div>
+
+          <div
+            id="settingEmail"
+            class="settingValue"
+          >
+            —
+          </div>
+
+        </div>
+
+
+        <div class="settingRow">
+
+          <div class="settingLabel">
+            Account ID
+          </div>
+
+          <div
+            id="settingId"
+            class="settingValue"
+          >
+            —
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <button
+        class="logoutBtn"
+        onclick="logout()"
+      >
+        Sign Out
+      </button>
+
+    </section>
+
+
+    <footer>
+      OlaqVerify<br>
+      Founder: Olayiwola Qurwiy
+    </footer>
+
+  </main>
+
+
+  <!-- =======================================================
+       BOTTOM NAV
+  ======================================================== -->
+
+  <nav class="bottomNav">
+
+    <button
+      class="navBtn active"
+      data-page="home"
+      onclick="go('home')"
+    >
+      Home
+    </button>
+
+    <button
+      class="navBtn"
+      data-page="order"
+      onclick="go('order')"
+    >
+      Order
+    </button>
+
+    <button
+      class="navBtn"
+      data-page="orders"
+      onclick="go('orders')"
+    >
+      Orders
+    </button>
+
+    <button
+      class="navBtn"
+      data-page="wallet"
+      onclick="go('wallet')"
+    >
+      Wallet
+    </button>
+
+    <button
+      class="navBtn"
+      data-page="settings"
+      onclick="go('settings')"
+    >
+      Settings
+    </button>
+
+  </nav>
+
+</div>
+
+
+<!-- =========================================================
+     TOP UP MODAL
+========================================================= -->
+
+<div
+  id="topupModal"
+  class="modal"
+  onclick="closeModalOutside(event)"
+>
+
+  <div class="modalBox">
+
+    <div class="modalHeader">
+
+      <h2>
+        Add Money
+      </h2>
+
+      <button
+        class="closeBtn"
+        onclick="closeTopup()"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <div class="card" style="background:#f5f3ff">
+
+      <p style="font-size:13px;color:#666">
+        Send your payment to the account below.
+      </p>
+
+      <div style="margin-top:15px">
+
+        <strong>
+          PalmPay
+        </strong>
+
+        <div style="margin-top:8px;font-size:22px;font-weight:900">
+          8164886717
+        </div>
+
+        <div style="margin-top:5px;color:#666">
+          Adekunle
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="field">
+
+      <label>
+        Amount
+      </label>
+
+      <input
+        id="topupAmount"
+        type="number"
+        min="1"
+        placeholder="Enter amount"
+      >
+
+    </div>
+
+
+    <div class="field">
+
+      <label>
+        Payment Reference
+      </label>
+
+      <input
+        id="topupReference"
+        type="text"
+        placeholder="Your payment reference"
+      >
+
+    </div>
+
+
+    <button
+      class="primaryBtn"
+      onclick="submitTopup()"
+    >
+      Submit Payment
+    </button>
+
+    <p
+      style="font-size:11px;color:#888;margin-top:12px;text-align:center"
+    >
+      Your balance will remain unchanged until the payment is approved.
+    </p>
+
+  </div>
+
+</div>
+
+
+<div id="toast"></div>
+
+
+<script>
+
+/* ============================================================
+   SUPABASE
+============================================================ */
+
+const SUPABASE_URL =
+  "https://alemtvfchysptzgzhaap.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_UEnF6pfZ2ORRcuIQUzgbRw_6bWNDnKm";
+
+const db =
+  supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+
+/* ============================================================
+   STATE
+============================================================ */
+
+let currentUser = null;
+let currentProfile = null;
+let pricesCache = [];
+let currentPage = "home";
+
+
+/* ============================================================
+   COUNTRIES
+============================================================ */
+
+const COUNTRIES = [
+"Afghanistan",
+"Albania",
+"Algeria",
+"Andorra",
+"Angola",
+"Antigua and Barbuda",
+"Argentina",
+"Armenia",
+"Australia",
+"Austria",
+"Azerbaijan",
+"Bahamas",
+"Bahrain",
+"Bangladesh",
+"Barbados",
+"Belarus",
+"Belgium",
+"Belize",
+"Benin",
+"Bhutan",
+"Bolivia",
+"Bosnia and Herzegovina",
+"Botswana",
+"Brazil",
+"Brunei",
+"Bulgaria",
+"Burkina Faso",
+"Burundi",
+"Cabo Verde",
+"Cambodia",
+"Cameroon",
+"Canada",
+"Central African Republic",
+"Chad",
+"Chile",
+"China",
+"Colombia",
+"Comoros",
+"Congo",
+"Costa Rica",
+"Cote d'Ivoire",
+"Croatia",
+"Cuba",
+"Cyprus",
+"Czech Republic",
+"Democratic Republic of the Congo",
+"Denmark",
+"Djibouti",
+"Dominica",
+"Dominican Republic",
+"Ecuador",
+"Egypt",
+"El Salvador",
+"Equatorial Guinea",
+"Eritrea",
+"Estonia",
+"Eswatini",
+"Ethiopia",
+"Fiji",
+"Finland",
+"France",
+"Gabon",
+"Gambia",
+"Georgia",
+"Germany",
+"Ghana",
+"Greece",
+"Grenada",
+"Guatemala",
+"Guinea",
+"Guinea-Bissau",
+"Guyana",
+"Haiti",
+"Honduras",
+"Hungary",
+"Iceland",
+"India",
+"Indonesia",
+"Iran",
+"Iraq",
+"Ireland",
+"Israel",
+"Italy",
+"Jamaica",
+"Japan",
+"Jordan",
+"Kazakhstan",
+"Kenya",
+"Kiribati",
+"Kuwait",
+"Kyrgyzstan",
+"Laos",
+"Latvia",
+"Lebanon",
+"Lesotho",
+"Liberia",
+"Libya",
+"Liechtenstein",
+"Lithuania",
+"Luxembourg",
+"Madagascar",
+"Malawi",
+"Malaysia",
+"Maldives",
+"Mali",
+"Malta",
+"Marshall Islands",
+"Mauritania",
+"Mauritius",
+"Mexico",
+"Micronesia",
+"Moldova",
+"Monaco",
+"Mongolia",
+"Montenegro",
+"Morocco",
+"Mozambique",
+"Myanmar",
+"Namibia",
+"Nauru",
+"Nepal",
+"Netherlands",
+"New Zealand",
+"Nicaragua",
+"Niger",
+"Nigeria",
+"North Korea",
+"North Macedonia",
+"Norway",
+"Oman",
+"Pakistan",
+"Palau",
+"Palestine",
+"Panama",
+"Papua New Guinea",
+"Paraguay",
+"Peru",
+"Philippines",
+"Poland",
+"Portugal",
+"Qatar",
+"Romania",
+"Russia",
+"Rwanda",
+"Saint Kitts and Nevis",
+"Saint Lucia",
+"Saint Vincent and the Grenadines",
+"Samoa",
+"San Marino",
+"Sao Tome and Principe",
+"Saudi Arabia",
+"Senegal",
+"Serbia",
+"Seychelles",
+"Sierra Leone",
+"Singapore",
+"Slovakia",
+"Slovenia",
+"Solomon Islands",
+"Somalia",
+"South Africa",
+"South Korea",
+"South Sudan",
+"Spain",
+"Sri Lanka",
+"Sudan",
+"Suriname",
+"Sweden",
+"Switzerland",
+"Syria",
+"Taiwan",
+"Tajikistan",
+"Tanzania",
+"Thailand",
+"Timor-Leste",
+"Togo",
+"Tonga",
+"Trinidad and Tobago",
+"Tunisia",
+"Turkey",
+"Turkmenistan",
+"Tuvalu",
+"Uganda",
+"Ukraine",
+"United Arab Emirates",
+"United Kingdom",
+"United States",
+"Uruguay",
+"Uzbekistan",
+"Vanuatu",
+"Vatican City",
+"Venezuela",
+"Vietnam",
+"Yemen",
+"Zambia",
+"Zimbabwe"
+];
+
+
+/* ============================================================
+   INIT
+============================================================ */
+
+document.addEventListener("DOMContentLoaded", async () => {
+
+  populateCountries();
+
+  const {
+    data: { session }
+  } = await db.auth.getSession();
+
+  if(session){
+    currentUser = session.user;
+    await startApp();
+  }else{
+    showAuthScreen();
+  }
+
+});
+
+
+/* ============================================================
+   AUTH SCREEN
+============================================================ */
+
+function showAuthScreen(){
+
+  document
+    .getElementById("authScreen")
+    .classList.remove("hidden");
+
+  document
+    .getElementById("app")
+    .classList.add("hidden");
+
+}
+
+
+function showAuth(type){
+
+  const loginForm =
+    document.getElementById("loginForm");
+
+  const signupForm =
+    document.getElementById("signupForm");
+
+  const loginTab =
+    document.getElementById("loginTab");
+
+  const signupTab =
+    document.getElementById("signupTab");
+
+  if(type === "login"){
+
+    loginForm.classList.remove("hidden");
+    signupForm.classList.add("hidden");
+
+    loginTab.classList.add("active");
+    signupTab.classList.remove("active");
+
+  }else{
+
+    loginForm.classList.add("hidden");
+    signupForm.classList.remove("hidden");
+
+    loginTab.classList.remove("active");
+    signupTab.classList.add("active");
+
+  }
+
+  document.getElementById("authMsg").textContent = "";
+
+}
+
+
+/* ============================================================
+   LOGIN
+============================================================ */
+
+async function login(){
+
+  const email =
+    document
+      .getElementById("loginEmail")
+      .value
+      .trim();
+
+  const password =
+    document
+      .getElementById("loginPassword")
+      .value;
+
+  if(!email || !password){
+
+    showAuthMessage(
+      "Enter your email and password.",
+      true
+    );
+
+    return;
+  }
+
+  showAuthMessage("Logging in...");
+
+  const {
+    data,
+    error
+  } = await db.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if(error){
+
+    showAuthMessage(
+      error.message,
+      true
+    );
+
+    return;
+  }
+
+  currentUser = data.user;
+
+  await startApp();
+
+}
+
+
+/* ============================================================
+   SIGNUP
+============================================================ */
+
+async function signup(){
+
+  const name =
+    document
+      .getElementById("signupName")
+      .value
+      .trim();
+
+  const email =
+    document
+      .getElementById("signupEmail")
+      .value
+      .trim();
+
+  const password =
+    document
+      .getElementById("signupPassword")
+      .value;
+
+  if(!name || !email || !password){
+
+    showAuthMessage(
+      "Fill in all fields.",
+      true
+    );
+
+    return;
+  }
+
+  if(password.length < 6){
+
+    showAuthMessage(
+      "Password must be at least 6 characters.",
+      true
+    );
+
+    return;
+  }
+
+  showAuthMessage("Creating account...");
+
+
+  const {
+    data,
+    error
+  } = await db.auth.signUp({
+
+    email,
+    password,
+
+    options:{
+      data:{
+        full_name:name
+      }
+    }
+
+  });
+
+
+  if(error){
+
+    showAuthMessage(
+      error.message,
+      true
+    );
+
+    return;
+  }
+
+
+  if(data.session){
+
+    currentUser = data.user;
+
+    await ensureProfile(name);
+
+    await startApp();
+
+  }else{
+
+    showAuthMessage(
+      "Account created. Check your email if confirmation is required."
+    );
+
+  }
+
+}
+
+
+/* ============================================================
+   PROFILE
+============================================================ */
+
+async function ensureProfile(name=""){
+
+  if(!currentUser) return;
+
+  const {
+    data
+  } = await db
+    .from("profiles")
+    .select("*")
+    .eq("id",currentUser.id)
+    .maybeSingle();
+
+  if(!data){
+
+    await db
+      .from("profiles")
+      .insert({
+        id:currentUser.id,
+        email:currentUser.email,
+        full_name:name,
+        balance:0,
+        role:"user"
+      });
+
+  }
+
+}
+
+
+async function loadProfile(){
+
+  if(!currentUser) return;
+
+  const {
+    data,
+    error
+  } = await db
+    .from("profiles")
+    .select("*")
+    .eq("id",currentUser.id)
+    .maybeSingle();
+
+  if(error){
+
+    console.error(error);
+
+    toast(
+      "Could not load your account.",
+      true
+    );
+
+    return;
+  }
+
+  if(!data){
+
+    await ensureProfile();
+
+    return loadProfile();
+
+  }
+
+  currentProfile = data;
+
+  updateProfileUI();
+
+}
+
+
+/* ============================================================
+   PROFILE UI
+============================================================ */
+
+function updateProfileUI(){
+
+  const balance =
+    Number(currentProfile?.balance || 0);
+
+  const formatted =
+    formatMoney(balance);
+
+  document.getElementById(
+    "homeBalance"
+  ).textContent = formatted;
+
+  document.getElementById(
+    "walletBalance"
+  ).textContent = formatted;
+
+
+  document.getElementById(
+    "topEmail"
+  ).textContent =
+    currentUser?.email || "";
+
+
+  document.getElementById(
+    "settingName"
+  ).textContent =
+    currentProfile?.full_name ||
+    currentProfile?.name ||
+    "Not set";
+
+
+  document.getElementById(
+    "settingEmail"
+  ).textContent =
+    currentUser?.email || "—";
+
+
+  document.getElementById(
+    "settingId"
+  ).textContent =
+    currentUser?.id || "—";
+
+}
+
+
+/* ============================================================
+   START APP
+============================================================ */
+
+async function startApp(){
+
+  document
+    .getElementById("authScreen")
+    .classList.add("hidden");
+
+  document
+    .getElementById("app")
+    .classList.remove("hidden");
+
+  await ensureProfile();
+
+  await loadProfile();
+
+  await loadPrices();
+
+  await loadOrders();
+
+  await loadTransactions();
+
+  go("home");
+
+}
+
+
+/* ============================================================
+   PRICES
+============================================================ */
+
+async function loadPrices(){
+
+  const {
+    data,
+    error
+  } = await db
+    .from("prices")
+    .select("*")
+    .eq("active",true)
+    .order("country");
+
+  if(error){
+
+    console.error(error);
+
+    pricesCache = [];
+
+    return;
+  }
+
+  pricesCache = data || [];
+
+  updateServices();
+
+}
+
+
+/* ============================================================
+   COUNTRIES DROPDOWN
+============================================================ */
+
+function populateCountries(){
+
+  const select =
+    document.getElementById(
+      "countrySelect"
+    );
+
+  if(!select) return;
+
+  select.innerHTML =
+    `<option value="">Select country</option>`;
+
+  COUNTRIES.forEach(country => {
+
+    const option =
+      document.createElement("option");
+
+    option.value = country;
+    option.textContent = country;
+
+    select.appendChild(option);
+
+  });
+
+}
+
+
+/* ============================================================
+   COUNTRY CHANGE
+============================================================ */
+
+function countryChanged(){
+
+  updateServices();
+
+  document.getElementById(
+    "priceBox"
+  ).innerHTML = `
+    <div class="price">
+      Select a service
+    </div>
+    <small>
+      Choose an available service for this country.
+    </small>
+  `;
+
+  document.getElementById(
+    "placeOrderBtn"
+  ).disabled = true;
+
+}
+
+
+/* ============================================================
+   SERVICE LIST
+============================================================ */
+
+function updateServices(){
+
+  const country =
+    document.getElementById(
+      "countrySelect"
+    ).value;
+
+  const select =
+    document.getElementById(
+      "serviceSelect"
+    );
+
+  select.innerHTML =
+    `<option value="">Select service</option>`;
+
+  if(!country){
+
+    select.disabled = true;
+
+    return;
+  }
+
+  const services = [
+    ...new Set(
+      pricesCache
+        .filter(
+          p =>
+            p.country.toLowerCase() ===
+            country.toLowerCase()
+        )
+        .map(p => p.service)
+    )
+  ];
+
+  services.forEach(service => {
+
+    const option =
+      document.createElement("option");
+
+    option.value = service;
+    option.textContent = service;
+
+    select.appendChild(option);
+
+  });
+
+  select.disabled =
+    services.length === 0;
+
+}
+
+
+/* ============================================================
+   SERVICE CHANGE
+============================================================ */
+
+function serviceChanged(){
+
+  const country =
+    document.getElementById(
+      "countrySelect"
+    ).value;
+
+  const service =
+    document.getElementById(
+      "serviceSelect"
+    ).value;
+
+  const priceBox =
+    document.getElementById(
+      "priceBox"
+    );
+
+  const button =
+    document.getElementById(
+      "placeOrderBtn"
+    );
+
+  button.disabled = true;
+
+  if(!country || !service){
+
+    priceBox.innerHTML = `
+      <div class="price">
+        Select a service
+      </div>
+      <small>
+        Choose a country and service.
+      </small>
+    `;
+
+    return;
+  }
+
+
+  const item =
+    pricesCache.find(
+      p =>
+        p.country.toLowerCase() ===
+          country.toLowerCase() &&
+        p.service.toLowerCase() ===
+          service.toLowerCase()
+    );
+
+
+  if(!item){
+
+    priceBox.innerHTML = `
+      <div class="price">
+        Not available
+      </div>
+      <small>
+        This service is currently unavailable.
+      </small>
+    `;
+
+    return;
+  }
+
+
+  const price =
+    Number(item.customer_price || 0);
+
+  if(price <= 0){
+
+    priceBox.innerHTML = `
+      <div class="price">
+        Not available
+      </div>
+      <small>
+        This service has not been activated yet.
+      </small>
+    `;
+
+    return;
+  }
+
+
+  priceBox.innerHTML = `
+    <div class="price">
+      ${escapeHTML(
+        item.currency || "NGN"
+      )}
+      ${price.toLocaleString(
+        "en-NG",
+        {
+          minimumFractionDigits:2
+        }
+      )}
+    </div>
+
+    <small>
+      Current customer price
+    </small>
+  `;
+
+  button.disabled = false;
+
+}
+
+
+/* ============================================================
+   PLACE ORDER
+============================================================ */
+
+async function placeOrder(){
+
+  const country =
+    document.getElementById(
+      "countrySelect"
+    ).value;
+
+  const service =
+    document.getElementById(
+      "serviceSelect"
+    ).value;
+
+  const button =
+    document.getElementById(
+      "placeOrderBtn"
+    );
+
+
+  if(!country || !service){
+
+    toast(
+      "Select a country and service.",
+      true
+    );
+
+    return;
+  }
+
+
+  button.disabled = true;
+  button.textContent = "Processing...";
+
+
+  try{
+
+    const {
+      data,
+      error
+    } = await db.rpc(
+      "place_order",
+      {
+        p_country:country,
+        p_service:service
+      }
+    );
+
+
+    if(error){
+
+      throw error;
+
+    }
+
+
+    if(!data?.success){
+
+      throw new Error(
+        data?.message ||
+        "Order could not be created."
+      );
+
+    }
+
+
+    toast(
+      "Order created successfully."
+    );
+
+
+    document.getElementById(
+      "countrySelect"
+    ).value = "";
+
+    document.getElementById(
+      "serviceSelect"
+    ).innerHTML =
+      `<option value="">Select service</option>`;
+
+    document.getElementById(
+      "serviceSelect"
+    ).disabled = true;
+
+    document.getElementById(
+      "priceBox"
+    ).innerHTML = `
+      <div class="price">
+        Select a service
+      </div>
+      <small>
+        Your order is now pending fulfillment.
+      </small>
+    `;
+
+
+    await loadProfile();
+
+    await loadOrders();
+
+    go("orders");
+
+
+  }catch(error){
+
+    console.error(error);
+
+    toast(
+      error.message ||
+      "Order failed.",
+      true
+    );
+
+  }finally{
+
+    button.textContent =
+      "Place Order";
+
+    button.disabled = false;
+
+  }
+
+}
+
+
+/* ============================================================
+   LOAD ORDERS
+============================================================ */
+
+async function loadOrders(){
+
+  if(!currentUser) return;
+
+
+  const {
+    data,
+    error
+  } = await db
+    .from("orders")
+    .select("*")
+    .eq("user_id",currentUser.id)
+    .order("created_at",{ascending:false})
+    .limit(50);
+
+
+  if(error){
+
+    console.error(error);
+
+    document.getElementById(
+      "ordersList"
+    ).innerHTML =
+      `<div class="empty">Could not load orders.</div>`;
+
+    return;
+  }
+
+
+  renderOrders(
+    data || []
+  );
+
+  renderHomeOrders(
+    data || []
+  );
+
+}
+
+
+/* ============================================================
+   RENDER ORDERS
+============================================================ */
+
+function renderOrders(orders){
+
+  const box =
+    document.getElementById(
+      "ordersList"
+    );
+
+  if(!orders.length){
+
+    box.innerHTML = `
+      <div class="card empty">
+        You have no orders yet.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  box.innerHTML =
+    orders.map(order => {
+
+      const status =
+        String(
+          order.status || "pending"
+        ).toLowerCase();
+
+      const date =
+        formatDate(
+          order.created_at
+        );
+
+      const assigned =
+        order.assigned_number;
+
+
+      return `
+        <div class="orderItem">
+
+          <div class="orderTop">
+
+            <div>
+
+              <div class="orderCountry">
+                ${escapeHTML(
+                  order.country || "Unknown"
+                )}
+              </div>
+
+              <div class="orderDate">
+                ${escapeHTML(
+                  order.service || ""
+                )}
+                •
+                ${escapeHTML(date)}
+              </div>
+
+            </div>
+
+            <div class="status ${escapeHTML(status)}">
+              ${escapeHTML(
+                capitalize(status)
+              )}
+            </div>
+
+          </div>
+
+
+          <div style="margin-top:12px;font-weight:bold">
+            ${formatMoney(
+              Number(order.price || 0)
+            )}
+          </div>
+
+
+          ${
+            assigned
+              ? `
+                <div class="numberBox">
+                  ${escapeHTML(
+                    assigned
+                  )}
+                </div>
+              `
+              : `
+                <div
+                  style="
+                    margin-top:12px;
+                    color:#888;
+                    font-size:12px
+                  "
+                >
+                  Waiting for fulfillment.
+                </div>
+              `
+          }
+
+        </div>
+      `;
+
+    }).join("");
+
+}
+
+
+/* ============================================================
+   HOME ORDERS
+============================================================ */
+
+function renderHomeOrders(orders){
+
+  const box =
+    document.getElementById(
+      "homeOrders"
+    );
+
+  const recent =
+    orders.slice(0,3);
+
+
+  if(!recent.length){
+
+    box.innerHTML = `
+      <div class="card empty">
+        No orders yet.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  box.innerHTML =
+    recent.map(order => {
+
+      const status =
+        String(
+          order.status || "pending"
+        ).toLowerCase();
+
+
+      return `
+        <div class="orderItem">
+
+          <div class="orderTop">
+
+            <div>
+              <div class="orderCountry">
+                ${escapeHTML(
+                  order.country || ""
+                )}
+              </div>
+
+              <div class="orderDate">
+                ${escapeHTML(
+                  order.service || ""
+                )}
+              </div>
+            </div>
+
+            <div class="status ${escapeHTML(status)}">
+              ${escapeHTML(
+                capitalize(status)
+              )}
+            </div>
+
+          </div>
+
+        </div>
+      `;
+
+    }).join("");
+
+}
+
+
+/* ============================================================
+   TRANSACTIONS
+============================================================ */
+
+async function loadTransactions(){
+
+  if(!currentUser) return;
+
+
+  const box =
+    document.getElementById(
+      "transactionsList"
+    );
+
+
+  const [
+    paymentsResult,
+    ordersResult
+  ] = await Promise.all([
+
+    db
+      .from("payment_requests")
+      .select("*")
+      .eq("user_id",currentUser.id)
+      .order("created_at",{ascending:false})
+      .limit(50),
+
+    db
+      .from("orders")
+      .select("*")
+      .eq("user_id",currentUser.id)
+      .order("created_at",{ascending:false})
+      .limit(50)
+
+  ]);
+
+
+  const payments =
+    paymentsResult.data || [];
+
+  const orders =
+    ordersResult.data || [];
+
+
+  const items = [];
+
+
+  payments.forEach(payment => {
+
+    items.push({
+      type:"payment",
+      title:"Wallet Top Up",
+      date:payment.created_at,
+      amount:Number(payment.amount || 0),
+      status:payment.status
+    });
+
+  });
+
+
+  orders.forEach(order => {
+
+    items.push({
+      type:"order",
+      title:
+        "Number Order • " +
+        (order.country || ""),
+      date:order.created_at,
+      amount:-Number(order.price || 0),
+      status:order.status
+    });
+
+  });
+
+
+  items.sort(
+    (a,b) =>
+      new Date(b.date) -
+      new Date(a.date)
+  );
+
+
+  if(!items.length){
+
+    box.innerHTML = `
+      <div class="card empty">
+        No transactions yet.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  box.innerHTML =
+    items.slice(0,50).map(item => {
+
+      const isPlus =
+        item.amount >= 0;
+
+      return `
+        <div class="transaction">
+
+          <div>
+
+            <div class="transactionTitle">
+              ${escapeHTML(
+                item.title
+              )}
+            </div>
+
+            <div class="transactionDate">
+              ${escapeHTML(
+                formatDate(item.date)
+              )}
+              •
+              ${escapeHTML(
+                capitalize(
+                  item.status || ""
+                )
+              )}
+            </div>
+
+          </div>
+
+
+          <div
+            class="amount ${isPlus ? "plus" : "minus"}"
+          >
+            ${isPlus ? "+" : ""}
+            ${formatMoney(
+              Math.abs(item.amount)
+            )}
+          </div>
+
+        </div>
+      `;
+
+    }).join("");
+
+}
+
+
+/* ============================================================
+   TOP UP
+============================================================ */
+
+function openTopup(){
+
+  document
+    .getElementById("topupModal")
+    .classList.add("show");
+
+}
+
+
+function closeTopup(){
+
+  document
+    .getElementById("topupModal")
+    .classList.remove("show");
+
+}
+
+
+function closeModalOutside(event){
+
+  if(event.target.id === "topupModal"){
+
+    closeTopup();
+
+  }
+
+}
+
+
+/* ============================================================
+   SUBMIT TOP UP
+============================================================ */
+
+async function submitTopup(){
+
+  const amount =
+    Number(
+      document
+        .getElementById("topupAmount")
+        .value
+    );
+
+  const reference =
+    document
+      .getElementById("topupReference")
+      .value
+      .trim();
+
+
+  if(!amount || amount <= 0){
+
+    toast(
+      "Enter a valid amount.",
+      true
+    );
+
+    return;
+  }
+
+
+  if(!reference){
+
+    toast(
+      "Enter your payment reference.",
+      true
+    );
+
+    return;
+  }
+
+
+  const {
+    error
+  } = await db
+    .from("payment_requests")
+    .insert({
+
+      user_id:currentUser.id,
+
+      amount:amount,
+
+      reference:reference,
+
+      status:"pending"
+
+    });
+
+
+  if(error){
+
+    console.error(error);
+
+    toast(
+      error.message ||
+      "Could not submit payment.",
+      true
+    );
+
+    return;
+  }
+
+
+  document.getElementById(
+    "topupAmount"
+  ).value = "";
+
+  document.getElementById(
+    "topupReference"
+  ).value = "";
+
+
+  closeTopup();
+
+  toast(
+    "Payment submitted. Waiting for approval."
+  );
+
+
+  await loadTransactions();
+
+}
+
+
+/* ============================================================
+   SUPPORT MESSAGE
+============================================================ */
+
+async function sendSupportMessage(){
+
+  const message =
+    document
+      .getElementById("supportMessage")
+      .value
+      .trim();
+
+
+  if(!message){
+
+    toast(
+      "Write a message first.",
+      true
+    );
+
+    return;
+  }
+
+
+  const {
+    error
+  } = await db
+    .from("messages")
+    .insert({
+
+      user_id:currentUser.id,
+
+      message:message
+
+    });
+
+
+  if(error){
+
+    console.error(error);
+
+    toast(
+      error.message ||
+      "Could not send message.",
+      true
+    );
+
+    return;
+  }
+
+
+  document.getElementById(
+    "supportMessage"
+  ).value = "";
+
+
+  toast(
+    "Message sent successfully."
+  );
+
+}
+
+
+/* ============================================================
+   NAVIGATION
+============================================================ */
+
+function go(page){
+
+  currentPage = page;
+
+
+  document
+    .querySelectorAll(".page")
+    .forEach(section => {
+
+      section.classList.remove(
+        "active"
+      );
+
+    });
+
+
+  const target =
+    document.getElementById(
+      "page-" + page
+    );
+
+
+  if(target){
+
+    target.classList.add(
+      "active"
+    );
+
+  }
+
+
+  document
+    .querySelectorAll(".navBtn")
+    .forEach(button => {
+
+      button.classList.toggle(
+        "active",
+        button.dataset.page === page
+      );
+
+    });
+
+
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
+
+
+  if(page === "orders"){
+
+    loadOrders();
+
+  }
+
+  if(page === "wallet"){
+
+    loadProfile();
+    loadTransactions();
+
+  }
+
+  if(page === "order"){
+
+    loadPrices();
+
+  }
+
+}
+
+
+/* ============================================================
+   REFRESH EVERYTHING
+============================================================ */
+
+async function loadAll(){
+
+  toast("Refreshing...");
+
+  await loadProfile();
+
+  await loadPrices();
+
+  await loadOrders();
+
+  await loadTransactions();
+
+  toast("Updated.");
+
+}
+
+
+/* ============================================================
+   LOGOUT
+============================================================ */
+
+async function logout(){
+
+  await db.auth.signOut();
+
+  currentUser = null;
+  currentProfile = null;
+
+  document
+    .getElementById("app")
+    .classList.add("hidden");
+
+  document
+    .getElementById("authScreen")
+    .classList.remove("hidden");
+
+  showAuth("login");
+
+}
+
+
+/* ============================================================
+   AUTH MESSAGE
+============================================================ */
+
+function showAuthMessage(
+  message,
+  error=false
+){
+
+  const el =
+    document.getElementById(
+      "authMsg"
+    );
+
+  el.textContent = message;
+
+  el.className =
+    "authMsg " +
+    (error ? "error" : "success");
+
+}
+
+
+/* ============================================================
+   TOAST
+============================================================ */
+
+let toastTimer;
+
+function toast(
+  message,
+  error=false
+){
+
+  const el =
+    document.getElementById(
+      "toast"
+    );
+
+  el.textContent =
+    message;
+
+  el.style.background =
+    error ? "#b91c1c" : "#171717";
+
+  el.classList.add("show");
+
+  clearTimeout(toastTimer);
+
+  toastTimer =
+    setTimeout(() => {
+
+      el.classList.remove(
+        "show"
+      );
+
+    },3000);
+
+}
+
+
+/* ============================================================
+   HELPERS
+============================================================ */
+
+function formatMoney(amount){
+
+  return "₦" +
+    Number(amount || 0)
+      .toLocaleString(
+        "en-NG",
+        {
+          minimumFractionDigits:2,
+          maximumFractionDigits:2
+        }
+      );
+
+}
+
+
+function formatDate(date){
+
+  if(!date) return "";
+
+  try{
+
+    return new Date(date)
+      .toLocaleString(
+        "en-NG",
+        {
+          dateStyle:"medium",
+          timeStyle:"short"
+        }
+      );
+
+  }catch{
+
+    return String(date);
+
+  }
+
+}
+
+
+function capitalize(text){
+
+  if(!text) return "";
+
+  return text.charAt(0).toUpperCase() +
+    text.slice(1);
+
+}
+
+
+function escapeHTML(value){
+
+  return String(
+    value ?? ""
+  )
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+
+}
+
+
+/* ============================================================
+   AUTH STATE LISTENER
+============================================================ */
+
+db.auth.onAuthStateChange(
+  async (event,session) => {
+
+    if(event === "SIGNED_OUT"){
+
+      currentUser = null;
+
+      return;
+    }
+
+
+    if(session && !currentUser){
+
+      currentUser =
+        session.user;
+
+      await startApp();
+
+    }
+
+  }
+);
+
+</script>
+
+</body>
+</html>
