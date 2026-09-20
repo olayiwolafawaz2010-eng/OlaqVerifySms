@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>OlaqVerify</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#f5f3ff;
+  color:#17121f;
+}
+
+header{
+  background:linear-gradient(135deg,#5b21b6,#7c3aed);
+  color:white;
+  padding:20px;
+}
+
+header h1{
+  margin:0;
+  font-size:24px;
+}
+
+header p{
+  margin:5px 0 0;
+  opacity:.85;
+  font-size:13px;
+}
+
+main{
+  max-width:700px;
+  margin:auto;
+  padding:15px;
+}
+
+.page{display:none}
+.page.active{display:block}
+
+.card{
+  background:white;
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:14px;
+  box-shadow:0 3px 15px #0000000d;
+}
+
+h2,h3{
+  color:#4c1d95;
+}
+
+input,select,textarea{
+  width:100%;
+  padding:13px;
+  border:1px solid #ddd;
+  border-radius:10px;
+  margin:6px 0 12px;
+  font-size:15px;
+}
+
+button{
+  cursor:pointer;
+}
+
+.primary{
+  width:100%;
+  padding:13px;
+  border:0;
+  border-radius:10px;
+  background:#5b21b6;
+  color:white;
+  font-weight:bold;
+  font-size:15px;
+}
+
+.secondary{
+  width:100%;
+  padding:12px;
+  border:0;
+  border-radius:10px;
+  background:#eee8ff;
+  color:#4c1d95;
+  font-weight:bold;
+}
+
+.nav{
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  background:white;
+  border-top:1px solid #ddd;
+  display:flex;
+  justify-content:space-around;
+  padding:8px;
+  z-index:20;
+}
+
+.nav button{
+  border:0;
+  background:none;
+  color:#777;
+  font-size:12px;
+}
+
+.nav button.active{
+  color:#5b21b6;
+  font-weight:bold;
+}
+
+body{
+  padding-bottom:70px;
+}
+
+.balance{
+  font-size:30px;
+  font-weight:bold;
+  color:#5b21b6;
+}
+
+.order{
+  border:1px solid #eee;
+  border-radius:13px;
+  padding:14px;
+  margin-bottom:12px;
+}
+
+.status{
+  display:inline-block;
+  padding:5px 9px;
+  border-radius:20px;
+  font-size:12px;
+  font-weight:bold;
+}
+
+.pending{
+  background:#fff7ed;
+  color:#c2410c;
+}
+
+.fulfilled{
+  background:#dcfce7;
+  color:#166534;
+}
+
+.message{
+  background:#f7f3ff;
+  border-left:4px solid #5b21b6;
+  padding:12px;
+  border-radius:9px;
+  margin-top:10px;
+}
+
+.small{
+  color:#777;
+  font-size:12px;
+}
+
+.error{
+  background:#fee2e2;
+  color:#b91c1c;
+  padding:11px;
+  border-radius:10px;
+  margin-top:10px;
+}
+
+.success{
+  background:#dcfce7;
+  color:#166534;
+  padding:11px;
+  border-radius:10px;
+  margin-top:10px;
+}
+
+.login{
+  max-width:430px;
+  margin:50px auto;
+}
+
+.hidden{
+  display:none!important;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>OlaqVerify</h1>
+  <p>Secure number verification service</p>
+</header>
+
+<main>
+
+<!-- LOGIN -->
+<section id="loginPage" class="page active">
+  <div class="card login">
+
+    <h2>Welcome</h2>
+
+    <input
+      id="email"
+      type="email"
+      placeholder="Email"
+    >
+
+    <input
+      id="password"
+      type="password"
+      placeholder="Password"
+    >
+
+    <button class="primary" onclick="login()">
+      Sign In
+    </button>
+
+    <br><br>
+
+    <button class="secondary" onclick="signup()">
+      Create Account
+    </button>
+
+    <div id="authResult"></div>
+
+  </div>
+</section>
+
+
+<!-- HOME -->
+<section id="homePage" class="page">
+
+  <div class="card">
+
+    <div class="small">Wallet Balance</div>
+
+    <div class="balance">
+      ₦<span id="balance">0.00</span>
+    </div>
+
+    <br>
+
+    <button class="primary" onclick="go('buyPage')">
+      Buy Number
+    </button>
+
+  </div>
+
+  <div class="card">
+
+    <h3>Quick Actions</h3>
+
+    <button class="secondary" onclick="go('ordersPage')">
+      My Orders
+    </button>
+
+    <br><br>
+
+    <button class="secondary" onclick="go('walletPage')">
+      Wallet
+    </button>
+
+    <br><br>
+
+    <button class="secondary" onclick="openSupport()">
+      WhatsApp Support
+    </button>
+
+  </div>
+
+</section>
+
+
+<!-- BUY -->
+<section id="buyPage" class="page">
+
+  <div class="card">
+
+    <h2>Buy Number</h2>
+
+    <label>Country</label>
+
+    <select id="country" onchange="updateServices()">
+      <option value="">Select country</option>
+    </select>
+
+    <label>Service</label>
+
+    <select id="service" onchange="updatePrice()">
+      <option value="">Select service</option>
+    </select>
+
+    <div class="card" style="background:#f7f3ff">
+
+      <div class="small">Price</div>
+
+      <h2>
+        ₦<span id="orderPrice">0.00</span>
+      </h2>
+
+    </div>
+
+    <button class="primary" onclick="placeOrder()">
+      Buy Number
+    </button>
+
+    <div id="orderResult"></div>
+
+  </div>
+
+</section>
+
+
+<!-- ORDERS -->
+<section id="ordersPage" class="page">
+
+  <div class="card">
+
+    <h2>My Orders</h2>
+
+    <div id="ordersList">
+      Loading...
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ORDER DETAILS -->
+<section id="orderDetailsPage" class="page">
+
+  <div class="card">
+
+    <button class="secondary" onclick="go('ordersPage')">
+      ← Back to Orders
+    </button>
+
+    <div id="orderDetails"></div>
+
+  </div>
+
+  <div class="card">
+
+    <h3>SMS Messages</h3>
+
+    <div id="smsMessages">
+      No SMS received yet.
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- WALLET -->
+<section id="walletPage" class="page">
+
+  <div class="card">
+
+    <h2>Wallet</h2>
+
+    <div class="balance">
+      ₦<span id="walletBalance">0.00</span>
+    </div>
+
+    <br>
+
+    <button class="primary" onclick="showTopup()">
+      Add Money
+    </button>
+
+    <div id="topupBox" class="hidden">
+
+      <hr>
+
+      <h3>Bank Transfer</h3>
+
+      <p>
+        <b>Bank:</b> PalmPay
+      </p>
+
+      <p>
+        <b>Account Number:</b> 8164886717
+      </p>
+
+      <p>
+        <b>Account Name:</b> Adekunle
+      </p>
+
+      <p>
+        <b>Balance:</b> ₦0.00
+      </p>
+
+      <input
+        id="topupAmount"
+        type="number"
+        placeholder="Amount sent"
+      >
+
+      <input
+        id="topupReference"
+        placeholder="Transfer reference"
+      >
+
+      <button class="primary" onclick="submitTopup()">
+        Submit Payment
+      </button>
+
+      <div id="topupResult"></div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- SETTINGS -->
+<section id="settingsPage" class="page">
+
+  <div class="card">
+
+    <h2>Settings</h2>
+
+    <p id="accountEmail"></p>
+
+    <button class="primary" onclick="logout()">
+      Logout
+    </button>
+
+  </div>
+
+</section>
+
+</main>
+
+
+<!-- NAVIGATION -->
+
+<div id="nav" class="nav hidden">
+
+  <button onclick="go('homePage')">
+    Home
+  </button>
+
+  <button onclick="go('buyPage')">
+    Buy
+  </button>
+
+  <button onclick="go('ordersPage')">
+    Orders
+  </button>
+
+  <button onclick="go('walletPage')">
+    Wallet
+  </button>
+
+  <button onclick="go('settingsPage')">
+    Settings
+  </button>
+
+</div>
+
+
+<script>
+
+/* =========================
+   SUPABASE
+========================= */
+
+const SUPABASE_URL =
+"https://alemtvfchysptzgzhaap.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_UEnF6pfZ2ORRcuIQUzgbRw_6bWNDnKm";
+
+const db = supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+let currentUser = null;
+let prices = [];
+let currentOrder = null;
+
+
+/* =========================
+   ESCAPE HTML
+========================= */
+
+function escapeHTML(value){
+
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+
+/* =========================
+   NAVIGATION
+========================= */
+
+function go(page){
+
+  document
+    .querySelectorAll(".page")
+    .forEach(x => x.classList.remove("active"));
+
+  const target =
+    document.getElementById(page);
+
+  if(target){
+    target.classList.add("active");
+  }
+
+  if(page === "homePage"){
+    loadProfile();
+  }
+
+  if(page === "buyPage"){
+    loadPrices();
+  }
+
+  if(page === "ordersPage"){
+    loadOrders();
+  }
+
+  if(page === "walletPage"){
+    loadProfile();
+  }
+}
+
+
+/* =========================
+   SIGN UP
+========================= */
+
+async function signup(){
+
+  const email =
+    document.getElementById("email").value.trim();
+
+  const password =
+    document.getElementById("password").value;
+
+  const result =
+    document.getElementById("authResult");
+
+  if(!email || !password){
+    result.innerHTML =
+      `<div class="error">Enter email and password.</div>`;
+    return;
+  }
+
+  const {data,error} =
+    await db.auth.signUp({
+      email,
+      password
+    });
+
+  if(error){
+
+    result.innerHTML =
+      `<div class="error">${escapeHTML(error.message)}</div>`;
+
+    return;
+  }
+
+  result.innerHTML =
+    `<div class="success">
+      Account created. You can now sign in.
+    </div>`;
+}
+
+
+/* =========================
+   LOGIN
+========================= */
+
+async function login(){
+
+  const email =
+    document.getElementById("email").value.trim();
+
+  const password =
+    document.getElementById("password").value;
+
+  const result =
+    document.getElementById("authResult");
+
+  if(!email || !password){
+
+    result.innerHTML =
+      `<div class="error">
+        Enter email and password.
+      </div>`;
+
+    return;
+  }
+
+  const {data,error} =
+    await db.auth.signInWithPassword({
+      email,
+      password
+    });
+
+  if(error){
+
+    result.innerHTML =
+      `<div class="error">
+        ${escapeHTML(error.message)}
+      </div>`;
+
+    return;
+  }
+
+  currentUser = data.user;
+
+  await startApp();
+}
+
+
+/* =========================
+   START APP
+========================= */
+
+async function startApp(){
+
+  document
+    .getElementById("loginPage")
+    .classList.remove("active");
+
+  document
+    .getElementById("nav")
+    .classList.remove("hidden");
+
+  document
+    .getElementById("accountEmail")
+    .textContent =
+    currentUser.email || "";
+
+  await loadProfile();
+
+  go("homePage");
+}
+
+
+/* =========================
+   PROFILE
+========================= */
+
+async function loadProfile(){
+
+  if(!currentUser) return;
+
+  const {data,error} =
+    await db
+      .from("profiles")
+      .select("*")
+      .eq("id",currentUser.id)
+      .maybeSingle();
+
+  if(error){
+
+    console.error(error);
+
+    return;
+  }
+
+  const balance =
+    Number(data?.balance || 0);
+
+  document.getElementById("balance")
+    .textContent =
+    balance.toFixed(2);
+
+  document.getElementById("walletBalance")
+    .textContent =
+    balance.toFixed(2);
+}
+
+
+/* =========================
+   LOAD PRICES
+========================= */
+
+async function loadPrices(){
+
+  const {data,error} =
+    await db
+      .from("prices")
+      .select("*")
+      .eq("active",true)
+      .order("country");
+
+  if(error){
+
+    document.getElementById("orderResult")
+      .innerHTML =
+      `<div class="error">
+        ${escapeHTML(error.message)}
+      </div>`;
+
+    return;
+  }
+
+  prices = data || [];
+
+  const countries =
+    [...new Set(
+      prices.map(x => x.country)
+    )];
+
+  const select =
+    document.getElementById("country");
+
+  const old =
+    select.value;
+
+  select.innerHTML =
+    `<option value="">Select country</option>` +
+    countries.map(c =>
+      `<option value="${escapeHTML(c)}">
+        ${escapeHTML(c)}
+      </option>`
+    ).join("");
+
+  if(countries.includes(old)){
+    select.value = old;
+  }
+
+  updateServices();
+}
+
+
+/* =========================
+   SERVICES
+========================= */
+
+function updateServices(){
+
+  const country =
+    document.getElementById("country").value;
+
+  const select =
+    document.getElementById("service");
+
+  const services =
+    prices
+      .filter(x => x.country === country)
+      .map(x => x.service);
+
+  select.innerHTML =
+    `<option value="">Select service</option>` +
+    services.map(s =>
+      `<option value="${escapeHTML(s)}">
+        ${escapeHTML(s)}
+      </option>`
+    ).join("");
+
+  updatePrice();
+}
+
+
+/* =========================
+   PRICE
+========================= */
+
+function updatePrice(){
+
+  const country =
+    document.getElementById("country").value;
+
+  const service =
+    document.getElementById("service").value;
+
+  const row =
+    prices.find(x =>
+      x.country === country &&
+      x.service === service
+    );
+
+  document.getElementById("orderPrice")
+    .textContent =
+    Number(row?.customer_price || 0)
+      .toFixed(2);
+}
+
+
+/* =========================
+   PLACE ORDER
+========================= */
+
+async function placeOrder(){
+
+  const country =
+    document.getElementById("country").value;
+
+  const service =
+    document.getElementById("service").value;
+
+  const result =
+    document.getElementById("orderResult");
+
+  result.innerHTML = "";
+
+  if(!country || !service){
+
+    result.innerHTML =
+      `<div class="error">
+        Select a country and service.
+      </div>`;
+
+    return;
+  }
+
+  const row =
+    prices.find(x =>
+      x.country === country &&
+      x.service === service
+    );
+
+  if(!row){
+
+    result.innerHTML =
+      `<div class="error">
+        This service is unavailable.
+      </div>`;
+
+    return;
+  }
+
+  const {data,error} =
+    await db.rpc("place_order",{
+      p_country:country,
+      p_service:service
+    });
+
+  if(error){
+
+    result.innerHTML =
+      `<div class="error">
+        ${escapeHTML(error.message)}
+      </div>`;
+
+    return;
+  }
+
+  result.innerHTML =
+    `<div class="success">
+      Order placed successfully. Waiting for fulfillment.
+    </div>`;
+
+  await loadProfile();
+
+  setTimeout(() => {
+    go("ordersPage");
+  },800);
+}
+
+
+/* =========================
+   LOAD ORDERS
+========================= */
+
+async function loadOrders(){
+
+  const box =
+    document.getElementById("ordersList");
+
+  box.innerHTML = "Loading...";
+
+  const {data,error} =
+    await db
+      .from("orders")
+      .select("*")
+      .eq("user_id",currentUser.id)
+      .order("created_at",{ascending:false});
+
+  if(error){
+
+    box.innerHTML =
+      `<div class="error">
+        ${escapeHTML(error.message)}
+      </div>`;
+
+    return;
+  }
+
+  if(!data || !data.length){
+
+    box.innerHTML =
+      `<p>No orders yet.</p>`;
+
+    return;
+  }
+
+  box.innerHTML =
+    data.map(o => `
+
+      <div class="order">
+
+        <div>
+          <b>
+            ${escapeHTML(o.country || "")}
+          </b>
+
+          <span class="status ${
+            o.status === "fulfilled"
+            ? "fulfilled"
+            : "pending"
+          }">
+            ${escapeHTML(o.status || "")}
+          </span>
+        </div>
+
+        <p>
+          Service:
+          ${escapeHTML(o.service || "")}
+        </p>
+
+        <p>
+          Number:
+          <b>
+            ${escapeHTML(
+              o.assigned_number ||
+              "Waiting for fulfillment"
+            )}
+          </b>
+        </p>
+
+        <button
+          class="secondary"
+          onclick="openOrder('${o.id}')">
+          View Order & SMS
+        </button>
+
+      </div>
+
+    `).join("");
+}
+
+
+/* =========================
+   OPEN ORDER
+========================= */
+
+async function openOrder(orderId){
+
+  const {data,error} =
+    await db
+      .from("orders")
+      .select("*")
+      .eq("id",orderId)
+      .eq("user_id",currentUser.id)
+      .single();
+
+  if(error){
+
+    alert(error.message);
+
+    return;
+  }
+
+  currentOrder = data;
+
+  document.getElementById("orderDetails")
+    .innerHTML = `
+
+      <h2>Order Details</h2>
+
+      <p>
+        <b>Country:</b>
+        ${escapeHTML(data.country || "")}
+      </p>
+
+      <p>
+        <b>Service:</b>
+        ${escapeHTML(data.service || "")}
+      </p>
+
+      <p>
+        <b>Status:</b>
+        ${escapeHTML(data.status || "")}
+      </p>
+
+      <p>
+        <b>Number:</b>
+        <br>
+        <strong style="font-size:20px;color:#5b21b6">
+          ${escapeHTML(
+            data.assigned_number ||
+            "Waiting for fulfillment"
+          )}
+        </strong>
+      </p>
+
+      <p class="small">
+        Order ID: ${escapeHTML(data.id)}
+      </p>
+    `;
+
+  go("orderDetailsPage");
+
+  await loadOrderMessages(data.id);
+}
+
+
+/* =========================
+   LOAD SMS FOR ORDER
+========================= */
+
+async function loadOrderMessages(orderId){
+
+  const box =
+    document.getElementById("smsMessages");
+
+  box.innerHTML = "Loading SMS...";
+
+  const {data,error} =
+    await db
+      .from("messages")
+      .select(
+        "id,order_id,user_id,phone_number,sender,message,created_at"
+      )
+      .eq("order_id",orderId)
+      .eq("user_id",currentUser.id)
+      .order("created_at",{ascending:true});
+
+  if(error){
+
+    box.innerHTML =
+      `<div class="error">
+        ${escapeHTML(error.message)}
+      </div>`;
+
+    return;
+  }
+
+  if(!data || data.length === 0){
+
+    box.innerHTML =
+      `<p class="small">
+        No SMS received yet.
+      </p>`;
+
+    return;
+  }
+
+  box.innerHTML =
+    data.map(sms => `
+
+      <div class="message">
+
+        <b>
+          ${escapeHTML(sms.sender || "SMS")}
+        </b>
+
+        <div style="margin-top:8px">
+          ${escapeHTML(sms.message || "")}
+        </div>
+
+        ${
+          sms.phone_number
+          ? `
+            <div class="small" style="margin-top:8px">
+              Number: ${escapeHTML(sms.phone_number)}
+            </div>
+          `
+          : ""
+        }
+
+        <div class="small" style="margin-top:5px">
+          ${new Date(
+            sms.created_at
+          ).toLocaleString()}
+        </div>
+
+      </div>
+
+    `).join("");
+}
+
+
+/* =========================
+   TOP UP
+========================= */
+
+function showTopup(){
+
+  document
+    .getElementById("topupBox")
+    .classList.toggle("hidden");
+}
+
+
+async function submitTopup(){
+
+  const amount =
+    Number(
+      document.getElementById("topupAmount").value
+    );
+
+  const reference =
+    document
+      .getElementById("topupReference")
+      .value.trim();
+
+  const result =
+    document.getElementById("topupResult");
+
+  if(!amount || amount <= 0){
+
+    result.innerHTML =
+      `<div class="error">
+        Enter a valid amount.
+      </div>`;
+
+    return;
+  }
+
+  if(!reference){
+
+    result.innerHTML =
+      `<div class="error">
+        Enter your transfer reference.
+      </div>`;
+
+    return;
+  }
+
+  const {error} =
+    await db
+      .from("payment_requests")
+      .insert({
+        user_id:currentUser.id,
+        amount:amount,
+        reference:reference,
+        status:"pending"
+      });
+
+  if(error){
+
+    result.innerHTML =
+      `<div class="error">
+        ${escapeHTML(error.message)}
+      </div>`;
+
+    return;
+  }
+
+  result.innerHTML =
+    `<div class="success">
+      Payment submitted. Waiting for admin approval.
+    </div>`;
+
+  document.getElementById("topupAmount").value = "";
+  document.getElementById("topupReference").value = "";
+}
+
+
+/* =========================
+   SUPPORT
+========================= */
+
+function openSupport(){
+
+  window.open(
+    "https://wa.me/2348164886717",
+    "_blank"
+  );
+}
+
+
+/* =========================
+   LOGOUT
+========================= */
+
+async function logout(){
+
+  await db.auth.signOut();
+
+  currentUser = null;
+
+  document
+    .getElementById("nav")
+    .classList.add("hidden");
+
+  document
+    .querySelectorAll(".page")
+    .forEach(x =>
+      x.classList.remove("active")
+    );
+
+  document
+    .getElementById("loginPage")
+    .classList.add("active");
+}
+
+
+/* =========================
+   AUTO LOGIN
+========================= */
+
+(async function(){
+
+  const {data} =
+    await db.auth.getSession();
+
+  if(data.session){
+
+    currentUser =
+      data.session.user;
+
+    await startApp();
+  }
+
+})();
+
+</script>
+
+</body>
+</html>
