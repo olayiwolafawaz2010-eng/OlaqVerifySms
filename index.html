@@ -1,0 +1,2685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#5b21b6">
+<title>OlaqVerify</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root{
+  --purple:#5b21b6;
+  --purple2:#3b0764;
+  --purple3:#7c3aed;
+  --light:#f5f3ff;
+  --card:#fff;
+  --text:#17121f;
+  --muted:#777080;
+  --border:#e9e4ef;
+  --green:#16a34a;
+  --red:#dc2626;
+  --orange:#ea580c;
+  --shadow:0 10px 30px rgba(44,20,80,.08);
+}
+
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+body{
+  font-family:Arial,Helvetica,sans-serif;
+  background:var(--light);
+  color:var(--text);
+}
+
+button,input{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+}
+
+.hidden{
+  display:none!important;
+}
+
+/* AUTH */
+
+.auth-screen{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:
+    radial-gradient(circle at top right,#8b5cf6 0,transparent 35%),
+    linear-gradient(135deg,#2e1065,#5b21b6);
+}
+
+.auth-card{
+  width:100%;
+  max-width:430px;
+  background:#fff;
+  border-radius:24px;
+  padding:28px;
+  box-shadow:0 25px 70px rgba(0,0,0,.25);
+}
+
+.logo{
+  text-align:center;
+  font-size:30px;
+  font-weight:900;
+  color:var(--purple);
+  margin-bottom:6px;
+}
+
+.logo-sub{
+  text-align:center;
+  color:var(--muted);
+  margin-bottom:24px;
+  font-size:14px;
+}
+
+.auth-tabs{
+  display:flex;
+  background:#f3effa;
+  padding:4px;
+  border-radius:12px;
+  margin-bottom:20px;
+}
+
+.auth-tab{
+  width:50%;
+  border:0;
+  background:transparent;
+  padding:11px;
+  border-radius:9px;
+  color:#666;
+  font-weight:700;
+}
+
+.auth-tab.active{
+  background:#fff;
+  color:var(--purple);
+  box-shadow:0 2px 8px rgba(0,0,0,.06);
+}
+
+.form-group{
+  margin-bottom:15px;
+}
+
+.form-group label{
+  display:block;
+  font-size:13px;
+  font-weight:700;
+  margin-bottom:7px;
+}
+
+.form-group input{
+  width:100%;
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:13px;
+  outline:none;
+}
+
+.form-group input:focus{
+  border-color:var(--purple3);
+  box-shadow:0 0 0 3px rgba(124,58,237,.1);
+}
+
+.primary-btn{
+  width:100%;
+  border:0;
+  padding:14px;
+  border-radius:12px;
+  background:linear-gradient(135deg,var(--purple),var(--purple3));
+  color:white;
+  font-weight:800;
+}
+
+.secondary-btn{
+  border:1px solid var(--border);
+  background:#fff;
+  padding:11px 14px;
+  border-radius:10px;
+  font-weight:700;
+}
+
+.auth-message{
+  margin-top:14px;
+  font-size:13px;
+  line-height:1.5;
+  text-align:center;
+}
+
+.error{
+  color:var(--red);
+}
+
+.success{
+  color:var(--green);
+}
+
+/* APP */
+
+.topbar{
+  position:sticky;
+  top:0;
+  z-index:20;
+  background:#fff;
+  border-bottom:1px solid var(--border);
+  padding:13px 18px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.brand{
+  font-size:22px;
+  font-weight:900;
+  color:var(--purple);
+}
+
+.top-actions{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.balance-pill{
+  background:#f0e7ff;
+  color:var(--purple);
+  padding:8px 12px;
+  border-radius:999px;
+  font-weight:800;
+  font-size:13px;
+}
+
+.icon-btn{
+  border:1px solid var(--border);
+  background:#fff;
+  width:38px;
+  height:38px;
+  border-radius:10px;
+}
+
+.layout{
+  display:flex;
+  min-height:calc(100vh - 65px);
+}
+
+.sidebar{
+  width:230px;
+  background:#fff;
+  border-right:1px solid var(--border);
+  padding:18px 12px;
+  flex-shrink:0;
+}
+
+.nav-btn{
+  width:100%;
+  text-align:left;
+  border:0;
+  background:transparent;
+  padding:13px 14px;
+  border-radius:10px;
+  margin-bottom:5px;
+  font-weight:700;
+  color:#625d69;
+}
+
+.nav-btn.active{
+  background:#f0e7ff;
+  color:var(--purple);
+}
+
+.main{
+  flex:1;
+  padding:22px;
+  max-width:1200px;
+  margin:auto;
+  width:100%;
+}
+
+.page{
+  display:none;
+}
+
+.page.active{
+  display:block;
+}
+
+.page-title{
+  font-size:26px;
+  font-weight:900;
+  margin-bottom:6px;
+}
+
+.page-subtitle{
+  color:var(--muted);
+  margin-bottom:20px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:14px;
+}
+
+.stat-card{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:18px;
+  box-shadow:var(--shadow);
+}
+
+.stat-title{
+  font-size:13px;
+  color:var(--muted);
+  margin-bottom:9px;
+}
+
+.stat-value{
+  font-size:24px;
+  font-weight:900;
+}
+
+.card{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:20px;
+  box-shadow:var(--shadow);
+  margin-bottom:16px;
+}
+
+.card-title{
+  font-size:18px;
+  font-weight:900;
+  margin-bottom:14px;
+}
+
+.notice{
+  background:#f0e7ff;
+  color:#4c1d95;
+  padding:13px;
+  border-radius:12px;
+  font-size:13px;
+  line-height:1.5;
+  margin-bottom:16px;
+}
+
+.number-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+}
+
+.number-card{
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:17px;
+  background:#fff;
+}
+
+.number-country{
+  display:flex;
+  gap:9px;
+  font-weight:900;
+  margin-bottom:10px;
+}
+
+.number-phone{
+  font-size:18px;
+  font-weight:900;
+  margin-bottom:7px;
+}
+
+.number-price{
+  color:var(--purple);
+  font-weight:900;
+  margin-bottom:13px;
+}
+
+.buy-btn{
+  width:100%;
+  border:0;
+  padding:11px;
+  border-radius:10px;
+  background:var(--purple);
+  color:white;
+  font-weight:800;
+}
+
+.buy-btn:disabled{
+  opacity:.55;
+}
+
+.table-wrap{
+  overflow-x:auto;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+th,td{
+  padding:13px 10px;
+  text-align:left;
+  border-bottom:1px solid var(--border);
+  white-space:nowrap;
+  font-size:13px;
+}
+
+th{
+  color:var(--muted);
+  font-size:12px;
+}
+
+.status{
+  display:inline-block;
+  padding:5px 9px;
+  border-radius:999px;
+  font-size:11px;
+  font-weight:900;
+  text-transform:capitalize;
+}
+
+.status.pending{
+  background:#fff7ed;
+  color:var(--orange);
+}
+
+.status.approved,
+.status.active{
+  background:#ecfdf5;
+  color:var(--green);
+}
+
+.status.declined{
+  background:#fef2f2;
+  color:var(--red);
+}
+
+.status.sold{
+  background:#f3f4f6;
+  color:#555;
+}
+
+.empty{
+  text-align:center;
+  color:var(--muted);
+  padding:30px 10px;
+}
+
+.modal-bg{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.55);
+  z-index:100;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+}
+
+.modal-bg.show{
+  display:flex;
+}
+
+.modal{
+  width:100%;
+  max-width:460px;
+  max-height:90vh;
+  overflow:auto;
+  background:#fff;
+  border-radius:20px;
+  padding:22px;
+}
+
+.modal-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:18px;
+}
+
+.close-btn{
+  border:0;
+  background:#f3f4f6;
+  width:35px;
+  height:35px;
+  border-radius:50%;
+}
+
+.payment-box{
+  background:#f8f5ff;
+  border:1px solid #e8dcff;
+  border-radius:14px;
+  padding:15px;
+  margin-bottom:15px;
+  line-height:1.8;
+}
+
+.profile-row{
+  display:flex;
+  justify-content:space-between;
+  gap:20px;
+  padding:14px 0;
+  border-bottom:1px solid var(--border);
+}
+
+.profile-label{
+  color:var(--muted);
+}
+
+.bottom-nav{
+  display:none;
+}
+
+@media(max-width:900px){
+  .grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .number-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+}
+
+@media(max-width:700px){
+  .sidebar{
+    display:none;
+  }
+
+  .main{
+    padding:16px;
+    padding-bottom:90px;
+  }
+
+  .grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .number-grid{
+    grid-template-columns:1fr;
+  }
+
+  .bottom-nav{
+    display:flex;
+    position:fixed;
+    bottom:0;
+    left:0;
+    right:0;
+    z-index:50;
+    background:#fff;
+    border-top:1px solid var(--border);
+    padding:7px 4px;
+    justify-content:space-around;
+  }
+
+  .bottom-nav button{
+    border:0;
+    background:transparent;
+    color:#777;
+    font-size:11px;
+    font-weight:700;
+    padding:7px 10px;
+  }
+
+  .bottom-nav button.active{
+    color:var(--purple);
+  }
+}
+
+@media(max-width:400px){
+  .grid{
+    grid-template-columns:1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ======================================================
+     AUTH
+====================================================== -->
+
+<section id="authScreen" class="auth-screen">
+
+  <div class="auth-card">
+
+    <div class="logo">OlaqVerify</div>
+
+    <div class="logo-sub">
+      Secure verification & testing platform
+    </div>
+
+    <div class="auth-tabs">
+
+      <button
+        id="loginTab"
+        class="auth-tab active"
+        onclick="showAuth('login')">
+        Login
+      </button>
+
+      <button
+        id="signupTab"
+        class="auth-tab"
+        onclick="showAuth('signup')">
+        Sign Up
+      </button>
+
+    </div>
+
+
+    <!-- LOGIN -->
+
+    <form id="loginForm">
+
+      <div class="form-group">
+        <label>Email</label>
+
+        <input
+          id="loginEmail"
+          type="email"
+          placeholder="you@example.com"
+          required>
+      </div>
+
+      <div class="form-group">
+        <label>Password</label>
+
+        <input
+          id="loginPassword"
+          type="password"
+          placeholder="Your password"
+          required>
+      </div>
+
+      <button
+        id="loginButton"
+        class="primary-btn"
+        type="submit">
+        Login
+      </button>
+
+    </form>
+
+
+    <!-- SIGN UP -->
+
+    <form
+      id="signupForm"
+      class="hidden">
+
+      <div class="form-group">
+        <label>Name</label>
+
+        <input
+          id="signupName"
+          type="text"
+          placeholder="Your name"
+          required>
+      </div>
+
+      <div class="form-group">
+        <label>Email</label>
+
+        <input
+          id="signupEmail"
+          type="email"
+          placeholder="you@example.com"
+          required>
+      </div>
+
+      <div class="form-group">
+        <label>Password</label>
+
+        <input
+          id="signupPassword"
+          type="password"
+          minlength="6"
+          placeholder="Minimum 6 characters"
+          required>
+      </div>
+
+      <button
+        id="signupButton"
+        class="primary-btn"
+        type="submit">
+        Create Account
+      </button>
+
+    </form>
+
+    <div
+      id="authMessage"
+      class="auth-message">
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ======================================================
+     APP
+====================================================== -->
+
+<section
+  id="app"
+  class="app hidden">
+
+  <header class="topbar">
+
+    <div class="brand">
+      OlaqVerify
+    </div>
+
+    <div class="top-actions">
+
+      <div
+        id="balancePill"
+        class="balance-pill">
+        ₦0.00
+      </div>
+
+      <button
+        class="icon-btn"
+        onclick="refreshAll()"
+        title="Refresh">
+        ↻
+      </button>
+
+    </div>
+
+  </header>
+
+
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+      <button
+        class="nav-btn active"
+        data-page="dashboard"
+        onclick="navigate('dashboard')">
+        Dashboard
+      </button>
+
+      <button
+        class="nav-btn"
+        data-page="numbers"
+        onclick="navigate('numbers')">
+        Numbers
+      </button>
+
+      <button
+        class="nav-btn"
+        data-page="orders"
+        onclick="navigate('orders')">
+        Orders
+      </button>
+
+      <button
+        class="nav-btn"
+        data-page="fund"
+        onclick="navigate('fund')">
+        Fund Wallet
+      </button>
+
+      <button
+        class="nav-btn"
+        data-page="inbox"
+        onclick="navigate('inbox')">
+        Inbox
+      </button>
+
+      <button
+        class="nav-btn"
+        data-page="profile"
+        onclick="navigate('profile')">
+        Profile
+      </button>
+
+      <button
+        class="nav-btn"
+        data-page="support"
+        onclick="navigate('support')">
+        Support
+      </button>
+
+      <button
+        class="nav-btn"
+        onclick="logout()">
+        Logout
+      </button>
+
+    </aside>
+
+
+    <main class="main">
+
+      <!-- DASHBOARD -->
+
+      <section
+        id="page-dashboard"
+        class="page active">
+
+        <div class="page-title">
+          Dashboard
+        </div>
+
+        <div class="page-subtitle">
+          Welcome back,
+          <span id="welcomeName">User</span>.
+        </div>
+
+        <div class="notice">
+          OlaqVerify is intended for authorized testing and development.
+          Only use numbers and verification services you are authorized to use.
+        </div>
+
+        <div class="grid">
+
+          <div class="stat-card">
+            <div class="stat-title">
+              Wallet Balance
+            </div>
+
+            <div
+              id="dashboardBalance"
+              class="stat-value">
+              ₦0.00
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-title">
+              Orders
+            </div>
+
+            <div
+              id="dashboardOrders"
+              class="stat-value">
+              0
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-title">
+              Pending Payments
+            </div>
+
+            <div
+              id="dashboardPending"
+              class="stat-value">
+              0
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-title">
+              Available Numbers
+            </div>
+
+            <div
+              id="dashboardNumbers"
+              class="stat-value">
+              0
+            </div>
+          </div>
+
+        </div>
+
+
+        <div
+          class="card"
+          style="margin-top:16px">
+
+          <div class="card-title">
+            Quick Actions
+          </div>
+
+          <div
+            style="display:flex;gap:10px;flex-wrap:wrap">
+
+            <button
+              class="primary-btn"
+              style="width:auto"
+              onclick="navigate('numbers')">
+              Browse Numbers
+            </button>
+
+            <button
+              class="secondary-btn"
+              onclick="navigate('fund')">
+              Fund Wallet
+            </button>
+
+            <button
+              class="secondary-btn"
+              onclick="navigate('orders')">
+              View Orders
+            </button>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- NUMBERS -->
+
+      <section
+        id="page-numbers"
+        class="page">
+
+        <div class="page-title">
+          Numbers
+        </div>
+
+        <div class="page-subtitle">
+          Available authorized testing inventory.
+        </div>
+
+        <div class="notice">
+          Numbers shown here come from your Supabase database.
+          Real incoming SMS requires a legitimate SMS provider and authorized numbers.
+        </div>
+
+        <div
+          id="numbersGrid"
+          class="number-grid">
+
+          <div class="empty">
+            Loading numbers...
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- ORDERS -->
+
+      <section
+        id="page-orders"
+        class="page">
+
+        <div class="page-title">
+          Orders
+        </div>
+
+        <div class="page-subtitle">
+          Your purchased testing numbers and their status.
+        </div>
+
+        <div class="card">
+
+          <div class="table-wrap">
+
+            <table>
+
+              <thead>
+                <tr>
+                  <th>Number</th>
+                  <th>Country</th>
+                  <th>Price</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+
+              <tbody id="ordersBody">
+
+                <tr>
+                  <td
+                    colspan="5"
+                    class="empty">
+                    Loading...
+                  </td>
+                </tr>
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- FUND -->
+
+      <section
+        id="page-fund"
+        class="page">
+
+        <div class="page-title">
+          Fund Wallet
+        </div>
+
+        <div class="page-subtitle">
+          Submit a payment request for administrator approval.
+        </div>
+
+        <div class="card">
+
+          <div class="card-title">
+            Manual Payment
+          </div>
+
+          <div class="notice">
+            Your payment details will be displayed here once you add
+            your official payment instructions to the platform.
+          </div>
+
+          <form id="paymentForm">
+
+            <div class="form-group">
+
+              <label>
+                Amount (₦)
+              </label>
+
+              <input
+                id="paymentAmount"
+                type="number"
+                min="1"
+                step="0.01"
+                placeholder="Example: 1000"
+                required>
+
+            </div>
+
+            <div class="form-group">
+
+              <label>
+                Payment Reference
+              </label>
+
+              <input
+                id="paymentReference"
+                type="text"
+                placeholder="Your payment reference"
+                required>
+
+            </div>
+
+            <button
+              class="primary-btn"
+              type="submit">
+              Submit Payment Request
+            </button>
+
+          </form>
+
+          <div
+            id="paymentMessage"
+            class="auth-message">
+          </div>
+
+        </div>
+
+
+        <div class="card">
+
+          <div class="card-title">
+            Payment History
+          </div>
+
+          <div class="table-wrap">
+
+            <table>
+
+              <thead>
+                <tr>
+                  <th>Amount</th>
+                  <th>Reference</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+
+              <tbody id="paymentsBody">
+
+                <tr>
+                  <td
+                    colspan="4"
+                    class="empty">
+                    Loading...
+                  </td>
+                </tr>
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- INBOX -->
+
+      <section
+        id="page-inbox"
+        class="page">
+
+        <div class="page-title">
+          Inbox
+        </div>
+
+        <div class="page-subtitle">
+          Incoming messages connected to your authorized testing orders.
+        </div>
+
+        <div class="card">
+
+          <div id="inboxList">
+
+            <div class="empty">
+              No messages yet.
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- PROFILE -->
+
+      <section
+        id="page-profile"
+        class="page">
+
+        <div class="page-title">
+          Profile
+        </div>
+
+        <div class="page-subtitle">
+          Your OlaqVerify account.
+        </div>
+
+        <div class="card">
+
+          <div class="profile-row">
+            <span class="profile-label">
+              Name
+            </span>
+
+            <strong id="profileName">
+              —
+            </strong>
+          </div>
+
+          <div class="profile-row">
+            <span class="profile-label">
+              Email
+            </span>
+
+            <strong id="profileEmail">
+              —
+            </strong>
+          </div>
+
+          <div class="profile-row">
+            <span class="profile-label">
+              Balance
+            </span>
+
+            <strong id="profileBalance">
+              ₦0.00
+            </strong>
+          </div>
+
+          <div class="profile-row">
+            <span class="profile-label">
+              Account ID
+            </span>
+
+            <strong
+              id="profileId"
+              style="font-size:11px">
+              —
+            </strong>
+          </div>
+
+        </div>
+
+        <button
+          class="secondary-btn"
+          onclick="logout()">
+          Logout
+        </button>
+
+      </section>
+
+
+      <!-- SUPPORT -->
+
+      <section
+        id="page-support"
+        class="page">
+
+        <div class="page-title">
+          Support
+        </div>
+
+        <div class="page-subtitle">
+          OlaqVerify support.
+        </div>
+
+        <div class="card">
+
+          <div class="card-title">
+            Support
+          </div>
+
+          <p
+            style="color:var(--muted);line-height:1.7">
+            Support contact details can be added when you have
+            your official support channel ready.
+          </p>
+
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+
+  <!-- MOBILE NAV -->
+
+  <nav class="bottom-nav">
+
+    <button
+      class="active"
+      data-page="dashboard"
+      onclick="navigate('dashboard')">
+      Home
+    </button>
+
+    <button
+      data-page="numbers"
+      onclick="navigate('numbers')">
+      Numbers
+    </button>
+
+    <button
+      data-page="orders"
+      onclick="navigate('orders')">
+      Orders
+    </button>
+
+    <button
+      data-page="fund"
+      onclick="navigate('fund')">
+      Fund
+    </button>
+
+    <button
+      data-page="profile"
+      onclick="navigate('profile')">
+      Profile
+    </button>
+
+  </nav>
+
+</section>
+
+
+<!-- ======================================================
+     PURCHASE MODAL
+====================================================== -->
+
+<div
+  id="buyModal"
+  class="modal-bg">
+
+  <div class="modal">
+
+    <div class="modal-head">
+
+      <strong>
+        Confirm Purchase
+      </strong>
+
+      <button
+        class="close-btn"
+        onclick="closeBuyModal()">
+        ×
+      </button>
+
+    </div>
+
+    <div id="buyDetails"></div>
+
+    <button
+      id="confirmBuyBtn"
+      class="primary-btn"
+      style="margin-top:15px"
+      onclick="confirmPurchase()">
+      Confirm Purchase
+    </button>
+
+    <div
+      id="buyMessage"
+      class="auth-message">
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+/* ======================================================
+   SUPABASE CONFIG
+====================================================== */
+
+const SUPABASE_URL =
+  "https://alemtvfchysptzgzhaap.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY =
+  "sb_publishable_UEnF6pfZ2ORRcuIQUzgbRw_6bWNDnKm";
+
+const db =
+  supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+  );
+
+
+/* ======================================================
+   STATE
+====================================================== */
+
+let currentUser = null;
+let currentProfile = null;
+let selectedNumber = null;
+
+
+/* ======================================================
+   HELPERS
+====================================================== */
+
+function money(value){
+
+  return "₦" +
+    Number(value || 0).toLocaleString(
+      "en-NG",
+      {
+        minimumFractionDigits:2,
+        maximumFractionDigits:2
+      }
+    );
+
+}
+
+
+function escapeHTML(value){
+
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
+}
+
+
+function formatDate(value){
+
+  if(!value) return "—";
+
+  return new Date(value).toLocaleString(
+    "en-NG",
+    {
+      dateStyle:"medium",
+      timeStyle:"short"
+    }
+  );
+
+}
+
+
+function authMessage(message,type=""){
+
+  const el =
+    document.getElementById("authMessage");
+
+  el.textContent = message;
+  el.className =
+    "auth-message " + type;
+
+}
+
+
+function paymentMessage(message,type=""){
+
+  const el =
+    document.getElementById("paymentMessage");
+
+  el.textContent = message;
+  el.className =
+    "auth-message " + type;
+
+}
+
+
+/* ======================================================
+   AUTH TABS
+====================================================== */
+
+function showAuth(type){
+
+  const loginForm =
+    document.getElementById("loginForm");
+
+  const signupForm =
+    document.getElementById("signupForm");
+
+  const loginTab =
+    document.getElementById("loginTab");
+
+  const signupTab =
+    document.getElementById("signupTab");
+
+  authMessage("");
+
+  if(type === "login"){
+
+    loginForm.classList.remove("hidden");
+    signupForm.classList.add("hidden");
+
+    loginTab.classList.add("active");
+    signupTab.classList.remove("active");
+
+  }else{
+
+    loginForm.classList.add("hidden");
+    signupForm.classList.remove("hidden");
+
+    loginTab.classList.remove("active");
+    signupTab.classList.add("active");
+
+  }
+
+}
+
+
+/* ======================================================
+   NAVIGATION
+====================================================== */
+
+function navigate(page){
+
+  document
+    .querySelectorAll(".page")
+    .forEach(el =>
+      el.classList.remove("active")
+    );
+
+  const target =
+    document.getElementById(
+      "page-" + page
+    );
+
+  if(target){
+    target.classList.add("active");
+  }
+
+  document
+    .querySelectorAll(
+      ".nav-btn[data-page],.bottom-nav button[data-page]"
+    )
+    .forEach(btn => {
+
+      btn.classList.toggle(
+        "active",
+        btn.dataset.page === page
+      );
+
+    });
+
+  if(page === "numbers"){
+    loadNumbers();
+  }
+
+  if(page === "orders"){
+    loadOrders();
+  }
+
+  if(page === "fund"){
+    loadPayments();
+  }
+
+  if(page === "inbox"){
+    loadInbox();
+  }
+
+  window.scrollTo(0,0);
+
+}
+
+
+/* ======================================================
+   SESSION
+====================================================== */
+
+async function loadSession(){
+
+  const {
+    data,
+    error
+  } =
+    await db.auth.getSession();
+
+  if(error){
+
+    console.error(error);
+
+    showAuthScreen();
+
+    return;
+
+  }
+
+  if(data.session){
+
+    currentUser =
+      data.session.user;
+
+    await openApp();
+
+  }else{
+
+    showAuthScreen();
+
+  }
+
+}
+
+
+/* ======================================================
+   AUTH STATE
+====================================================== */
+
+db.auth.onAuthStateChange(
+  async(event,session)=>{
+
+    if(session){
+
+      currentUser =
+        session.user;
+
+      if(event === "SIGNED_IN"){
+
+        await openApp();
+
+      }
+
+    }else{
+
+      currentUser = null;
+      currentProfile = null;
+
+      showAuthScreen();
+
+    }
+
+  }
+);
+
+
+/* ======================================================
+   AUTH SCREEN
+====================================================== */
+
+function showAuthScreen(){
+
+  document
+    .getElementById("authScreen")
+    .classList.remove("hidden");
+
+  document
+    .getElementById("app")
+    .classList.add("hidden");
+
+}
+
+
+/* ======================================================
+   OPEN APP
+====================================================== */
+
+async function openApp(){
+
+  document
+    .getElementById("authScreen")
+    .classList.add("hidden");
+
+  document
+    .getElementById("app")
+    .classList.remove("hidden");
+
+  await loadProfile();
+
+  await refreshAll();
+
+  navigate("dashboard");
+
+}
+
+
+/* ======================================================
+   PROFILE
+====================================================== */
+
+async function loadProfile(){
+
+  if(!currentUser) return;
+
+  const {
+    data,
+    error
+  } =
+    await db
+      .from("profiles")
+      .select("*")
+      .eq("id",currentUser.id)
+      .maybeSingle();
+
+  if(error){
+
+    console.error(
+      "Profile error:",
+      error
+    );
+
+    currentProfile = {
+      id:currentUser.id,
+      name:
+        currentUser.user_metadata?.name ||
+        "User",
+      email:
+        currentUser.email || "",
+      balance:0
+    };
+
+    return;
+
+  }
+
+  currentProfile = data;
+
+}
+
+
+function updateProfileUI(){
+
+  if(!currentProfile) return;
+
+  const name =
+    currentProfile.name ||
+    "User";
+
+  const email =
+    currentProfile.email ||
+    currentUser?.email ||
+    "";
+
+  const balance =
+    Number(
+      currentProfile.balance || 0
+    );
+
+  document
+    .getElementById("welcomeName")
+    .textContent = name;
+
+  document
+    .getElementById("dashboardBalance")
+    .textContent = money(balance);
+
+  document
+    .getElementById("balancePill")
+    .textContent = money(balance);
+
+  document
+    .getElementById("profileName")
+    .textContent = name;
+
+  document
+    .getElementById("profileEmail")
+    .textContent = email;
+
+  document
+    .getElementById("profileBalance")
+    .textContent = money(balance);
+
+  document
+    .getElementById("profileId")
+    .textContent =
+      currentUser?.id || "—";
+
+}
+
+
+/* ======================================================
+   LOGIN
+====================================================== */
+
+document
+  .getElementById("loginForm")
+  .addEventListener(
+    "submit",
+    async function(e){
+
+      e.preventDefault();
+
+      const button =
+        document.getElementById(
+          "loginButton"
+        );
+
+      button.disabled = true;
+      button.textContent =
+        "Signing in...";
+
+      const email =
+        document
+          .getElementById("loginEmail")
+          .value
+          .trim();
+
+      const password =
+        document
+          .getElementById("loginPassword")
+          .value;
+
+      const {
+        error
+      } =
+        await db.auth.signInWithPassword({
+          email,
+          password
+        });
+
+      if(error){
+
+        authMessage(
+          error.message,
+          "error"
+        );
+
+        button.disabled = false;
+        button.textContent =
+          "Login";
+
+        return;
+
+      }
+
+      button.disabled = false;
+      button.textContent =
+        "Login";
+
+    }
+  );
+
+
+/* ======================================================
+   SIGNUP
+====================================================== */
+
+document
+  .getElementById("signupForm")
+  .addEventListener(
+    "submit",
+    async function(e){
+
+      e.preventDefault();
+
+      const button =
+        document.getElementById(
+          "signupButton"
+        );
+
+      button.disabled = true;
+      button.textContent =
+        "Creating...";
+
+      const name =
+        document
+          .getElementById("signupName")
+          .value
+          .trim();
+
+      const email =
+        document
+          .getElementById("signupEmail")
+          .value
+          .trim();
+
+      const password =
+        document
+          .getElementById("signupPassword")
+          .value;
+
+      const {
+        data,
+        error
+      } =
+        await db.auth.signUp({
+
+          email,
+          password,
+
+          options:{
+            data:{
+              name:name
+            }
+          }
+
+        });
+
+      if(error){
+
+        authMessage(
+          error.message,
+          "error"
+        );
+
+        button.disabled = false;
+        button.textContent =
+          "Create Account";
+
+        return;
+
+      }
+
+      if(data.session){
+
+        authMessage(
+          "Account created successfully.",
+          "success"
+        );
+
+      }else{
+
+        authMessage(
+          "Account created. Check your email to confirm your account.",
+          "success"
+        );
+
+      }
+
+      button.disabled = false;
+      button.textContent =
+        "Create Account";
+
+    }
+  );
+
+
+/* ======================================================
+   LOGOUT
+====================================================== */
+
+async function logout(){
+
+  await db.auth.signOut();
+
+  currentUser = null;
+  currentProfile = null;
+
+  showAuthScreen();
+
+  showAuth("login");
+
+}
+
+
+/* ======================================================
+   REFRESH
+====================================================== */
+
+async function refreshAll(){
+
+  if(!currentUser) return;
+
+  await loadProfile();
+
+  updateProfileUI();
+
+  await loadNumbers();
+  await loadOrders();
+  await loadPayments();
+  await loadInbox();
+
+  await updateDashboardStats();
+
+}
+
+
+/* ======================================================
+   NUMBERS
+====================================================== */
+
+async function loadNumbers(){
+
+  const grid =
+    document.getElementById(
+      "numbersGrid"
+    );
+
+  if(!grid || !currentUser) return;
+
+  grid.innerHTML =
+    '<div class="empty">Loading numbers...</div>';
+
+  const {
+    data,
+    error
+  } =
+    await db
+      .from("numbers")
+      .select("*")
+      .eq("status","available")
+      .order(
+        "created_at",
+        {ascending:false}
+      );
+
+  if(error){
+
+    console.error(error);
+
+    grid.innerHTML =
+      '<div class="empty">Could not load numbers. Check Supabase policies.</div>';
+
+    return;
+
+  }
+
+  if(!data || data.length === 0){
+
+    grid.innerHTML =
+      '<div class="empty">No numbers are currently available.</div>';
+
+    return;
+
+  }
+
+  grid.innerHTML =
+    data.map(item => `
+
+      <div class="number-card">
+
+        <div class="number-country">
+          <span>
+            ${escapeHTML(item.flag || "🌐")}
+          </span>
+
+          <span>
+            ${escapeHTML(item.country || "Unknown")}
+          </span>
+        </div>
+
+        <div class="number-phone">
+          ${escapeHTML(item.phone_number)}
+        </div>
+
+        <div class="number-price">
+          ${money(item.price)}
+        </div>
+
+        <button
+          class="buy-btn"
+          onclick="openBuyModal('${item.id}')">
+          Buy Number
+        </button>
+
+      </div>
+
+    `).join("");
+
+  document
+    .getElementById("dashboardNumbers")
+    .textContent = data.length;
+
+}
+
+
+/* ======================================================
+   PURCHASE MODAL
+====================================================== */
+
+async function openBuyModal(numberId){
+
+  const {
+    data:item,
+    error
+  } =
+    await db
+      .from("numbers")
+      .select("*")
+      .eq("id",numberId)
+      .eq("status","available")
+      .maybeSingle();
+
+  if(error || !item){
+
+    alert(
+      "This number is no longer available."
+    );
+
+    await loadNumbers();
+
+    return;
+
+  }
+
+  selectedNumber = item;
+
+  document
+    .getElementById("buyDetails")
+    .innerHTML = `
+
+      <div class="payment-box">
+
+        <strong>
+          ${escapeHTML(item.flag || "🌐")}
+          ${escapeHTML(item.country || "Number")}
+        </strong>
+
+        <br><br>
+
+        <strong>Number</strong><br>
+        ${escapeHTML(item.phone_number)}
+
+        <br><br>
+
+        <strong>Price</strong><br>
+        ${money(item.price)}
+
+      </div>
+
+    `;
+
+  document
+    .getElementById("buyMessage")
+    .textContent = "";
+
+  document
+    .getElementById("buyModal")
+    .classList.add("show");
+
+}
+
+
+function closeBuyModal(){
+
+  selectedNumber = null;
+
+  document
+    .getElementById("buyModal")
+    .classList.remove("show");
+
+}
+
+
+/* ======================================================
+   SECURE PURCHASE
+====================================================== */
+
+async function confirmPurchase(){
+
+  if(!selectedNumber || !currentUser){
+    return;
+  }
+
+  const button =
+    document.getElementById(
+      "confirmBuyBtn"
+    );
+
+  const message =
+    document.getElementById(
+      "buyMessage"
+    );
+
+  button.disabled = true;
+  button.textContent =
+    "Processing...";
+
+  message.textContent = "";
+
+  const {
+    error
+  } =
+    await db.rpc(
+      "purchase_number",
+      {
+        p_number_id:
+          selectedNumber.id
+      }
+    );
+
+  if(error){
+
+    console.error(error);
+
+    message.textContent =
+      error.message ||
+      "Purchase failed.";
+
+    message.className =
+      "auth-message error";
+
+    button.disabled = false;
+    button.textContent =
+      "Confirm Purchase";
+
+    return;
+
+  }
+
+  message.textContent =
+    "Purchase successful.";
+
+  message.className =
+    "auth-message success";
+
+  await loadProfile();
+  updateProfileUI();
+
+  await loadNumbers();
+  await loadOrders();
+  await updateDashboardStats();
+
+  setTimeout(
+    closeBuyModal,
+    1000
+  );
+
+  button.disabled = false;
+  button.textContent =
+    "Confirm Purchase";
+
+}
+
+
+/* ======================================================
+   ORDERS
+====================================================== */
+
+async function loadOrders(){
+
+  const body =
+    document.getElementById(
+      "ordersBody"
+    );
+
+  if(!body || !currentUser) return;
+
+  body.innerHTML = `
+    <tr>
+      <td colspan="5" class="empty">
+        Loading...
+      </td>
+    </tr>
+  `;
+
+  const {
+    data,
+    error
+  } =
+    await db
+      .from("orders")
+      .select("*")
+      .eq(
+        "user_id",
+        currentUser.id
+      )
+      .order(
+        "created_at",
+        {ascending:false}
+      );
+
+  if(error){
+
+    console.error(error);
+
+    body.innerHTML = `
+      <tr>
+        <td colspan="5" class="empty">
+          Could not load orders.
+        </td>
+      </tr>
+    `;
+
+    return;
+
+  }
+
+  document
+    .getElementById("dashboardOrders")
+    .textContent =
+      data?.length || 0;
+
+  if(!data || data.length === 0){
+
+    body.innerHTML = `
+      <tr>
+        <td colspan="5" class="empty">
+          You have no orders yet.
+        </td>
+      </tr>
+    `;
+
+    return;
+
+  }
+
+  body.innerHTML =
+    data.map(order => `
+
+      <tr>
+
+        <td>
+          ${escapeHTML(order.phone_number)}
+        </td>
+
+        <td>
+          ${escapeHTML(order.country || "—")}
+        </td>
+
+        <td>
+          ${money(order.price)}
+        </td>
+
+        <td>
+          <span
+            class="status ${escapeHTML(order.status)}">
+            ${escapeHTML(order.status)}
+          </span>
+        </td>
+
+        <td>
+          ${formatDate(order.created_at)}
+        </td>
+
+      </tr>
+
+    `).join("");
+
+}
+
+
+/* ======================================================
+   PAYMENTS
+====================================================== */
+
+async function loadPayments(){
+
+  const body =
+    document.getElementById(
+      "paymentsBody"
+    );
+
+  if(!body || !currentUser) return;
+
+  body.innerHTML = `
+    <tr>
+      <td colspan="4" class="empty">
+        Loading...
+      </td>
+    </tr>
+  `;
+
+  const {
+    data,
+    error
+  } =
+    await db
+      .from("payment_requests")
+      .select("*")
+      .eq(
+        "user_id",
+        currentUser.id
+      )
+      .order(
+        "created_at",
+        {ascending:false}
+      );
+
+  if(error){
+
+    console.error(error);
+
+    body.innerHTML = `
+      <tr>
+        <td colspan="4" class="empty">
+          Could not load payments.
+        </td>
+      </tr>
+    `;
+
+    return;
+
+  }
+
+  const pending =
+    (data || [])
+      .filter(
+        x => x.status === "pending"
+      )
+      .length;
+
+  document
+    .getElementById("dashboardPending")
+    .textContent = pending;
+
+  if(!data || data.length === 0){
+
+    body.innerHTML = `
+      <tr>
+        <td colspan="4" class="empty">
+          No payment requests yet.
+        </td>
+      </tr>
+    `;
+
+    return;
+
+  }
+
+  body.innerHTML =
+    data.map(payment => `
+
+      <tr>
+
+        <td>
+          ${money(payment.amount)}
+        </td>
+
+        <td>
+          ${escapeHTML(payment.reference)}
+        </td>
+
+        <td>
+          <span
+            class="status ${escapeHTML(payment.status)}">
+            ${escapeHTML(payment.status)}
+          </span>
+        </td>
+
+        <td>
+          ${formatDate(payment.created_at)}
+        </td>
+
+      </tr>
+
+    `).join("");
+
+}
+
+
+/* ======================================================
+   PAYMENT REQUEST
+====================================================== */
+
+document
+  .getElementById("paymentForm")
+  .addEventListener(
+    "submit",
+    async function(e){
+
+      e.preventDefault();
+
+      if(!currentUser) return;
+
+      const amount =
+        Number(
+          document
+            .getElementById("paymentAmount")
+            .value
+        );
+
+      const reference =
+        document
+          .getElementById(
+            "paymentReference"
+          )
+          .value
+          .trim();
+
+      if(!amount || amount <= 0){
+
+        paymentMessage(
+          "Enter a valid amount.",
+          "error"
+        );
+
+        return;
+
+      }
+
+      if(!reference){
+
+        paymentMessage(
+          "Enter your payment reference.",
+          "error"
+        );
+
+        return;
+
+      }
+
+      paymentMessage(
+        "Submitting..."
+      );
+
+      const {
+        error
+      } =
+        await db
+          .from("payment_requests")
+          .insert({
+
+            user_id:
+              currentUser.id,
+
+            amount:amount,
+
+            reference:reference,
+
+            status:"pending"
+
+          });
+
+      if(error){
+
+        console.error(error);
+
+        paymentMessage(
+          error.message ||
+          "Payment request failed.",
+          "error"
+        );
+
+        return;
+
+      }
+
+      document
+        .getElementById("paymentForm")
+        .reset();
+
+      paymentMessage(
+        "Payment request submitted and is pending approval.",
+        "success"
+      );
+
+      await loadPayments();
+      await updateDashboardStats();
+
+    }
+  );
+
+
+/* ======================================================
+   INBOX
+====================================================== */
+
+async function loadInbox(){
+
+  const container =
+    document.getElementById(
+      "inboxList"
+    );
+
+  if(!container || !currentUser) return;
+
+  container.innerHTML =
+    '<div class="empty">Loading...</div>';
+
+  const {
+    data:orders,
+    error:ordersError
+  } =
+    await db
+      .from("orders")
+      .select(
+        "id,phone_number"
+      )
+      .eq(
+        "user_id",
+        currentUser.id
+      );
+
+  if(ordersError){
+
+    console.error(ordersError);
+
+    container.innerHTML =
+      '<div class="empty">Could not load inbox.</div>';
+
+    return;
+
+  }
+
+  if(!orders || orders.length === 0){
+
+    container.innerHTML =
+      '<div class="empty">No orders yet.</div>';
+
+    return;
+
+  }
+
+  const orderIds =
+    orders.map(
+      order => order.id
+    );
+
+  const {
+    data:messages,
+    error:messagesError
+  } =
+    await db
+      .from("messages")
+      .select("*")
+      .in(
+        "order_id",
+        orderIds
+      )
+      .order(
+        "received_at",
+        {ascending:false}
+      );
+
+  if(messagesError){
+
+    console.error(messagesError);
+
+    container.innerHTML =
+      '<div class="empty">Could not load messages.</div>';
+
+    return;
+
+  }
+
+  if(!messages || messages.length === 0){
+
+    container.innerHTML =
+      '<div class="empty">No SMS messages have been received yet.</div>';
+
+    return;
+
+  }
+
+  const orderMap = {};
+
+  orders.forEach(order => {
+
+    orderMap[order.id] =
+      order.phone_number;
+
+  });
+
+  container.innerHTML =
+    messages.map(msg => `
+
+      <div
+        style="
+          border-bottom:1px solid var(--border);
+          padding:15px 0;
+        ">
+
+        <strong>
+          ${escapeHTML(
+            orderMap[msg.order_id] ||
+            "Order"
+          )}
+        </strong>
+
+        <div
+          style="
+            margin-top:7px;
+            line-height:1.6;
+          ">
+          ${escapeHTML(msg.message)}
+        </div>
+
+        <div
+          style="
+            color:var(--muted);
+            font-size:12px;
+            margin-top:7px;
+          ">
+          ${formatDate(msg.received_at)}
+        </div>
+
+      </div>
+
+    `).join("");
+
+}
+
+
+/* ======================================================
+   DASHBOARD COUNTS
+====================================================== */
+
+async function updateDashboardStats(){
+
+  if(!currentUser) return;
+
+  const ordersResult =
+    await db
+      .from("orders")
+      .select(
+        "id",
+        {
+          count:"exact",
+          head:true
+        }
+      )
+      .eq(
+        "user_id",
+        currentUser.id
+      );
+
+  const paymentsResult =
+    await db
+      .from("payment_requests")
+      .select("id,status")
+      .eq(
+        "user_id",
+        currentUser.id
+      );
+
+  const numbersResult =
+    await db
+      .from("numbers")
+      .select(
+        "id",
+        {
+          count:"exact",
+          head:true
+        }
+      )
+      .eq(
+        "status",
+        "available"
+      );
+
+  document
+    .getElementById(
+      "dashboardOrders"
+    )
+    .textContent =
+      ordersResult.count || 0;
+
+  const pending =
+    (paymentsResult.data || [])
+      .filter(
+        x => x.status === "pending"
+      )
+      .length;
+
+  document
+    .getElementById(
+      "dashboardPending"
+    )
+    .textContent = pending;
+
+  document
+    .getElementById(
+      "dashboardNumbers"
+    )
+    .textContent =
+      numbersResult.count || 0;
+
+}
+
+
+/* ======================================================
+   START
+====================================================== */
+
+loadSession();
+
+</script>
+
+</body>
+</html>
