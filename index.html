@@ -1,0 +1,2329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>OlaqVerify</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root{
+  --purple:#6417c8;
+  --purple2:#3b0878;
+  --red:#ef233c;
+  --green:#16a34a;
+  --bg:#f6f5fa;
+  --card:#fff;
+  --text:#171321;
+  --muted:#777384;
+  --border:#e8e5ee;
+  --shadow:0 8px 25px rgba(45,20,80,.08);
+}
+
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+}
+
+button,input,select,textarea{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+  border:0;
+}
+
+.hidden{
+  display:none!important;
+}
+
+/* AUTH */
+
+#auth{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:linear-gradient(145deg,#3b0878,#6417c8 55%,#ef233c);
+}
+
+.auth-box{
+  width:100%;
+  max-width:430px;
+  background:white;
+  border-radius:24px;
+  padding:28px;
+  box-shadow:0 20px 60px rgba(0,0,0,.2);
+}
+
+.logo{
+  text-align:center;
+  font-size:31px;
+  font-weight:900;
+  color:var(--purple);
+}
+
+.logo span{
+  color:var(--red);
+}
+
+.auth-sub{
+  text-align:center;
+  color:var(--muted);
+  margin:8px 0 25px;
+}
+
+.auth-box h2{
+  margin-bottom:16px;
+}
+
+.field{
+  margin-bottom:14px;
+}
+
+.field label{
+  display:block;
+  font-size:13px;
+  font-weight:bold;
+  margin-bottom:7px;
+}
+
+.field input,
+.field textarea,
+.field select{
+  width:100%;
+  border:1px solid var(--border);
+  background:#faf9fc;
+  border-radius:12px;
+  padding:13px;
+  outline:none;
+}
+
+.field input:focus,
+.field textarea:focus,
+.field select:focus{
+  border-color:var(--purple);
+}
+
+.primary{
+  width:100%;
+  background:linear-gradient(135deg,var(--purple),var(--red));
+  color:#fff;
+  padding:14px;
+  border-radius:12px;
+  font-weight:bold;
+}
+
+.secondary{
+  background:#f0eafd;
+  color:var(--purple);
+  padding:11px 15px;
+  border-radius:10px;
+  font-weight:bold;
+}
+
+.auth-switch{
+  text-align:center;
+  margin-top:18px;
+  font-size:14px;
+  color:var(--muted);
+}
+
+.auth-switch button{
+  background:none;
+  color:var(--purple);
+  font-weight:bold;
+}
+
+/* APP */
+
+#app{
+  min-height:100vh;
+}
+
+.topbar{
+  height:68px;
+  background:white;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 24px;
+  position:sticky;
+  top:0;
+  z-index:20;
+}
+
+.brand{
+  font-size:23px;
+  font-weight:900;
+  color:var(--purple);
+}
+
+.brand span{
+  color:var(--red);
+}
+
+.user-pill{
+  background:#f3edff;
+  color:var(--purple);
+  padding:9px 13px;
+  border-radius:30px;
+  font-size:13px;
+  font-weight:bold;
+}
+
+.layout{
+  display:flex;
+  min-height:calc(100vh - 68px);
+}
+
+.sidebar{
+  width:230px;
+  background:white;
+  border-right:1px solid var(--border);
+  padding:18px 12px;
+  flex-shrink:0;
+}
+
+.nav-btn{
+  width:100%;
+  background:transparent;
+  padding:13px 14px;
+  margin-bottom:6px;
+  border-radius:11px;
+  text-align:left;
+  color:#625e6d;
+  font-weight:bold;
+}
+
+.nav-btn.active{
+  background:#f0e7ff;
+  color:var(--purple);
+}
+
+.main{
+  flex:1;
+  padding:25px;
+  max-width:1200px;
+}
+
+.page{
+  display:none;
+}
+
+.page.active{
+  display:block;
+}
+
+.page-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:20px;
+}
+
+.page-head h1{
+  font-size:26px;
+}
+
+.back-btn{
+  background:#eeeaf5;
+  color:#3f3849;
+  padding:10px 14px;
+  border-radius:10px;
+  font-weight:bold;
+}
+
+/* HOME */
+
+.hero{
+  background:linear-gradient(135deg,var(--purple2),var(--purple),var(--red));
+  color:white;
+  border-radius:22px;
+  padding:27px;
+  margin-bottom:20px;
+}
+
+.hero small{
+  opacity:.8;
+}
+
+.hero h1{
+  margin-top:7px;
+  font-size:28px;
+}
+
+.balance-card{
+  margin-top:20px;
+  background:rgba(255,255,255,.14);
+  border:1px solid rgba(255,255,255,.2);
+  border-radius:15px;
+  padding:17px;
+}
+
+.balance{
+  font-size:31px;
+  font-weight:900;
+  margin-top:5px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:14px;
+  margin-bottom:20px;
+}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:17px;
+  padding:18px;
+  box-shadow:var(--shadow);
+}
+
+.stat strong{
+  display:block;
+  font-size:25px;
+  margin-top:7px;
+}
+
+.stat span{
+  color:var(--muted);
+  font-size:13px;
+}
+
+.support-card{
+  display:flex;
+  align-items:center;
+  gap:15px;
+}
+
+.wa-icon{
+  width:52px;
+  height:52px;
+  border-radius:50%;
+  background:#20c56a;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+}
+
+.wa-icon svg{
+  width:29px;
+  height:29px;
+  fill:white;
+}
+
+.support-text{
+  flex:1;
+}
+
+.support-text strong{
+  display:block;
+  margin-bottom:4px;
+}
+
+.support-text span{
+  font-size:13px;
+  color:var(--muted);
+}
+
+/* NUMBERS */
+
+.number-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:15px;
+}
+
+.number-card{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:17px;
+  padding:18px;
+  box-shadow:var(--shadow);
+}
+
+.country{
+  font-size:12px;
+  color:var(--purple);
+  font-weight:bold;
+  margin-bottom:8px;
+}
+
+.number{
+  font-size:19px;
+  font-weight:900;
+  margin-bottom:8px;
+}
+
+.service{
+  color:var(--muted);
+  font-size:13px;
+  margin-bottom:15px;
+}
+
+.price{
+  font-size:19px;
+  font-weight:900;
+  margin-bottom:12px;
+}
+
+.buy{
+  width:100%;
+  background:var(--purple);
+  color:white;
+  padding:12px;
+  border-radius:10px;
+  font-weight:bold;
+}
+
+/* LISTS */
+
+.list{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.list-item{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:15px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.list-main strong{
+  display:block;
+  margin-bottom:5px;
+}
+
+.list-main small{
+  color:var(--muted);
+}
+
+.status{
+  padding:7px 10px;
+  border-radius:20px;
+  background:#f0eafd;
+  color:var(--purple);
+  font-size:12px;
+  font-weight:bold;
+  white-space:nowrap;
+}
+
+.status.pending{
+  background:#fff4d6;
+  color:#9a6500;
+}
+
+.status.approved{
+  background:#dcfce7;
+  color:#15803d;
+}
+
+.status.declined{
+  background:#fee2e2;
+  color:#b91c1c;
+}
+
+/* WALLET */
+
+.wallet{
+  background:linear-gradient(135deg,var(--purple2),var(--purple));
+  color:white;
+  border-radius:20px;
+  padding:25px;
+  margin-bottom:18px;
+}
+
+.wallet .amount{
+  font-size:36px;
+  font-weight:900;
+  margin:7px 0 20px;
+}
+
+.wallet button{
+  background:white;
+  color:var(--purple);
+  padding:12px 17px;
+  border-radius:10px;
+  font-weight:bold;
+}
+
+/* SETTINGS */
+
+.profile-card{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:20px;
+}
+
+.profile-row{
+  padding:14px 0;
+  border-bottom:1px solid var(--border);
+}
+
+.profile-row:last-child{
+  border-bottom:0;
+}
+
+.profile-row small{
+  display:block;
+  color:var(--muted);
+  margin-bottom:5px;
+}
+
+.danger{
+  margin-top:20px;
+  background:#fee2e2;
+  color:#b91c1c;
+  padding:12px 17px;
+  border-radius:10px;
+  font-weight:bold;
+}
+
+.founder{
+  text-align:center;
+  color:#aaa4b2;
+  font-size:11px;
+  margin-top:28px;
+  padding-bottom:20px;
+}
+
+/* MODAL */
+
+.modal-bg{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.5);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  z-index:100;
+}
+
+.modal-bg.show{
+  display:flex;
+}
+
+.modal{
+  width:100%;
+  max-width:430px;
+  background:white;
+  border-radius:20px;
+  padding:22px;
+  max-height:90vh;
+  overflow:auto;
+}
+
+.modal-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:18px;
+}
+
+.close{
+  background:#eeeaf5;
+  width:35px;
+  height:35px;
+  border-radius:50%;
+  font-size:20px;
+}
+
+.payment-box{
+  background:#f7f3ff;
+  border:1px solid #e5d9ff;
+  border-radius:14px;
+  padding:16px;
+  margin-bottom:15px;
+}
+
+.payment-box strong{
+  display:block;
+  color:var(--purple);
+  margin-bottom:7px;
+}
+
+.payment-line{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  margin:8px 0;
+  font-size:14px;
+}
+
+.copy{
+  background:#eee7ff;
+  color:var(--purple);
+  padding:7px 9px;
+  border-radius:7px;
+  font-size:11px;
+  font-weight:bold;
+}
+
+/* MOBILE */
+
+.bottom-nav{
+  display:none;
+}
+
+@media(max-width:850px){
+  .sidebar{
+    display:none;
+  }
+
+  .main{
+    padding:16px;
+    padding-bottom:90px;
+  }
+
+  .grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .number-grid{
+    grid-template-columns:1fr;
+  }
+
+  .topbar{
+    padding:0 16px;
+  }
+
+  .bottom-nav{
+    display:flex;
+    position:fixed;
+    bottom:0;
+    left:0;
+    right:0;
+    height:67px;
+    background:white;
+    border-top:1px solid var(--border);
+    z-index:50;
+    justify-content:space-around;
+  }
+
+  .bottom-nav button{
+    flex:1;
+    background:white;
+    color:#777384;
+    font-size:11px;
+    font-weight:bold;
+  }
+
+  .bottom-nav button.active{
+    color:var(--purple);
+  }
+
+  .support-card{
+    align-items:flex-start;
+  }
+
+  .support-card .secondary{
+    white-space:nowrap;
+  }
+}
+
+@media(max-width:430px){
+  .hero h1{
+    font-size:23px;
+  }
+
+  .balance{
+    font-size:27px;
+  }
+
+  .page-head h1{
+    font-size:22px;
+  }
+
+  .grid{
+    gap:9px;
+  }
+
+  .card{
+    padding:14px;
+  }
+
+  .stat strong{
+    font-size:21px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- AUTH -->
+<section id="auth">
+
+  <div class="auth-box">
+
+    <div class="logo">Olaq<span>Verify</span></div>
+
+    <div class="auth-sub">
+      Secure account dashboard
+    </div>
+
+    <div id="loginForm">
+
+      <h2>Welcome back</h2>
+
+      <div class="field">
+        <label>Email</label>
+        <input id="loginEmail" type="email" placeholder="Enter your email">
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <input id="loginPassword" type="password" placeholder="Enter your password">
+      </div>
+
+      <button class="primary" onclick="login()">Sign In</button>
+
+      <div class="auth-switch">
+        Don't have an account?
+        <button onclick="showSignup()">Create account</button>
+      </div>
+
+    </div>
+
+
+    <div id="signupForm" class="hidden">
+
+      <h2>Create account</h2>
+
+      <div class="field">
+        <label>Name</label>
+        <input id="signupName" type="text" placeholder="Your name">
+      </div>
+
+      <div class="field">
+        <label>Email</label>
+        <input id="signupEmail" type="email" placeholder="Email address">
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <input id="signupPassword" type="password" placeholder="Minimum 6 characters">
+      </div>
+
+      <button class="primary" onclick="signup()">Create Account</button>
+
+      <div class="auth-switch">
+        Already have an account?
+        <button onclick="showLogin()">Sign in</button>
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- APP -->
+<section id="app" class="hidden">
+
+  <header class="topbar">
+
+    <div class="brand">
+      Olaq<span>Verify</span>
+    </div>
+
+    <div class="user-pill" id="topUser">
+      Account
+    </div>
+
+  </header>
+
+
+  <div class="layout">
+
+    <aside class="sidebar">
+
+      <button class="nav-btn active" data-page="home" onclick="go('home')">
+        Home
+      </button>
+
+      <button class="nav-btn" data-page="buy" onclick="go('buy')">
+        Buy Number
+      </button>
+
+      <button class="nav-btn" data-page="orders" onclick="go('orders')">
+        My Orders
+      </button>
+
+      <button class="nav-btn" data-page="wallet" onclick="go('wallet')">
+        Wallet
+      </button>
+
+      <button class="nav-btn" data-page="transactions" onclick="go('transactions')">
+        Transactions
+      </button>
+
+      <button class="nav-btn" data-page="support" onclick="go('support')">
+        Support
+      </button>
+
+      <button class="nav-btn" data-page="settings" onclick="go('settings')">
+        Settings
+      </button>
+
+    </aside>
+
+
+    <main class="main">
+
+
+      <!-- HOME -->
+      <section class="page active" id="page-home">
+
+        <div class="hero">
+
+          <small>Welcome back</small>
+
+          <h1 id="welcomeName">
+            OlaqVerify
+          </h1>
+
+          <div class="balance-card">
+
+            <small>Available balance</small>
+
+            <div class="balance" id="homeBalance">
+              ₦0.00
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="grid">
+
+          <div class="card stat">
+            <span>Orders</span>
+            <strong id="statOrders">0</strong>
+          </div>
+
+          <div class="card stat">
+            <span>Numbers</span>
+            <strong id="statNumbers">0</strong>
+          </div>
+
+          <div class="card stat">
+            <span>Pending payments</span>
+            <strong id="statPayments">0</strong>
+          </div>
+
+          <div class="card stat">
+            <span>Account</span>
+            <strong>Active</strong>
+          </div>
+
+        </div>
+
+
+        <div class="card support-card">
+
+          <div class="wa-icon">
+
+            <svg viewBox="0 0 32 32">
+              <path d="M16 3a13 13 0 0 0-11.2 19.6L3 29l6.7-1.8A13 13 0 1 0 16 3zm0 23.5c-2.1 0-4.1-.6-5.8-1.8l-.4-.3-4 .9 1.1-3.9-.3-.4A10.5 10.5 0 1 1 16 26.5zm5.8-7.9c-.3-.2-1.8-.9-2.1-1-.3-.1-.5-.2-.7.2-.2.3-.8 1-.9 1.2-.2.2-.3.3-.6.1-1.7-.8-2.8-1.5-3.9-3.3-.3-.5.3-.4.8-1.3.1-.2.1-.4 0-.6l-.6-1.5c-.2-.4-.4-.4-.7-.4h-.6c-.2 0-.6.1-.9.4-.3.3-1.1 1-1.1 2.5s1.1 2.9 1.3 3.1c.2.2 2.2 3.4 5.4 4.7 2 .8 2.8.9 3.8.7.6-.1 1.8-.7 2.1-1.4.3-.7.3-1.3.2-1.4-.1-.2-.3-.2-.6-.4z"/>
+            </svg>
+
+          </div>
+
+          <div class="support-text">
+
+            <strong>Need help?</strong>
+
+            <span>
+              Chat with OlaqVerify support on WhatsApp.
+            </span>
+
+          </div>
+
+          <button class="secondary" onclick="openWhatsApp()">
+            WhatsApp
+          </button>
+
+        </div>
+
+      </section>
+
+
+      <!-- BUY -->
+      <section class="page" id="page-buy">
+
+        <div class="page-head">
+
+          <div>
+            <h1>Buy Number</h1>
+          </div>
+
+          <button class="back-btn" onclick="go('home')">
+            ← Back
+          </button>
+
+        </div>
+
+        <div id="numbersList" class="number-grid">
+          <div class="card">
+            Loading available numbers...
+          </div>
+        </div>
+
+      </section>
+
+
+      <!-- ORDERS -->
+      <section class="page" id="page-orders">
+
+        <div class="page-head">
+
+          <h1>My Orders</h1>
+
+          <button class="back-btn" onclick="go('home')">
+            ← Back
+          </button>
+
+        </div>
+
+        <div id="ordersList" class="list">
+          <div class="card">
+            Loading orders...
+          </div>
+        </div>
+
+      </section>
+
+
+      <!-- WALLET -->
+      <section class="page" id="page-wallet">
+
+        <div class="page-head">
+
+          <h1>Wallet</h1>
+
+          <button class="back-btn" onclick="go('home')">
+            ← Back
+          </button>
+
+        </div>
+
+        <div class="wallet">
+
+          <small>Available balance</small>
+
+          <div class="amount" id="walletBalance">
+            ₦0.00
+          </div>
+
+          <button onclick="openTopup()">
+            Add Money
+          </button>
+
+        </div>
+
+
+        <div class="card">
+
+          <h3>Payment account</h3>
+
+          <br>
+
+          <div class="payment-line">
+            <span>Bank</span>
+            <strong>PalmPay</strong>
+          </div>
+
+          <div class="payment-line">
+            <span>Account</span>
+            <strong>8164886717</strong>
+          </div>
+
+          <div class="payment-line">
+            <span>Name</span>
+            <strong>Adekunle</strong>
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- TRANSACTIONS -->
+      <section class="page" id="page-transactions">
+
+        <div class="page-head">
+
+          <h1>Transactions</h1>
+
+          <button class="back-btn" onclick="go('home')">
+            ← Back
+          </button>
+
+        </div>
+
+        <div id="transactionsList" class="list">
+          <div class="card">
+            Loading transactions...
+          </div>
+        </div>
+
+      </section>
+
+
+      <!-- SUPPORT -->
+      <section class="page" id="page-support">
+
+        <div class="page-head">
+
+          <h1>Support</h1>
+
+          <button class="back-btn" onclick="go('home')">
+            ← Back
+          </button>
+
+        </div>
+
+
+        <div class="card support-card">
+
+          <div class="wa-icon">
+
+            <svg viewBox="0 0 32 32">
+              <path d="M16 3a13 13 0 0 0-11.2 19.6L3 29l6.7-1.8A13 13 0 1 0 16 3zm0 23.5c-2.1 0-4.1-.6-5.8-1.8l-.4-.3-4 .9 1.1-3.9-.3-.4A10.5 10.5 0 1 1 16 26.5z"/>
+            </svg>
+
+          </div>
+
+          <div class="support-text">
+
+            <strong>WhatsApp Support</strong>
+
+            <span>
+              Contact OlaqVerify support.
+            </span>
+
+          </div>
+
+          <button class="secondary" onclick="openWhatsApp()">
+            Chat
+          </button>
+
+        </div>
+
+
+        <br>
+
+        <div class="card">
+
+          <h3>Send support message</h3>
+
+          <br>
+
+          <div class="field">
+            <textarea id="supportMessage" rows="5" placeholder="Describe your issue..."></textarea>
+          </div>
+
+          <button class="primary" onclick="sendSupport()">
+            Send Message
+          </button>
+
+        </div>
+
+      </section>
+
+
+      <!-- SETTINGS -->
+      <section class="page" id="page-settings">
+
+        <div class="page-head">
+
+          <h1>Settings</h1>
+
+          <button class="back-btn" onclick="go('home')">
+            ← Back
+          </button>
+
+        </div>
+
+
+        <div class="profile-card">
+
+          <div class="profile-row">
+            <small>Name</small>
+            <strong id="profileName">-</strong>
+          </div>
+
+          <div class="profile-row">
+            <small>Email</small>
+            <strong id="profileEmail">-</strong>
+          </div>
+
+          <div class="profile-row">
+            <small>Payment Account</small>
+            <strong>PalmPay • 8164886717</strong>
+          </div>
+
+        </div>
+
+
+        <button class="danger" onclick="logout()">
+          Sign Out
+        </button>
+
+
+        <div class="founder">
+          Founder: Olayiwola Qurwiy
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+
+  <!-- MOBILE NAV -->
+  <nav class="bottom-nav">
+
+    <button data-page="home" onclick="go('home')">
+      Home
+    </button>
+
+    <button data-page="buy" onclick="go('buy')">
+      Buy
+    </button>
+
+    <button data-page="orders" onclick="go('orders')">
+      Orders
+    </button>
+
+    <button data-page="wallet" onclick="go('wallet')">
+      Wallet
+    </button>
+
+    <button data-page="settings" onclick="go('settings')">
+      Settings
+    </button>
+
+  </nav>
+
+</section>
+
+
+<!-- TOPUP MODAL -->
+<div class="modal-bg" id="topupModal">
+
+  <div class="modal">
+
+    <div class="modal-head">
+
+      <h2>Add Money</h2>
+
+      <button class="close" onclick="closeTopup()">×</button>
+
+    </div>
+
+
+    <div class="payment-box">
+
+      <strong>Send payment to</strong>
+
+      <div class="payment-line">
+        <span>Bank</span>
+        <b>PalmPay</b>
+      </div>
+
+      <div class="payment-line">
+        <span>Account</span>
+        <b>8164886717</b>
+      </div>
+
+      <div class="payment-line">
+        <span>Name</span>
+        <b>Adekunle</b>
+      </div>
+
+    </div>
+
+
+    <div class="field">
+
+      <label>Amount</label>
+
+      <input id="topupAmount" type="number" min="1" placeholder="Enter amount">
+
+    </div>
+
+
+    <div class="field">
+
+      <label>Payment reference</label>
+
+      <input id="topupReference" type="text" placeholder="Transaction reference">
+
+    </div>
+
+
+    <button class="primary" onclick="submitTopup()">
+      Submit Payment
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- ORDER MODAL -->
+<div class="modal-bg" id="orderModal">
+
+  <div class="modal">
+
+    <div class="modal-head">
+
+      <h2>Confirm Order</h2>
+
+      <button class="close" onclick="closeOrder()">×</button>
+
+    </div>
+
+
+    <div id="orderDetails" class="payment-box"></div>
+
+    <button class="primary" onclick="confirmOrder()">
+      Confirm Order
+    </button>
+
+  </div>
+
+</div>
+
+
+<script>
+/* =========================
+   SUPABASE
+========================= */
+
+const SUPABASE_URL =
+"https://alemtvfchysptzgzhaap.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY =
+"sb_publishable_UEnF6pfZ2ORRcuIQUzgbRw_6bWNDnKm";
+
+const db = supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY
+);
+
+
+/* =========================
+   GLOBAL STATE
+========================= */
+
+let currentUser = null;
+let currentProfile = null;
+let selectedNumber = null;
+
+
+/* =========================
+   HELPERS
+========================= */
+
+function money(value){
+
+  const n = Number(value || 0);
+
+  return "₦" + n.toLocaleString("en-NG",{
+    minimumFractionDigits:2,
+    maximumFractionDigits:2
+  });
+
+}
+
+
+function escapeHtml(value){
+
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
+}
+
+
+/* =========================
+   AUTH SCREEN
+========================= */
+
+function showSignup(){
+
+  document.getElementById("loginForm")
+    .classList.add("hidden");
+
+  document.getElementById("signupForm")
+    .classList.remove("hidden");
+
+}
+
+
+function showLogin(){
+
+  document.getElementById("signupForm")
+    .classList.add("hidden");
+
+  document.getElementById("loginForm")
+    .classList.remove("hidden");
+
+}
+
+
+async function signup(){
+
+  const name =
+    document.getElementById("signupName").value.trim();
+
+  const email =
+    document.getElementById("signupEmail").value.trim();
+
+  const password =
+    document.getElementById("signupPassword").value;
+
+  if(!name || !email || !password){
+
+    alert("Please fill all fields.");
+
+    return;
+  }
+
+  if(password.length < 6){
+
+    alert("Password must be at least 6 characters.");
+
+    return;
+  }
+
+  const {data,error} =
+    await db.auth.signUp({
+      email,
+      password,
+      options:{
+        data:{
+          name:name
+        }
+      }
+    });
+
+  if(error){
+
+    alert(error.message);
+
+    return;
+  }
+
+  if(data.user){
+
+    await createProfileIfNeeded(
+      data.user,
+      name
+    );
+  }
+
+  alert(
+    "Account created. If email confirmation is enabled, check your email before signing in."
+  );
+
+  showLogin();
+
+}
+
+
+async function login(){
+
+  const email =
+    document.getElementById("loginEmail").value.trim();
+
+  const password =
+    document.getElementById("loginPassword").value;
+
+  if(!email || !password){
+
+    alert("Enter your email and password.");
+
+    return;
+  }
+
+  const {data,error} =
+    await db.auth.signInWithPassword({
+      email,
+      password
+    });
+
+  if(error){
+
+    alert(error.message);
+
+    return;
+  }
+
+  currentUser = data.user;
+
+  await loadApp();
+
+}
+
+
+/* =========================
+   PROFILE
+========================= */
+
+async function createProfileIfNeeded(user,name){
+
+  const {data,error} =
+    await db
+      .from("profiles")
+      .select("*")
+      .eq("id",user.id)
+      .maybeSingle();
+
+  if(error){
+
+    console.log("Profile check:",error);
+
+    return;
+  }
+
+  if(!data){
+
+    const {error:insertError} =
+      await db
+        .from("profiles")
+        .insert({
+          id:user.id,
+          name:name || user.email?.split("@")[0],
+          email:user.email,
+          balance:0
+        });
+
+    if(insertError){
+
+      console.log(
+        "Profile creation:",
+        insertError
+      );
+    }
+
+  }
+
+}
+
+
+async function loadProfile(){
+
+  if(!currentUser) return;
+
+  const {data,error} =
+    await db
+      .from("profiles")
+      .select("*")
+      .eq("id",currentUser.id)
+      .maybeSingle();
+
+  if(error){
+
+    console.log("Profile error:",error);
+
+    currentProfile = {
+      id:currentUser.id,
+      name:currentUser.user_metadata?.name ||
+           currentUser.email?.split("@")[0],
+      email:currentUser.email,
+      balance:0
+    };
+
+    return;
+  }
+
+  if(!data){
+
+    await createProfileIfNeeded(
+      currentUser,
+      currentUser.user_metadata?.name ||
+      currentUser.email?.split("@")[0]
+    );
+
+    const retry =
+      await db
+        .from("profiles")
+        .select("*")
+        .eq("id",currentUser.id)
+        .maybeSingle();
+
+    currentProfile = retry.data || {
+      id:currentUser.id,
+      name:currentUser.email?.split("@")[0],
+      email:currentUser.email,
+      balance:0
+    };
+
+    return;
+  }
+
+  currentProfile = data;
+
+}
+
+
+/* =========================
+   LOAD APP
+========================= */
+
+async function loadApp(){
+
+  document.getElementById("auth")
+    .classList.add("hidden");
+
+  document.getElementById("app")
+    .classList.remove("hidden");
+
+  await loadProfile();
+
+  updateProfileUI();
+
+  await refreshDashboard();
+
+}
+
+
+function updateProfileUI(){
+
+  if(!currentProfile) return;
+
+  const name =
+    currentProfile.name ||
+    currentUser?.user_metadata?.name ||
+    currentUser?.email?.split("@")[0] ||
+    "User";
+
+  const email =
+    currentProfile.email ||
+    currentUser?.email ||
+    "";
+
+  document.getElementById("welcomeName")
+    .textContent = name;
+
+  document.getElementById("topUser")
+    .textContent = name;
+
+  document.getElementById("profileName")
+    .textContent = name;
+
+  document.getElementById("profileEmail")
+    .textContent = email;
+
+  document.getElementById("homeBalance")
+    .textContent = money(currentProfile.balance);
+
+  document.getElementById("walletBalance")
+    .textContent = money(currentProfile.balance);
+
+}
+
+
+/* =========================
+   NAVIGATION
+========================= */
+
+function go(page){
+
+  document.querySelectorAll(".page")
+    .forEach(p => p.classList.remove("active"));
+
+  const target =
+    document.getElementById("page-" + page);
+
+  if(target){
+    target.classList.add("active");
+  }
+
+  document.querySelectorAll(
+    ".nav-btn,.bottom-nav button"
+  ).forEach(btn => {
+
+    btn.classList.toggle(
+      "active",
+      btn.dataset.page === page
+    );
+
+  });
+
+  if(page === "home"){
+    refreshDashboard();
+  }
+
+  if(page === "buy"){
+    loadNumbers();
+  }
+
+  if(page === "orders"){
+    loadOrders();
+  }
+
+  if(page === "transactions"){
+    loadTransactions();
+  }
+
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
+
+}
+
+
+/* =========================
+   DASHBOARD
+========================= */
+
+async function refreshDashboard(){
+
+  await loadProfile();
+
+  updateProfileUI();
+
+  let ordersCount = 0;
+
+  const orders =
+    await db
+      .from("orders")
+      .select("id",{
+        count:"exact",
+        head:true
+      })
+      .eq("user_id",currentUser.id);
+
+  if(!orders.error){
+
+    ordersCount = orders.count || 0;
+
+  }
+
+
+  let numbersCount = 0;
+
+  const numbers =
+    await db
+      .from("numbers")
+      .select("id",{
+        count:"exact",
+        head:true
+      })
+      .eq("status","available");
+
+  if(!numbers.error){
+
+    numbersCount = numbers.count || 0;
+
+  }
+
+
+  let paymentCount = 0;
+
+  const payments =
+    await db
+      .from("payment_requests")
+      .select("id",{
+        count:"exact",
+        head:true
+      })
+      .eq("user_id",currentUser.id)
+      .eq("status","pending");
+
+  if(!payments.error){
+
+    paymentCount = payments.count || 0;
+
+  }
+
+
+  document.getElementById("statOrders")
+    .textContent = ordersCount;
+
+  document.getElementById("statNumbers")
+    .textContent = numbersCount;
+
+  document.getElementById("statPayments")
+    .textContent = paymentCount;
+
+}
+
+
+/* =========================
+   NUMBERS
+========================= */
+
+async function loadNumbers(){
+
+  const box =
+    document.getElementById("numbersList");
+
+  box.innerHTML =
+    `<div class="card">Loading available numbers...</div>`;
+
+  const {data,error} =
+    await db
+      .from("numbers")
+      .select("*")
+      .eq("status","available")
+      .order("created_at",{
+        ascending:false
+      });
+
+  if(error){
+
+    box.innerHTML =
+      `<div class="card">
+        Unable to load numbers.<br><br>
+        <small>${escapeHtml(error.message)}</small>
+      </div>`;
+
+    return;
+  }
+
+  if(!data || data.length === 0){
+
+    box.innerHTML =
+      `<div class="card">
+        No numbers are currently available.
+      </div>`;
+
+    return;
+  }
+
+  box.innerHTML = "";
+
+  data.forEach(number => {
+
+    const country =
+      number.country ||
+      number.country_name ||
+      "International";
+
+    const phone =
+      number.number ||
+      number.phone_number ||
+      "Number";
+
+    const service =
+      number.service ||
+      number.platform ||
+      "SMS";
+
+    const price =
+      number.price || 0;
+
+    const card =
+      document.createElement("div");
+
+    card.className = "number-card";
+
+    card.innerHTML = `
+      <div class="country">
+        ${escapeHtml(country)}
+      </div>
+
+      <div class="number">
+        ${escapeHtml(phone)}
+      </div>
+
+      <div class="service">
+        ${escapeHtml(service)}
+      </div>
+
+      <div class="price">
+        ${money(price)}
+      </div>
+
+      <button class="buy">
+        Buy Number
+      </button>
+    `;
+
+    card
+      .querySelector(".buy")
+      .addEventListener(
+        "click",
+        () => openOrder(number)
+      );
+
+    box.appendChild(card);
+
+  });
+
+}
+
+
+/* =========================
+   ORDER MODAL
+========================= */
+
+function openOrder(number){
+
+  selectedNumber = number;
+
+  const country =
+    number.country ||
+    number.country_name ||
+    "International";
+
+  const phone =
+    number.number ||
+    number.phone_number ||
+    "Number";
+
+  const service =
+    number.service ||
+    number.platform ||
+    "SMS";
+
+  const price =
+    number.price || 0;
+
+  document.getElementById("orderDetails")
+    .innerHTML = `
+      <strong>Order details</strong>
+
+      <div class="payment-line">
+        <span>Country</span>
+        <b>${escapeHtml(country)}</b>
+      </div>
+
+      <div class="payment-line">
+        <span>Number</span>
+        <b>${escapeHtml(phone)}</b>
+      </div>
+
+      <div class="payment-line">
+        <span>Service</span>
+        <b>${escapeHtml(service)}</b>
+      </div>
+
+      <div class="payment-line">
+        <span>Price</span>
+        <b>${money(price)}</b>
+      </div>
+    `;
+
+  document.getElementById("orderModal")
+    .classList.add("show");
+
+}
+
+
+function closeOrder(){
+
+  document.getElementById("orderModal")
+    .classList.remove("show");
+
+  selectedNumber = null;
+
+}
+
+
+async function confirmOrder(){
+
+  if(!selectedNumber || !currentUser){
+
+    return;
+  }
+
+  await loadProfile();
+
+  const price =
+    Number(selectedNumber.price || 0);
+
+  const balance =
+    Number(currentProfile?.balance || 0);
+
+  if(price <= 0){
+
+    alert("Invalid number price.");
+
+    return;
+  }
+
+  if(balance < price){
+
+    alert(
+      "Insufficient balance. Please add money to your wallet first."
+    );
+
+    closeOrder();
+
+    go("wallet");
+
+    return;
+  }
+
+  /*
+    IMPORTANT:
+    The frontend does NOT deduct money here.
+    Real wallet deduction should happen in a
+    secure database RPC/transaction.
+  */
+
+  const {error} =
+    await db
+      .from("orders")
+      .insert({
+        user_id:currentUser.id,
+        number_id:selectedNumber.id,
+        status:"pending"
+      });
+
+  if(error){
+
+    alert(
+      "Order could not be created: " +
+      error.message
+    );
+
+    return;
+  }
+
+  alert(
+    "Order submitted successfully. Your order is now pending."
+  );
+
+  closeOrder();
+
+  await loadOrders();
+
+  go("orders");
+
+}
+
+
+/* =========================
+   ORDERS
+========================= */
+
+async function loadOrders(){
+
+  const box =
+    document.getElementById("ordersList");
+
+  box.innerHTML =
+    `<div class="card">Loading orders...</div>`;
+
+  const {data,error} =
+    await db
+      .from("orders")
+      .select("*")
+      .eq("user_id",currentUser.id)
+      .order("created_at",{
+        ascending:false
+      });
+
+  if(error){
+
+    box.innerHTML =
+      `<div class="card">
+        Unable to load orders.<br><br>
+        <small>${escapeHtml(error.message)}</small>
+      </div>`;
+
+    return;
+  }
+
+  if(!data || data.length === 0){
+
+    box.innerHTML =
+      `<div class="card">
+        You have no orders yet.
+      </div>`;
+
+    return;
+  }
+
+  box.innerHTML = "";
+
+  data.forEach(order => {
+
+    const item =
+      document.createElement("div");
+
+    item.className = "list-item";
+
+    const status =
+      String(order.status || "pending")
+        .toLowerCase();
+
+    item.innerHTML = `
+      <div class="list-main">
+        <strong>Order #${escapeHtml(order.id)}</strong>
+        <small>
+          ${order.created_at
+            ? new Date(order.created_at).toLocaleString()
+            : "Date unavailable"}
+        </small>
+      </div>
+
+      <div class="status ${escapeHtml(status)}">
+        ${escapeHtml(order.status || "pending")}
+      </div>
+    `;
+
+    box.appendChild(item);
+
+  });
+
+}
+
+
+/* =========================
+   TOPUP
+========================= */
+
+function openTopup(){
+
+  document.getElementById("topupAmount").value = "";
+
+  document.getElementById("topupReference").value = "";
+
+  document.getElementById("topupModal")
+    .classList.add("show");
+
+}
+
+
+function closeTopup(){
+
+  document.getElementById("topupModal")
+    .classList.remove("show");
+
+}
+
+
+async function submitTopup(){
+
+  const amount =
+    Number(
+      document.getElementById("topupAmount").value
+    );
+
+  const reference =
+    document.getElementById("topupReference")
+      .value.trim();
+
+  if(!amount || amount <= 0){
+
+    alert("Enter a valid amount.");
+
+    return;
+  }
+
+  if(!reference){
+
+    alert("Enter your payment reference.");
+
+    return;
+  }
+
+  const {error} =
+    await db
+      .from("payment_requests")
+      .insert({
+        user_id:currentUser.id,
+        amount:amount,
+        reference:reference,
+        status:"pending"
+      });
+
+  if(error){
+
+    alert(
+      "Payment request failed: " +
+      error.message
+    );
+
+    return;
+  }
+
+  alert(
+    "Payment submitted. It will remain pending until it is reviewed."
+  );
+
+  closeTopup();
+
+  await refreshDashboard();
+
+  go("transactions");
+
+}
+
+
+/* =========================
+   TRANSACTIONS
+========================= */
+
+async function loadTransactions(){
+
+  const box =
+    document.getElementById("transactionsList");
+
+  box.innerHTML =
+    `<div class="card">Loading transactions...</div>`;
+
+  const {data,error} =
+    await db
+      .from("payment_requests")
+      .select("*")
+      .eq("user_id",currentUser.id)
+      .order("created_at",{
+        ascending:false
+      });
+
+  if(error){
+
+    box.innerHTML =
+      `<div class="card">
+        Unable to load transactions.<br><br>
+        <small>${escapeHtml(error.message)}</small>
+      </div>`;
+
+    return;
+  }
+
+  if(!data || data.length === 0){
+
+    box.innerHTML =
+      `<div class="card">
+        No transactions yet.
+      </div>`;
+
+    return;
+  }
+
+  box.innerHTML = "";
+
+  data.forEach(payment => {
+
+    const status =
+      String(payment.status || "pending")
+        .toLowerCase();
+
+    const item =
+      document.createElement("div");
+
+    item.className = "list-item";
+
+    item.innerHTML = `
+      <div class="list-main">
+
+        <strong>
+          ${money(payment.amount)}
+        </strong>
+
+        <small>
+          Ref: ${escapeHtml(payment.reference || "N/A")}
+        </small>
+
+      </div>
+
+      <div class="status ${escapeHtml(status)}">
+        ${escapeHtml(payment.status || "pending")}
+      </div>
+    `;
+
+    box.appendChild(item);
+
+  });
+
+}
+
+
+/* =========================
+   SUPPORT
+========================= */
+
+function openWhatsApp(){
+
+  window.open(
+    "https://wa.me/2348164886717",
+    "_blank"
+  );
+
+}
+
+
+async function sendSupport(){
+
+  const message =
+    document.getElementById("supportMessage")
+      .value.trim();
+
+  if(!message){
+
+    alert("Write your message first.");
+
+    return;
+  }
+
+  const {error} =
+    await db
+      .from("messages")
+      .insert({
+        user_id:currentUser.id,
+        message:message
+      });
+
+  if(error){
+
+    alert(
+      "Message could not be sent: " +
+      error.message
+    );
+
+    return;
+  }
+
+  document.getElementById("supportMessage")
+    .value = "";
+
+  alert("Message sent successfully.");
+
+}
+
+
+/* =========================
+   LOGOUT
+========================= */
+
+async function logout(){
+
+  await db.auth.signOut();
+
+  currentUser = null;
+
+  currentProfile = null;
+
+  document.getElementById("app")
+    .classList.add("hidden");
+
+  document.getElementById("auth")
+    .classList.remove("hidden");
+
+  showLogin();
+
+}
+
+
+/* =========================
+   STARTUP
+========================= */
+
+async function start(){
+
+  const {data} =
+    await db.auth.getSession();
+
+  if(data.session){
+
+    currentUser = data.session.user;
+
+    await loadApp();
+
+  }else{
+
+    document.getElementById("auth")
+      .classList.remove("hidden");
+
+    document.getElementById("app")
+      .classList.add("hidden");
+
+  }
+
+}
+
+
+db.auth.onAuthStateChange(
+  async (event,session) => {
+
+    if(
+      session &&
+      !currentUser
+    ){
+
+      currentUser = session.user;
+
+      await loadApp();
+
+    }
+
+  }
+);
+
+
+/* =========================
+   CLOSE MODALS ON BACKDROP
+========================= */
+
+document
+  .getElementById("topupModal")
+  .addEventListener("click",function(e){
+
+    if(e.target === this){
+      closeTopup();
+    }
+
+  });
+
+
+document
+  .getElementById("orderModal")
+  .addEventListener("click",function(e){
+
+    if(e.target === this){
+      closeOrder();
+    }
+
+  });
+
+
+/* START */
+
+start();
+
+</script>
+
+</body>
+  </html>
