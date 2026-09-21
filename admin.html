@@ -323,19 +323,40 @@ th,td{
             <label>Country</label>
             <input id="numberCountry" placeholder="United States">
           </div>
+<div class="card">
+  <h3>Add number</h3>
 
-          <div>
-            <label>Phone number</label>
-            <input id="phoneNumber" placeholder="+14437274730">
-          </div>
-        </div>
+  <div class="formgrid">
 
-        <br>
+    <div>
+      <label>Country</label>
+      <input id="numberCountry" placeholder="United States">
+    </div>
 
-        <button class="btn green" onclick="addNumber()">
-          Add number
-        </button>
-      </div>
+    <div>
+      <label>Phone number</label>
+      <input id="phoneNumber" placeholder="+14437274730">
+    </div>
+
+    <div>
+      <label>Number price (₦)</label>
+      <input
+        id="numberPrice"
+        type="number"
+        min="0"
+        step="0.01"
+        placeholder="500"
+      >
+    </div>
+
+  </div>
+
+  <br>
+
+  <button class="btn green" onclick="addNumber()">
+    Add number
+  </button>
+</div>
 
       <div id="numbersList"></div>
     </section>
