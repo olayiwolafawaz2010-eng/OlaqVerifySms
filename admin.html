@@ -1255,23 +1255,30 @@ function showSection(id,button){
 ========================= */
 
 async function checkAdmin(){
+  const { data: { user }, error: authError } = await db.auth.getUser();
 
-  const {
-    data:{
-      user
-    },
-    error
-  } =
-    await db.auth.getUser();
-
-
-  if(error || !user){
-
-    window.location.href = "index.html";
-
+  if(authError || !user){
+    alert("Please login first.");
+    location.href = "index.html";
     return false;
   }
 
+  const { data: isAdmin, error } = await db.rpc("is_admin");
+
+  if(error){
+    console.error("Admin check error:", error);
+    alert("Unable to verify admin access.");
+    return false;
+  }
+
+  if(!isAdmin){
+    alert("Access denied. Admin account required.");
+    location.href = "index.html";
+    return false;
+  }
+
+  return true;
+}
 
   currentUser = user;
 
