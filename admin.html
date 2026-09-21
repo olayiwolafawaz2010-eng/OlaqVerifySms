@@ -1,0 +1,1877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OlaqVerify Admin</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#f5f3ff;
+  color:#171322;
+}
+
+button,input,select{font:inherit}
+
+button{cursor:pointer}
+
+.header{
+  background:linear-gradient(135deg,#4c1d95,#7c3aed);
+  color:#fff;
+  padding:24px 16px;
+  border-radius:0 0 24px 24px;
+}
+
+.header h1{
+  margin:0;
+  font-size:25px;
+}
+
+.header p{
+  margin:6px 0 0;
+  opacity:.85;
+}
+
+.container{
+  width:min(1100px,94%);
+  margin:18px auto 50px;
+}
+
+.status{
+  background:#fff;
+  padding:13px 15px;
+  border-radius:14px;
+  margin-bottom:15px;
+  box-shadow:0 3px 15px #0000000b;
+  font-size:14px;
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+  margin-bottom:18px;
+}
+
+.stat{
+  background:#fff;
+  padding:16px;
+  border-radius:16px;
+  box-shadow:0 3px 15px #0000000b;
+}
+
+.stat small{
+  color:#777;
+}
+
+.stat strong{
+  display:block;
+  font-size:23px;
+  margin-top:7px;
+}
+
+.tabs{
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding-bottom:5px;
+  margin-bottom:15px;
+}
+
+.tabs button{
+  border:0;
+  background:#fff;
+  padding:11px 15px;
+  border-radius:11px;
+  white-space:nowrap;
+}
+
+.tabs button.active{
+  background:#5b21b6;
+  color:#fff;
+}
+
+.panel{
+  display:none;
+  background:#fff;
+  padding:18px;
+  border-radius:18px;
+  box-shadow:0 3px 15px #0000000b;
+}
+
+.panel.active{
+  display:block;
+}
+
+h2{
+  margin:0 0 15px;
+  font-size:20px;
+}
+
+h3{
+  margin:5px 0 12px;
+}
+
+.card{
+  border:1px solid #eee;
+  border-radius:14px;
+  padding:14px;
+  margin:10px 0;
+}
+
+.row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+.muted{
+  color:#777;
+  font-size:13px;
+  margin-top:4px;
+}
+
+.good{color:#15803d}
+.bad{color:#dc2626}
+.pending{color:#b45309}
+
+.formgrid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+}
+
+input,select{
+  width:100%;
+  padding:12px;
+  border:1px solid #ddd;
+  border-radius:10px;
+  outline:none;
+  background:#fff;
+}
+
+input:focus,select:focus{
+  border-color:#7c3aed;
+}
+
+.btn{
+  border:0;
+  padding:10px 14px;
+  border-radius:10px;
+  background:#5b21b6;
+  color:#fff;
+}
+
+.btn.green{background:#15803d}
+.btn.red{background:#dc2626}
+.btn.orange{background:#d97706}
+.btn.gray{background:#555}
+
+.tablewrap{
+  overflow-x:auto;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:700px;
+  font-size:13px;
+}
+
+th,td{
+  padding:10px 8px;
+  border-bottom:1px solid #eee;
+  text-align:left;
+}
+
+.empty{
+  text-align:center;
+  color:#777;
+  padding:25px;
+}
+
+#login{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+
+.loginbox{
+  width:min(420px,100%);
+  background:#fff;
+  padding:25px;
+  border-radius:20px;
+  box-shadow:0 8px 35px #0002;
+}
+
+.loginbox h1{
+  color:#5b21b6;
+  margin-top:0;
+}
+
+@media(max-width:700px){
+  .stats{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .formgrid{
+    grid-template-columns:1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+
+<div id="login">
+
+  <div class="loginbox">
+
+    <h1>OlaqVerify Admin</h1>
+
+    <p class="muted">
+      Administrator login
+    </p>
+
+    <input
+      id="email"
+      type="email"
+      placeholder="Admin email"
+    >
+
+    <br><br>
+
+    <input
+      id="password"
+      type="password"
+      placeholder="Password"
+    >
+
+    <br><br>
+
+    <button
+      class="btn"
+      style="width:100%"
+      onclick="login()"
+    >
+      Sign in
+    </button>
+
+    <p id="loginMsg"></p>
+
+  </div>
+
+</div>
+
+
+<!-- ADMIN APP -->
+
+<div id="app" style="display:none">
+
+  <div class="header">
+
+    <div class="container">
+
+      <h1>OlaqVerify Admin</h1>
+
+      <p>
+        Manage payments, users, orders, numbers and settings.
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <div class="container">
+
+    <div id="status" class="status">
+      Checking administrator access...
+    </div>
+
+
+    <!-- STATS -->
+
+    <div class="stats">
+
+      <div class="stat">
+        <small>Users</small>
+        <strong id="usersCount">0</strong>
+      </div>
+
+      <div class="stat">
+        <small>Pending payments</small>
+        <strong id="pendingPayments">0</strong>
+      </div>
+
+      <div class="stat">
+        <small>Pending orders</small>
+        <strong id="pendingOrders">0</strong>
+      </div>
+
+      <div class="stat">
+        <small>Available numbers</small>
+        <strong id="availableNumbers">0</strong>
+      </div>
+
+    </div>
+
+
+    <!-- TABS -->
+
+    <div class="tabs">
+
+      <button
+        class="active"
+        onclick="showPanel('dashboard',this)"
+      >
+        Dashboard
+      </button>
+
+      <button onclick="showPanel('payments',this)">
+        Payments
+      </button>
+
+      <button onclick="showPanel('users',this)">
+        Users
+      </button>
+
+      <button onclick="showPanel('orders',this)">
+        Orders
+      </button>
+
+      <button onclick="showPanel('numbers',this)">
+        Numbers
+      </button>
+
+      <button onclick="showPanel('prices',this)">
+        Pricing
+      </button>
+
+      <button onclick="showPanel('messages',this)">
+        Messages
+      </button>
+
+      <button onclick="showPanel('settings',this)">
+        Settings
+      </button>
+
+    </div>
+
+
+    <!-- DASHBOARD -->
+
+    <section
+      id="dashboard"
+      class="panel active"
+    >
+
+      <h2>Dashboard</h2>
+
+      <div class="card">
+
+        <b>OlaqVerify system</b>
+
+        <p class="muted">
+          Payment approval is controlled by the administrator.
+          Available numbers are automatically assigned when customers place orders.
+        </p>
+
+      </div>
+
+      <div class="card">
+
+        <div class="row">
+
+          <div>
+            <b>Refresh system</b>
+
+            <div class="muted">
+              Reload users, payments, orders, numbers and SMS.
+            </div>
+          </div>
+
+          <button
+            class="btn"
+            onclick="refreshAll()"
+          >
+            Refresh
+          </button>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- PAYMENTS -->
+
+    <section
+      id="payments"
+      class="panel"
+    >
+
+      <h2>Payment Requests</h2>
+
+      <div id="paymentsList">
+        Loading...
+      </div>
+
+    </section>
+
+
+    <!-- USERS -->
+
+    <section
+      id="users"
+      class="panel"
+    >
+
+      <h2>Users & Wallets</h2>
+
+      <div id="usersList">
+        Loading...
+      </div>
+
+    </section>
+
+
+    <!-- ORDERS -->
+
+    <section
+      id="orders"
+      class="panel"
+    >
+
+      <h2>Orders</h2>
+
+      <div id="ordersList">
+        Loading...
+      </div>
+
+    </section>
+
+
+    <!-- NUMBERS -->
+
+    <section
+      id="numbers"
+      class="panel"
+    >
+
+      <h2>Number Inventory</h2>
+
+
+      <div class="card">
+
+        <h3>Add number</h3>
+
+        <div class="formgrid">
+
+          <div>
+
+            <label>Country</label>
+
+            <input
+              id="numberCountry"
+              placeholder="United States"
+            >
+
+          </div>
+
+
+          <div>
+
+            <label>Phone number</label>
+
+            <input
+              id="phoneNumber"
+              placeholder="+14437274730"
+            >
+
+          </div>
+
+
+          <div>
+
+            <label>Price (₦)</label>
+
+            <input
+              id="numberPrice"
+              type="number"
+              min="0"
+              step="0.01"
+              placeholder="500"
+            >
+
+          </div>
+
+        </div>
+
+        <br>
+
+        <button
+          class="btn green"
+          onclick="addNumber()"
+        >
+          Add number
+        </button>
+
+      </div>
+
+
+      <div id="numbersList">
+        Loading...
+      </div>
+
+    </section>
+
+
+    <!-- PRICES -->
+
+    <section
+      id="prices"
+      class="panel"
+    >
+
+      <h2>Pricing Catalogue</h2>
+
+      <div id="pricesList">
+        Loading...
+      </div>
+
+    </section>
+
+
+    <!-- MESSAGES -->
+
+    <section
+      id="messages"
+      class="panel"
+    >
+
+      <h2>Incoming SMS</h2>
+
+      <div id="messagesList">
+        Loading...
+      </div>
+
+    </section>
+
+
+    <!-- SETTINGS -->
+
+    <section
+      id="settings"
+      class="panel"
+    >
+
+      <h2>Settings</h2>
+
+
+      <div class="card">
+
+        <div class="row">
+
+          <div>
+
+            <b>Transactions</b>
+
+            <div
+              id="transactionText"
+              class="muted"
+            >
+              Loading...
+            </div>
+
+          </div>
+
+
+          <input
+            id="transactionsSwitch"
+            type="checkbox"
+            style="width:22px;height:22px"
+            onchange="toggleTransactions(this.checked)"
+          >
+
+        </div>
+
+      </div>
+
+
+      <div class="card">
+
+        <b>Support</b>
+
+        <p class="muted">
+          WhatsApp: +234 816 488 6717
+        </p>
+
+        <a
+          href="https://wa.me/2348164886717"
+          target="_blank"
+        >
+          Open WhatsApp support
+        </a>
+
+      </div>
+
+
+      <button
+        class="btn red"
+        onclick="logout()"
+      >
+        Log out
+      </button>
+
+    </section>
+
+  </div>
+
+</div>
+
+
+<script>
+
+const SUPABASE_URL =
+"https://alemtvfchysptzgzhaap.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_UEnF6pfZ2ORRcuIQUzgbRw_6bWNDnKm";
+
+const db =
+supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+
+function esc(value){
+
+  return String(value ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+
+}
+
+
+function money(value){
+
+  return "₦" +
+    Number(value || 0)
+    .toLocaleString(
+      "en-NG",
+      {
+        minimumFractionDigits:2,
+        maximumFractionDigits:2
+      }
+    );
+
+}
+
+
+function setStatus(text,good=true){
+
+  const el =
+    document.getElementById("status");
+
+  el.textContent=text;
+
+  el.className =
+    "status " +
+    (good ? "good" : "bad");
+
+}
+
+
+async function login(){
+
+  const email =
+    document.getElementById("email")
+    .value.trim();
+
+  const password =
+    document.getElementById("password")
+    .value;
+
+  const msg =
+    document.getElementById("loginMsg");
+
+  msg.textContent="Signing in...";
+
+  const {data,error} =
+    await db.auth.signInWithPassword({
+      email,
+      password
+    });
+
+  if(error){
+
+    msg.className="bad";
+    msg.textContent=error.message;
+
+    return;
+  }
+
+  await startAdmin();
+
+}
+
+
+async function startAdmin(){
+
+  const {data,error} =
+    await db.rpc("is_admin");
+
+  if(error || data !== true){
+
+    await db.auth.signOut();
+
+    document.getElementById("loginMsg")
+      .textContent=
+      "This account is not an administrator.";
+
+    return;
+  }
+
+  document.getElementById("login")
+    .style.display="none";
+
+  document.getElementById("app")
+    .style.display="block";
+
+  setStatus("Administrator access verified.");
+
+  await refreshAll();
+
+}
+
+
+async function logout(){
+
+  await db.auth.signOut();
+
+  location.reload();
+
+}
+
+
+function showPanel(id,button){
+
+  document
+    .querySelectorAll(".panel")
+    .forEach(
+      x=>x.classList.remove("active")
+    );
+
+  document
+    .querySelectorAll(".tabs button")
+    .forEach(
+      x=>x.classList.remove("active")
+    );
+
+  document
+    .getElementById(id)
+    .classList.add("active");
+
+  if(button)
+    button.classList.add("active");
+
+}
+
+
+/* =========================
+   REFRESH
+========================= */
+
+async function refreshAll(){
+
+  setStatus("Refreshing admin data...");
+
+  await Promise.all([
+    loadStats(),
+    loadPayments(),
+    loadUsers(),
+    loadOrders(),
+    loadNumbers(),
+    loadPrices(),
+    loadMessages(),
+    loadSettings()
+  ]);
+
+  setStatus("Admin data updated.");
+
+}
+
+
+/* =========================
+   STATS
+========================= */
+
+async function loadStats(){
+
+  const users =
+    await db
+      .from("profiles")
+      .select("id",{count:"exact",head:true});
+
+
+  const payments =
+    await db
+      .from("payment_requests")
+      .select("id",{count:"exact",head:true})
+      .eq("status","pending");
+
+
+  const orders =
+    await db
+      .from("orders")
+      .select("id",{count:"exact",head:true})
+      .eq("status","pending");
+
+
+  const numbers =
+    await db
+      .from("numbers")
+      .select("id",{count:"exact",head:true})
+      .is("order_id",null);
+
+
+  document.getElementById("usersCount")
+    .textContent=users.count ?? 0;
+
+  document.getElementById("pendingPayments")
+    .textContent=payments.count ?? 0;
+
+  document.getElementById("pendingOrders")
+    .textContent=orders.count ?? 0;
+
+  document.getElementById("availableNumbers")
+    .textContent=numbers.count ?? 0;
+
+}
+
+
+/* =========================
+   PAYMENTS
+========================= */
+
+async function loadPayments(){
+
+  const box =
+    document.getElementById("paymentsList");
+
+  const {data,error} =
+    await db
+      .from("payment_requests")
+      .select("*")
+      .order("created_at",{ascending:false});
+
+  if(error){
+
+    box.innerHTML =
+      `<div class="empty bad">
+        ${esc(error.message)}
+      </div>`;
+
+    return;
+  }
+
+  if(!data?.length){
+
+    box.innerHTML =
+      `<div class="empty">
+        No payment requests.
+      </div>`;
+
+    return;
+  }
+
+
+  box.innerHTML =
+    data.map(p=>{
+
+      const status =
+        String(p.status || "pending")
+        .toLowerCase();
+
+      return `
+
+        <div class="card">
+
+          <div class="row">
+
+            <div>
+
+              <b>${money(p.amount)}</b>
+
+              <div class="muted">
+                User: ${esc(p.user_id)}
+              </div>
+
+              <div class="muted">
+                Reference:
+                ${esc(p.reference || "None")}
+              </div>
+
+              <div class="muted">
+                ${esc(p.created_at || "")}
+              </div>
+
+            </div>
+
+
+            <b class="${
+              status==="approved"
+              ?"good"
+              :status==="declined"
+              ?"bad"
+              :"pending"
+            }">
+
+              ${esc(status)}
+
+            </b>
+
+          </div>
+
+
+          ${
+            status==="pending"
+
+            ?
+
+            `
+
+            <br>
+
+            <button
+              class="btn green"
+              onclick="approvePayment('${p.id}')"
+            >
+              Approve
+            </button>
+
+            <button
+              class="btn red"
+              onclick="declinePayment('${p.id}')"
+            >
+              Decline
+            </button>
+
+            `
+
+            :
+
+            ""
+
+          }
+
+        </div>
+
+      `;
+
+    }).join("");
+
+}
+
+
+async function approvePayment(id){
+
+  if(!confirm("Approve this payment?"))
+    return;
+
+  const {error} =
+    await db.rpc(
+      "approve_payment",
+      {
+        p_payment_id:id
+      }
+    );
+
+  if(error){
+
+    alert(error.message);
+
+    return;
+  }
+
+  alert("Payment approved.");
+
+  await refreshAll();
+
+}
+
+
+async function declinePayment(id){
+
+  if(!confirm("Decline this payment?"))
+    return;
+
+  const {error} =
+    await db.rpc(
+      "decline_payment",
+      {
+        p_payment_id:id
+      }
+    );
+
+  if(error){
+
+    alert(error.message);
+
+    return;
+  }
+
+  alert("Payment declined.");
+
+  await refreshAll();
+
+}
+
+
+/* =========================
+   USERS
+========================= */
+
+async function loadUsers(){
+
+  const box =
+    document.getElementById("usersList");
+
+  const {data,error} =
+    await db
+      .from("profiles")
+      .select("id,name,balance,role")
+      .order("balance",{ascending:false});
+
+  if(error){
+
+    box.innerHTML =
+      `<div class="empty bad">
+        ${esc(error.message)}
+      </div>`;
+
+    return;
+  }
+
+  if(!data?.length){
+
+    box.innerHTML =
+      `<div class="empty">
+        No users.
+      </div>`;
+
+    return;
+  }
+
+
+  box.innerHTML =
+    data.map(u=>`
+
+      <div class="card">
+
+        <div class="row">
+
+          <div>
+
+            <b>
+              ${esc(u.name || "Unnamed user")}
+            </b>
+
+            <div class="muted">
+              ${esc(u.id)}
+            </div>
+
+            <div class="muted">
+              Role: ${esc(u.role || "user")}
+            </div>
+
+          </div>
+
+          <strong>
+            ${money(u.balance)}
+          </strong>
+
+        </div>
+
+      </div>
+
+    `).join("");
+
+}
+
+
+/* =========================
+   ORDERS
+========================= */
+
+async function loadOrders(){
+
+  const box =
+    document.getElementById("ordersList");
+
+  const {data,error} =
+    await db
+      .from("orders")
+      .select("*")
+      .order("created_at",{ascending:false});
+
+  if(error){
+
+    box.innerHTML =
+      `<div class="empty bad">
+        ${esc(error.message)}
+      </div>`;
+
+    return;
+  }
+
+  if(!data?.length){
+
+    box.innerHTML =
+      `<div class="empty">
+        No orders yet.
+      </div>`;
+
+    return;
+  }
+
+
+  box.innerHTML =
+    data.map(o=>`
+
+      <div class="card">
+
+        <div class="row">
+
+          <div>
+
+            <b>
+              ${esc(o.country)}
+              —
+              ${esc(o.service)}
+            </b>
+
+            <div class="muted">
+              User: ${esc(o.user_id)}
+            </div>
+
+            <div class="muted">
+              Order: ${esc(o.id)}
+            </div>
+
+            <div class="muted">
+              Price: ${money(o.price)}
+            </div>
+
+          </div>
+
+
+          <b class="${
+            o.status==="fulfilled"
+            ?"good"
+            :o.status==="cancelled"
+            ?"bad"
+            :"pending"
+          }">
+
+            ${esc(o.status)}
+
+          </b>
+
+        </div>
+
+
+        ${
+          o.assigned_number
+
+          ?
+
+          `<div style="margin-top:10px">
+            <b>Assigned number:</b>
+            ${esc(o.assigned_number)}
+          </div>`
+
+          :
+
+          `<div class="muted" style="margin-top:10px">
+            Waiting for number assignment.
+          </div>`
+
+        }
+
+      </div>
+
+    `).join("");
+
+}
+
+
+/* =========================
+   NUMBERS
+========================= */
+
+async function addNumber(){
+
+  const country =
+    document
+      .getElementById("numberCountry")
+      .value.trim();
+
+
+  const phone =
+    document
+      .getElementById("phoneNumber")
+      .value.trim();
+
+
+  const price =
+    Number(
+      document
+        .getElementById("numberPrice")
+        .value
+    );
+
+
+  if(!country){
+
+    alert("Enter the country.");
+
+    return;
+  }
+
+
+  if(!phone){
+
+    alert("Enter the phone number.");
+
+    return;
+  }
+
+
+  if(
+    !Number.isFinite(price) ||
+    price < 0
+  ){
+
+    alert("Enter a valid price.");
+
+    return;
+  }
+
+
+  const {error} =
+    await db
+      .from("numbers")
+      .insert({
+
+        country:country,
+
+        phone_number:phone,
+
+        price:price,
+
+        order_id:null,
+
+        assigned_at:null
+
+      });
+
+
+  if(error){
+
+    alert(error.message);
+
+    return;
+  }
+
+
+  document
+    .getElementById("numberCountry")
+    .value="";
+
+  document
+    .getElementById("phoneNumber")
+    .value="";
+
+  document
+    .getElementById("numberPrice")
+    .value="";
+
+
+  alert("Number added successfully.");
+
+  await refreshAll();
+
+}
+
+
+async function loadNumbers(){
+
+  const box =
+    document.getElementById("numbersList");
+
+
+  const {data,error} =
+    await db
+      .from("numbers")
+      .select(
+        "id,country,phone_number,price,order_id,assigned_at"
+      )
+      .order("country");
+
+
+  if(error){
+
+    box.innerHTML =
+      `<div class="empty bad">
+        ${esc(error.message)}
+      </div>`;
+
+    return;
+  }
+
+
+  if(!data?.length){
+
+    box.innerHTML =
+      `<div class="empty">
+        No numbers in inventory.
+      </div>`;
+
+    return;
+  }
+
+
+  box.innerHTML=`
+
+    <h3>Current inventory</h3>
+
+    <div class="tablewrap">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>Country</th>
+
+            <th>Phone</th>
+
+            <th>Price</th>
+
+            <th>Status</th>
+
+            <th>Order</th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+          ${
+            data.map(n=>`
+
+              <tr>
+
+                <td>
+                  ${esc(n.country)}
+                </td>
+
+                <td>
+                  <b>
+                    ${esc(n.phone_number)}
+                  </b>
+                </td>
+
+                <td>
+                  ${money(n.price)}
+                </td>
+
+                <td>
+
+                  ${
+                    n.order_id
+
+                    ?
+
+                    `<span class="bad">
+                      Assigned
+                    </span>`
+
+                    :
+
+                    `<span class="good">
+                      Available
+                    </span>`
+                  }
+
+                </td>
+
+                <td>
+                  ${esc(n.order_id || "-")}
+                </td>
+
+              </tr>
+
+            `).join("")
+          }
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  `;
+
+}
+
+
+/* =========================
+   PRICES
+========================= */
+
+async function loadPrices(){
+
+  const box =
+    document.getElementById("pricesList");
+
+  const {data,error} =
+    await db
+      .from("prices")
+      .select("*")
+      .order("country")
+      .order("service");
+
+  if(error){
+
+    box.innerHTML =
+      `<div class="empty bad">
+        ${esc(error.message)}
+      </div>`;
+
+    return;
+  }
+
+
+  if(!data?.length){
+
+    box.innerHTML =
+      `<div class="empty">
+        No prices found.
+      </div>`;
+
+    return;
+  }
+
+
+  box.innerHTML=`
+
+    <div class="tablewrap">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>Country</th>
+            <th>Service</th>
+            <th>Provider cost</th>
+            <th>Customer price</th>
+            <th>Active</th>
+            <th></th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+          ${
+            data.map(p=>`
+
+              <tr>
+
+                <td>
+                  ${esc(p.flag || "")}
+                  ${esc(p.country)}
+                </td>
+
+                <td>
+                  ${esc(p.service)}
+                </td>
+
+                <td>
+
+                  <input
+                    id="provider-${p.id}"
+                    type="number"
+                    value="${esc(p.provider_cost)}"
+                  >
+
+                </td>
+
+                <td>
+
+                  <input
+                    id="customer-${p.id}"
+                    type="number"
+                    value="${esc(p.customer_price)}"
+                  >
+
+                </td>
+
+                <td>
+
+                  <input
+                    id="active-${p.id}"
+                    type="checkbox"
+                    ${p.active ? "checked":""}
+                  >
+
+                </td>
+
+                <td>
+
+                  <button
+                    class="btn"
+                    onclick="savePrice('${p.id}')"
+                  >
+                    Save
+                  </button>
+
+                </td>
+
+              </tr>
+
+            `).join("")
+          }
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  `;
+
+}
+
+
+async function savePrice(id){
+
+  const provider =
+    Number(
+      document
+        .getElementById("provider-"+id)
+        .value
+    );
+
+
+  const customer =
+    Number(
+      document
+        .getElementById("customer-"+id)
+        .value
+    );
+
+
+  const active =
+    document
+      .getElementById("active-"+id)
+      .checked;
+
+
+  if(
+    !Number.isFinite(provider) ||
+    !Number.isFinite(customer) ||
+    provider < 0 ||
+    customer < 0
+  ){
+
+    alert("Enter valid prices.");
+
+    return;
+  }
+
+
+  const {error} =
+    await db
+      .from("prices")
+      .update({
+
+        provider_cost:provider,
+
+        customer_price:customer,
+
+        active:active,
+
+        updated_at:
+          new Date().toISOString()
+
+      })
+      .eq("id",id);
+
+
+  if(error){
+
+    alert(error.message);
+
+    return;
+  }
+
+
+  alert("Price updated.");
+
+}
+
+
+/* =========================
+   SMS
+========================= */
+
+async function loadMessages(){
+
+  const box =
+    document.getElementById("messagesList");
+
+  const {data,error} =
+    await db
+      .from("messages")
+      .select("*")
+      .order("created_at",{ascending:false})
+      .limit(100);
+
+
+  if(error){
+
+    box.innerHTML =
+      `<div class="empty bad">
+        ${esc(error.message)}
+      </div>`;
+
+    return;
+  }
+
+
+  if(!data?.length){
+
+    box.innerHTML =
+      `<div class="empty">
+        No SMS received yet.
+      </div>`;
+
+    return;
+  }
+
+
+  box.innerHTML =
+    data.map(m=>`
+
+      <div class="card">
+
+        <div class="row">
+
+          <div>
+
+            <b>
+              ${esc(m.sender || "Unknown")}
+            </b>
+
+            →
+
+            <b>
+              ${esc(
+                m.receiver ||
+                m.phone_number ||
+                ""
+              )}
+            </b>
+
+          </div>
+
+          <span class="muted">
+            ${esc(
+              m.created_at ||
+              m.timestamp ||
+              ""
+            )}
+          </span>
+
+        </div>
+
+
+        <p>
+          ${esc(m.message || "")}
+        </p>
+
+
+        <div class="muted">
+          User: ${esc(m.user_id || "")}
+        </div>
+
+      </div>
+
+    `).join("");
+
+}
+
+
+/* =========================
+   SETTINGS
+========================= */
+
+async function loadSettings(){
+
+  const {data,error} =
+    await db
+      .from("site_settings")
+      .select("key,value")
+      .eq(
+        "key",
+        "transactions_enabled"
+      )
+      .maybeSingle();
+
+
+  if(error){
+
+    document
+      .getElementById("transactionText")
+      .textContent=error.message;
+
+    return;
+  }
+
+
+  const enabled =
+    data
+      ? (
+          data.value === true ||
+          data.value === "true"
+        )
+      : true;
+
+
+  document
+    .getElementById("transactionsSwitch")
+    .checked=enabled;
+
+
+  document
+    .getElementById("transactionText")
+    .textContent =
+      enabled
+      ? "Customers can place orders."
+      : "Customer transactions are paused.";
+
+}
+
+
+async function toggleTransactions(enabled){
+
+  const {error} =
+    await db.rpc(
+      "set_transactions_enabled",
+      {
+        p_enabled:enabled
+      }
+    );
+
+
+  if(error){
+
+    alert(error.message);
+
+    document
+      .getElementById(
+        "transactionsSwitch"
+      )
+      .checked=!enabled;
+
+    return;
+  }
+
+
+  await loadSettings();
+
+}
+
+
+/* =========================
+   START
+========================= */
+
+(async function(){
+
+  const {data} =
+    await db.auth.getSession();
+
+  if(data.session){
+
+    await startAdmin();
+
+  }
+
+})();
+
+
+db.auth.onAuthStateChange(
+  async(event,session)=>{
+
+    if(
+      event==="SIGNED_IN" &&
+      session
+    ){
+
+      await startAdmin();
+
+    }
+
+  }
+);
+
+
+setInterval(()=>{
+
+  const app =
+    document.getElementById("app");
+
+  if(
+    app &&
+    app.style.display==="block"
+  ){
+
+    refreshAll();
+
+  }
+
+},15000);
+
+</script>
+
+</body>
+</html>
