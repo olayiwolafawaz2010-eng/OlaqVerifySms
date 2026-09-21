@@ -1,0 +1,1844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>OlaqVerify Admin</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{box-sizing:border-box}
+:root{
+  --purple:#6d28d9;
+  --purple2:#4c1d95;
+  --light:#f5f3ff;
+  --card:#fff;
+  --text:#18181b;
+  --muted:#71717a;
+  --border:#e4e4e7;
+  --green:#16a34a;
+  --red:#dc2626;
+  --orange:#ea580c;
+}
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#f6f5fb;
+  color:var(--text);
+}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer;border:0}
+#app{display:none}
+
+.top{
+  background:linear-gradient(135deg,var(--purple2),var(--purple));
+  color:#fff;
+  padding:18px;
+  position:sticky;
+  top:0;
+  z-index:20;
+  box-shadow:0 5px 20px #0002;
+}
+.toprow{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+.logo{
+  font-size:23px;
+  font-weight:800;
+}
+.adminbadge{
+  font-size:11px;
+  background:#ffffff22;
+  padding:7px 10px;
+  border-radius:20px;
+}
+.logout{
+  background:#fff;
+  color:var(--purple2);
+  padding:9px 12px;
+  border-radius:10px;
+  font-weight:700;
+}
+
+.container{
+  max-width:1200px;
+  margin:auto;
+  padding:18px;
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+  margin-bottom:18px;
+}
+.stat{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:16px;
+}
+.stat small{color:var(--muted)}
+.stat strong{
+  display:block;
+  font-size:25px;
+  margin-top:8px;
+}
+
+.nav{
+  display:flex;
+  gap:8px;
+  overflow:auto;
+  padding-bottom:10px;
+  margin-bottom:15px;
+}
+.nav button{
+  white-space:nowrap;
+  background:#fff;
+  border:1px solid var(--border);
+  padding:10px 14px;
+  border-radius:12px;
+  font-weight:700;
+}
+.nav button.active{
+  background:var(--purple);
+  color:white;
+  border-color:var(--purple);
+}
+
+.section{display:none}
+.section.active{display:block}
+
+.card{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:18px;
+  margin-bottom:15px;
+}
+.card h2{
+  margin:0 0 14px;
+  font-size:18px;
+}
+.card h3{
+  margin:0 0 10px;
+  font-size:15px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+}
+
+input,select,textarea{
+  width:100%;
+  padding:12px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  outline:none;
+  background:#fff;
+}
+input:focus,select:focus,textarea:focus{
+  border-color:var(--purple);
+  box-shadow:0 0 0 3px #6d28d91a;
+}
+
+label{
+  display:block;
+  font-size:12px;
+  color:var(--muted);
+  margin-bottom:6px;
+  font-weight:700;
+}
+
+.primary{
+  background:var(--purple);
+  color:#fff;
+  padding:11px 15px;
+  border-radius:10px;
+  font-weight:700;
+}
+.secondary{
+  background:var(--light);
+  color:var(--purple2);
+  padding:10px 13px;
+  border-radius:10px;
+  font-weight:700;
+}
+.danger{
+  background:#fee2e2;
+  color:#991b1b;
+  padding:10px 13px;
+  border-radius:10px;
+  font-weight:700;
+}
+.success{
+  background:#dcfce7;
+  color:#166534;
+  padding:10px 13px;
+  border-radius:10px;
+  font-weight:700;
+}
+
+.tablewrap{
+  overflow:auto;
+  border:1px solid var(--border);
+  border-radius:13px;
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:700px;
+}
+th,td{
+  padding:12px;
+  border-bottom:1px solid var(--border);
+  text-align:left;
+  font-size:13px;
+}
+th{
+  background:#fafafa;
+  color:#52525b;
+}
+tr:last-child td{border-bottom:0}
+
+.badge{
+  display:inline-block;
+  padding:5px 9px;
+  border-radius:20px;
+  font-size:11px;
+  font-weight:700;
+}
+.pending{background:#fef3c7;color:#92400e}
+.approved,.fulfilled{background:#dcfce7;color:#166534}
+.declined{background:#fee2e2;color:#991b1b}
+
+.actions{
+  display:flex;
+  gap:7px;
+  flex-wrap:wrap;
+}
+
+.empty{
+  text-align:center;
+  padding:30px;
+  color:var(--muted);
+}
+
+.notice{
+  padding:12px;
+  border-radius:12px;
+  background:#f5f3ff;
+  color:#4c1d95;
+  font-size:13px;
+  margin-bottom:12px;
+}
+
+.switchrow{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+.switch{
+  width:55px;
+  height:30px;
+  border-radius:30px;
+  background:#d4d4d8;
+  position:relative;
+  cursor:pointer;
+}
+.switch span{
+  width:24px;
+  height:24px;
+  background:white;
+  border-radius:50%;
+  position:absolute;
+  top:3px;
+  left:3px;
+  transition:.2s;
+  box-shadow:0 2px 5px #0003;
+}
+.switch.on{
+  background:var(--green);
+}
+.switch.on span{
+  left:28px;
+}
+
+.toast{
+  position:fixed;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#18181b;
+  color:white;
+  padding:12px 16px;
+  border-radius:12px;
+  z-index:100;
+  display:none;
+  max-width:90%;
+  text-align:center;
+}
+
+@media(max-width:800px){
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .grid{grid-template-columns:1fr}
+}
+@media(max-width:500px){
+  .container{padding:12px}
+  .stats{gap:8px}
+  .stat{padding:12px}
+  .stat strong{font-size:20px}
+}
+</style>
+</head>
+
+<body>
+
+<div id="loading" style="
+position:fixed;inset:0;
+display:flex;align-items:center;justify-content:center;
+background:#4c1d95;color:white;
+font-weight:bold;font-size:18px">
+Loading OlaqVerify Admin...
+</div>
+
+<div id="app">
+
+<header class="top">
+  <div class="toprow">
+    <div>
+      <div class="logo">OlaqVerify</div>
+      <div class="adminbadge">ADMIN CONTROL CENTRE</div>
+    </div>
+    <button class="logout" id="logoutBtn">Logout</button>
+  </div>
+</header>
+
+<main class="container">
+
+<div class="stats">
+  <div class="stat">
+    <small>Users</small>
+    <strong id="statUsers">0</strong>
+  </div>
+  <div class="stat">
+    <small>Wallet balance</small>
+    <strong id="statBalance">₦0</strong>
+  </div>
+  <div class="stat">
+    <small>Pending orders</small>
+    <strong id="statOrders">0</strong>
+  </div>
+  <div class="stat">
+    <small>Available numbers</small>
+    <strong id="statNumbers">0</strong>
+  </div>
+</div>
+
+<nav class="nav">
+  <button class="active" data-section="dashboard">Dashboard</button>
+  <button data-section="payments">Payments</button>
+  <button data-section="users">Users</button>
+  <button data-section="pricing">Pricing</button>
+  <button data-section="deals">Deals</button>
+  <button data-section="orders">Orders</button>
+  <button data-section="inventory">Numbers</button>
+  <button data-section="messages">Messages</button>
+  <button data-section="settings">Settings</button>
+</nav>
+
+<!-- DASHBOARD -->
+<section id="dashboard" class="section active">
+
+<div class="card">
+<h2>OlaqVerify overview</h2>
+<div class="notice">
+Use this panel to control the catalogue, approve customer payments,
+assign available numbers to orders and monitor incoming SMS.
+</div>
+
+<div class="grid">
+
+<div>
+<h3>System</h3>
+<p id="systemStatus">Checking...</p>
+</div>
+
+<div>
+<h3>Transactions</h3>
+<p id="transactionStatus">Checking...</p>
+</div>
+
+</div>
+</div>
+
+<div class="card">
+<h2>Recent orders</h2>
+<div id="recentOrders"></div>
+</div>
+
+</section>
+
+<!-- PAYMENTS -->
+<section id="payments" class="section">
+
+<div class="card">
+<h2>Payment requests</h2>
+<div id="paymentsList">Loading...</div>
+</div>
+
+</section>
+
+<!-- USERS -->
+<section id="users" class="section">
+
+<div class="card">
+<h2>Users & wallets</h2>
+
+<div class="grid" style="margin-bottom:15px">
+<input id="userSearch" placeholder="Search by name or ID">
+<button class="secondary" onclick="loadUsers()">Refresh users</button>
+</div>
+
+<div id="usersList">Loading...</div>
+</div>
+
+</section>
+
+<!-- PRICING -->
+<section id="pricing" class="section">
+
+<div class="card">
+<h2>Add / update price</h2>
+
+<div class="grid">
+
+<div>
+<label>Country</label>
+<input id="priceCountry" placeholder="Nigeria">
+</div>
+
+<div>
+<label>Service</label>
+<select id="priceService">
+<option>WhatsApp</option>
+<option>TikTok</option>
+<option>Facebook</option>
+<option>Telegram</option>
+</select>
+</div>
+
+<div>
+<label>Flag</label>
+<input id="priceFlag" placeholder="🇳🇬">
+</div>
+
+<div>
+<label>Provider cost</label>
+<input id="providerCost" type="number" min="0" placeholder="0">
+</div>
+
+<div>
+<label>Customer price</label>
+<input id="customerPrice" type="number" min="0" placeholder="500">
+</div>
+
+<div>
+<label>Currency</label>
+<input id="priceCurrency" value="NGN">
+</div>
+
+</div>
+
+<br>
+
+<button class="primary" onclick="savePrice()">Save price</button>
+</div>
+
+<div class="card">
+<h2>Price catalogue</h2>
+<div id="pricesList">Loading...</div>
+</div>
+
+</section>
+
+<!-- DEALS -->
+<section id="deals" class="section">
+
+<div class="card">
+<h2>Create flash deal</h2>
+
+<div class="grid">
+
+<div>
+<label>Title</label>
+<input id="dealTitle" placeholder="Weekend Special">
+</div>
+
+<div>
+<label>Description</label>
+<input id="dealDescription" placeholder="Limited-time offer">
+</div>
+
+<div>
+<label>Price ID</label>
+<input id="dealPriceId" placeholder="Paste price ID">
+</div>
+
+<div>
+<label>Original price</label>
+<input id="dealOriginal" type="number">
+</div>
+
+<div>
+<label>Deal price</label>
+<input id="dealPrice" type="number">
+</div>
+
+<div>
+<label>Quantity</label>
+<input id="dealQuantity" type="number" min="1">
+</div>
+
+</div>
+
+<br>
+<button class="primary" onclick="createDeal()">Create deal</button>
+</div>
+
+<div class="card">
+<h2>Active deals</h2>
+<div id="dealsList">Loading...</div>
+</div>
+
+</section>
+
+<!-- ORDERS -->
+<section id="orders" class="section">
+
+<div class="card">
+<h2>Customer orders</h2>
+
+<div class="notice">
+To fulfil an order, select an available number from the matching country.
+The assignment is performed through the secured
+<code>assign_number_to_order</code> RPC.
+</div>
+
+<div id="ordersList">Loading...</div>
+</div>
+
+</section>
+
+<!-- INVENTORY -->
+<section id="inventory" class="section">
+
+<div class="card">
+<h2>Add number to inventory</h2>
+
+<div class="grid">
+
+<div>
+<label>Country</label>
+<input id="numberCountry" placeholder="United States">
+</div>
+
+<div>
+<label>Number</label>
+<input id="numberValue" placeholder="+14437274730">
+</div>
+
+</div>
+
+<br>
+
+<button class="primary" onclick="addNumber()">Add number</button>
+</div>
+
+<div class="card">
+<h2>Number inventory</h2>
+<div id="numbersList">Loading...</div>
+</div>
+
+</section>
+
+<!-- MESSAGES -->
+<section id="messages" class="section">
+
+<div class="card">
+<h2>SMS inbox</h2>
+<div class="notice">
+Incoming provider messages will appear here after the Telnyx webhook is connected to the database.
+</div>
+<div id="messagesList">Loading...</div>
+</div>
+
+</section>
+
+<!-- SETTINGS -->
+<section id="settings" class="section">
+
+<div class="card">
+
+<h2>Transaction control</h2>
+
+<div class="switchrow">
+
+<div>
+<strong>Customer transactions</strong>
+<div style="font-size:12px;color:#71717a;margin-top:4px">
+Controls whether customers can create new orders.
+</div>
+</div>
+
+<div id="transactionSwitch" class="switch" onclick="toggleTransactions()">
+<span></span>
+</div>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>Admin information</h2>
+
+<p id="adminEmail">Loading...</p>
+
+<div class="notice">
+Never place your Telnyx secret key, Supabase service-role key,
+Paystack secret key, or other private credentials inside this HTML file.
+</div>
+
+</div>
+
+</section>
+
+</main>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+
+const SUPABASE_URL =
+"https://alemtvfchysptzgzhaap.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_UEnF6pfZ2ORRcuIQUzgbRw_6bWNDnKm";
+
+const db = supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
+
+let currentUser=null;
+let transactionsEnabled=true;
+
+/* ---------------- HELPERS ---------------- */
+
+function money(value,currency="NGN"){
+  return new Intl.NumberFormat("en-NG",{
+    style:"currency",
+    currency:currency,
+    maximumFractionDigits:2
+  }).format(Number(value||0));
+}
+
+function esc(value){
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+function toast(message){
+  const el=document.getElementById("toast");
+  el.textContent=message;
+  el.style.display="block";
+
+  clearTimeout(window.toastTimer);
+
+  window.toastTimer=setTimeout(()=>{
+    el.style.display="none";
+  },3000);
+}
+
+function errorText(error){
+  return error?.message || "Something went wrong";
+}
+
+function statusBadge(status){
+  const s=String(status||"unknown").toLowerCase();
+
+  let cls="pending";
+
+  if(
+    s==="approved" ||
+    s==="fulfilled" ||
+    s==="active" ||
+    s==="success"
+  ) cls="approved";
+
+  if(
+    s==="declined" ||
+    s==="cancelled" ||
+    s==="failed"
+  ) cls="declined";
+
+  return `<span class="badge ${cls}">${esc(status)}</span>`;
+}
+
+/* ---------------- AUTH ---------------- */
+
+async function checkAdmin(){
+
+  const {data:{user},error}=await db.auth.getUser();
+
+  if(error || !user){
+    location.href="index.html";
+    return false;
+  }
+
+  currentUser=user;
+
+  const {data,is_admin_error}=await db.rpc("is_admin");
+
+  if(is_admin_error || data!==true){
+    alert("Admin access required.");
+    await db.auth.signOut();
+    location.href="index.html";
+    return false;
+  }
+
+  document.getElementById("adminEmail").textContent=
+    "Signed in as: "+(user.email||user.id);
+
+  document.getElementById("loading").style.display="none";
+  document.getElementById("app").style.display="block";
+
+  return true;
+}
+
+/* ---------------- NAV ---------------- */
+
+document.querySelectorAll(".nav button").forEach(btn=>{
+
+  btn.addEventListener("click",()=>{
+
+    document.querySelectorAll(".nav button")
+      .forEach(x=>x.classList.remove("active"));
+
+    document.querySelectorAll(".section")
+      .forEach(x=>x.classList.remove("active"));
+
+    btn.classList.add("active");
+
+    const id=btn.dataset.section;
+
+    document.getElementById(id).classList.add("active");
+
+    if(id==="payments")loadPayments();
+    if(id==="users")loadUsers();
+    if(id==="pricing")loadPrices();
+    if(id==="deals")loadDeals();
+    if(id==="orders")loadOrders();
+    if(id==="inventory")loadNumbers();
+    if(id==="messages")loadMessages();
+    if(id==="settings")loadSettings();
+  });
+
+});
+
+/* ---------------- DASHBOARD ---------------- */
+
+async function loadDashboard(){
+
+  const [
+    users,
+    orders,
+    numbers,
+    balance
+  ]=await Promise.all([
+
+    db.from("profiles")
+      .select("id", {count:"exact",head:true}),
+
+    db.from("orders")
+      .select("id,status,created_at,country,service,price,currency,assigned_number")
+      .order("created_at",{ascending:false})
+      .limit(8),
+
+    db.from("numbers")
+      .select("id,order_id",{count:"exact"}),
+
+    db.from("profiles")
+      .select("balance")
+
+  ]);
+
+  document.getElementById("statUsers").textContent=
+    users.count||0;
+
+  const rows=balance.data||[];
+
+  const total=rows.reduce(
+    (sum,x)=>sum+Number(x.balance||0),0
+  );
+
+  document.getElementById("statBalance").textContent=
+    money(total);
+
+  const pending=(orders.data||[]).filter(
+    x=>String(x.status).toLowerCase()==="pending"
+  ).length;
+
+  document.getElementById("statOrders").textContent=pending;
+
+  const available=(numbers.data||[]).filter(
+    x=>!x.order_id
+  ).length;
+
+  document.getElementById("statNumbers").textContent=available;
+
+  document.getElementById("systemStatus").innerHTML=
+    `<span class="badge approved">ONLINE</span>`;
+
+  renderRecentOrders(orders.data||[]);
+}
+
+function renderRecentOrders(rows){
+
+  if(!rows.length){
+    document.getElementById("recentOrders").innerHTML=
+      `<div class="empty">No orders yet.</div>`;
+    return;
+  }
+
+  document.getElementById("recentOrders").innerHTML=`
+
+  <div class="tablewrap">
+  <table>
+  <thead>
+  <tr>
+  <th>Country</th>
+  <th>Service</th>
+  <th>Price</th>
+  <th>Status</th>
+  <th>Number</th>
+  </tr>
+  </thead>
+
+  <tbody>
+
+  ${rows.map(x=>`
+
+  <tr>
+  <td>${esc(x.country)}</td>
+  <td>${esc(x.service)}</td>
+  <td>${money(x.price,x.currency||"NGN")}</td>
+  <td>${statusBadge(x.status)}</td>
+  <td>${esc(x.assigned_number||"—")}</td>
+  </tr>
+
+  `).join("")}
+
+  </tbody>
+  </table>
+  </div>
+
+  `;
+}
+
+/* ---------------- PAYMENTS ---------------- */
+
+async function loadPayments(){
+
+  const {data,error}=await db
+    .from("payment_requests")
+    .select("*")
+    .order("created_at",{ascending:false})
+    .limit(100);
+
+  if(error){
+    document.getElementById("paymentsList").innerHTML=
+      `<div class="empty">${esc(errorText(error))}</div>`;
+    return;
+  }
+
+  if(!data?.length){
+    document.getElementById("paymentsList").innerHTML=
+      `<div class="empty">No payment requests.</div>`;
+    return;
+  }
+
+  document.getElementById("paymentsList").innerHTML=`
+
+  <div class="tablewrap">
+  <table>
+  <thead>
+  <tr>
+  <th>Amount</th>
+  <th>Reference</th>
+  <th>Status</th>
+  <th>Date</th>
+  <th>Action</th>
+  </tr>
+  </thead>
+
+  <tbody>
+
+  ${data.map(p=>`
+
+  <tr>
+
+  <td>${money(p.amount,p.currency||"NGN")}</td>
+
+  <td>${esc(
+    p.reference ||
+    p.payment_reference ||
+    p.id
+  )}</td>
+
+  <td>${statusBadge(p.status)}</td>
+
+  <td>${p.created_at?
+    new Date(p.created_at).toLocaleString("en-NG"):
+    "—"}</td>
+
+  <td>
+
+  ${
+    String(p.status||"").toLowerCase()==="pending"
+    ? `
+      <div class="actions">
+
+      <button
+      class="success"
+      onclick="approvePayment('${p.id}')">
+      Approve
+      </button>
+
+      <button
+      class="danger"
+      onclick="declinePayment('${p.id}')">
+      Decline
+      </button>
+
+      </div>
+    `
+    : "—"
+  }
+
+  </td>
+
+  </tr>
+
+  `).join("")}
+
+  </tbody>
+  </table>
+  </div>
+
+  `;
+}
+
+async function approvePayment(id){
+
+  if(!confirm("Approve this payment?"))return;
+
+  const {error}=await db.rpc(
+    "approve_payment",
+    {p_payment_id:id}
+  );
+
+  if(error){
+    toast(errorText(error));
+    return;
+  }
+
+  toast("Payment approved.");
+
+  await loadPayments();
+  await loadDashboard();
+}
+
+async function declinePayment(id){
+
+  if(!confirm("Decline this payment?"))return;
+
+  const {error}=await db.rpc(
+    "decline_payment",
+    {p_payment_id:id}
+  );
+
+  if(error){
+    toast(errorText(error));
+    return;
+  }
+
+  toast("Payment declined.");
+
+  await loadPayments();
+  await loadDashboard();
+}
+
+/* ---------------- USERS ---------------- */
+
+async function loadUsers(){
+
+  const search=
+    document.getElementById("userSearch")?.value
+    ?.trim()
+    .toLowerCase()||"";
+
+  let query=db
+    .from("profiles")
+    .select("id,name,balance,role")
+    .order("name",{ascending:true})
+    .limit(200);
+
+  const {data,error}=await query;
+
+  if(error){
+    document.getElementById("usersList").innerHTML=
+      `<div class="empty">${esc(errorText(error))}</div>`;
+    return;
+  }
+
+  let rows=data||[];
+
+  if(search){
+    rows=rows.filter(x=>
+      String(x.name||"").toLowerCase().includes(search) ||
+      String(x.id||"").toLowerCase().includes(search) ||
+      String(x.role||"").toLowerCase().includes(search)
+    );
+  }
+
+  if(!rows.length){
+    document.getElementById("usersList").innerHTML=
+      `<div class="empty">No users found.</div>`;
+    return;
+  }
+
+  document.getElementById("usersList").innerHTML=`
+
+  <div class="tablewrap">
+  <table>
+
+  <thead>
+  <tr>
+  <th>Name</th>
+  <th>User ID</th>
+  <th>Balance</th>
+  <th>Role</th>
+  </tr>
+  </thead>
+
+  <tbody>
+
+  ${rows.map(u=>`
+
+  <tr>
+  <td>${esc(u.name||"Unnamed")}</td>
+  <td style="font-size:11px">${esc(u.id)}</td>
+  <td>${money(u.balance)}</td>
+  <td>${esc(u.role||"user")}</td>
+  </tr>
+
+  `).join("")}
+
+  </tbody>
+
+  </table>
+  </div>
+
+  `;
+}
+
+document.getElementById("userSearch")
+?.addEventListener("input",loadUsers);
+
+/* ---------------- PRICES ---------------- */
+
+async function savePrice(){
+
+  const country=
+    document.getElementById("priceCountry").value.trim();
+
+  const service=
+    document.getElementById("priceService").value;
+
+  const flag=
+    document.getElementById("priceFlag").value.trim();
+
+  const provider_cost=
+    Number(document.getElementById("providerCost").value||0);
+
+  const customer_price=
+    Number(document.getElementById("customerPrice").value||0);
+
+  const currency=
+    document.getElementById("priceCurrency").value.trim()||"NGN";
+
+  if(!country){
+    toast("Enter a country.");
+    return;
+  }
+
+  if(customer_price<0 || provider_cost<0){
+    toast("Invalid price.");
+    return;
+  }
+
+  const {error}=await db
+    .from("prices")
+    .upsert({
+      country,
+      service,
+      flag,
+      provider_cost,
+      customer_price,
+      currency,
+      active:true,
+      updated_at:new Date().toISOString()
+    },{
+      onConflict:"country,service"
+    });
+
+  if(error){
+    toast(errorText(error));
+    return;
+  }
+
+  toast("Price saved.");
+
+  await loadPrices();
+}
+
+async function loadPrices(){
+
+  const {data,error}=await db
+    .from("prices")
+    .select("*")
+    .order("country",{ascending:true})
+    .limit(500);
+
+  if(error){
+    document.getElementById("pricesList").innerHTML=
+      `<div class="empty">${esc(errorText(error))}</div>`;
+    return;
+  }
+
+  if(!data?.length){
+    document.getElementById("pricesList").innerHTML=
+      `<div class="empty">No prices found.</div>`;
+    return;
+  }
+
+  document.getElementById("pricesList").innerHTML=`
+
+  <div class="tablewrap">
+  <table>
+
+  <thead>
+  <tr>
+  <th>Country</th>
+  <th>Service</th>
+  <th>Provider</th>
+  <th>Customer</th>
+  <th>Active</th>
+  <th>Action</th>
+  </tr>
+  </thead>
+
+  <tbody>
+
+  ${data.map(p=>`
+
+  <tr>
+
+  <td>${esc(p.flag||"")} ${esc(p.country)}</td>
+
+  <td>${esc(p.service)}</td>
+
+  <td>${money(p.provider_cost,p.currency)}</td>
+
+  <td>${money(p.customer_price,p.currency)}</td>
+
+  <td>${p.active?
+    '<span class="badge approved">YES</span>':
+    '<span class="badge declined">NO</span>'}</td>
+
+  <td>
+
+  <button
+  class="secondary"
+  onclick="togglePrice('${p.id}',${!p.active})">
+  ${p.active?"Disable":"Enable"}
+  </button>
+
+  </td>
+
+  </tr>
+
+  `).join("")}
+
+  </tbody>
+
+  </table>
+  </div>
+
+  `;
+}
+
+async function togglePrice(id,value){
+
+  const {error}=await db
+    .from("prices")
+    .update({
+      active:value,
+      updated_at:new Date().toISOString()
+    })
+    .eq("id",id);
+
+  if(error){
+    toast(errorText(error));
+    return;
+  }
+
+  toast(value?"Price enabled.":"Price disabled.");
+
+  loadPrices();
+}
+
+/* ---------------- DEALS ---------------- */
+
+async function createDeal(){
+
+  const title=document.getElementById("dealTitle").value.trim();
+  const description=document.getElementById("dealDescription").value.trim();
+  const price_id=document.getElementById("dealPriceId").value.trim();
+
+  const original_price=
+    Number(document.getElementById("dealOriginal").value||0);
+
+  const deal_price=
+    Number(document.getElementById("dealPrice").value||0);
+
+  const quantity=
+    Number(document.getElementById("dealQuantity").value||0);
+
+  if(!title || !price_id){
+    toast("Title and price ID are required.");
+    return;
+  }
+
+  const {error}=await db
+    .from("deals")
+    .insert({
+      title,
+      description,
+      price_id,
+      original_price,
+      deal_price,
+      quantity,
+      sold_quantity:0,
+      active:true
+    });
+
+  if(error){
+    toast(errorText(error));
+    return;
+  }
+
+  toast("Deal created.");
+
+  await loadDeals();
+}
+
+async function loadDeals(){
+
+  const {data,error}=await db
+    .from("deals")
+    .select("*")
+    .order("created_at",{ascending:false})
+    .limit(100);
+
+  if(error){
+    document.getElementById("dealsList").innerHTML=
+      `<div class="empty">${esc(errorText(error))}</div>`;
+    return;
+  }
+
+  if(!data?.length){
+    document.getElementById("dealsList").innerHTML=
+      `<div class="empty">No deals yet.</div>`;
+    return;
+  }
+
+  document.getElementById("dealsList").innerHTML=`
+
+  <div class="tablewrap">
+  <table>
+
+  <thead>
+  <tr>
+  <th>Deal</th>
+  <th>Price</th>
+  <th>Sold</th>
+  <th>Status</th>
+  <th>Action</th>
+  </tr>
+  </thead>
+
+  <tbody>
+
+  ${data.map(d=>`
+
+  <tr>
+
+  <td>
+  <strong>${esc(d.title)}</strong>
+  <br>
+  <small>${esc(d.description||"")}</small>
+  </td>
+
+  <td>
+  ${money(d.deal_price)}
+  <br>
+  <small>was ${money(d.original_price)}</small>
+  </td>
+
+  <td>
+  ${Number(d.sold_quantity||0)}
+  /
+  ${Number(d.quantity||0)}
+  </td>
+
+  <td>
+  ${d.active?
+    '<span class="badge approved">ACTIVE</span>':
+    '<span class="badge declined">OFF</span>'}
+  </td>
+
+  <td>
+
+  <button
+  class="secondary"
+  onclick="toggleDeal('${d.id}',${!d.active})">
+  ${d.active?"Disable":"Enable"}
+  </button>
+
+  <button
+  class="danger"
+  onclick="deleteDeal('${d.id}')">
+  Delete
+  </button>
+
+  </td>
+
+  </tr>
+
+  `).join("")}
+
+  </tbody>
+
+  </table>
+  </div>
+
+  `;
+}
+
+async function toggleDeal(id,value){
+
+  const {error}=await db
+    .from("deals")
+    .update({
+      active:value,
+      updated_at:new Date().toISOString()
+    })
+    .eq("id",id);
+
+  if(error){
+    toast(errorText(error));
+    return;
+  }
+
+  toast(value?"Deal enabled.":"Deal disabled.");
+
+  loadDeals();
+}
+
+async function deleteDeal(id){
+
+  if(!confirm("Delete this deal?"))return;
+
+  const {error}=await db
+    .from("deals")
+    .delete()
+    .eq("id",id);
+
+  if(error){
+    toast(errorText(error));
+    return;
+  }
+
+  toast("Deal deleted.");
+
+  loadDeals();
+}
+
+/* ---------------- ORDERS ---------------- */
+
+async function loadOrders(){
+
+  const {data,error}=await db
+    .from("orders")
+    .select("*")
+    .order("created_at",{ascending:false})
+    .limit(200);
+
+  if(error){
+    document.getElementById("ordersList").innerHTML=
+      `<div class="empty">${esc(errorText(error))}</div>`;
+    return;
+  }
+
+  if(!data?.length){
+    document.getElementById("ordersList").innerHTML=
+      `<div class="empty">No orders yet.</div>`;
+    return;
+  }
+
+  document.getElementById("ordersList").innerHTML=`
+
+  <div class="tablewrap">
+  <table>
+
+  <thead>
+  <tr>
+  <th>Country</th>
+  <th>Service</th>
+  <th>Price</th>
+  <th>Status</th>
+  <th>Assigned number</th>
+  <th>Action</th>
+  </tr>
+  </thead>
+
+  <tbody>
+
+  ${data.map(o=>`
+
+  <tr>
+
+  <td>${esc(o.country)}</td>
+  <td>${esc(o.service)}</td>
+  <td>${money(o.price,o.currency||"NGN")}</td>
+  <td>${statusBadge(o.status)}</td>
+
+  <td>
+  ${esc(o.assigned_number||"—")}
+  </td>
+
+  <td>
+
+  ${
+    String(o.status).toLowerCase()==="pending"
+    ? `
+    <button
+    class="primary"
+    onclick="assignNumber('${o.id}','${esc(o.country)}')">
+    Assign number
+    </button>
+    `
+    : "—"
+  }
+
+  </td>
+
+  </tr>
+
+  `).join("")}
+
+  </tbody>
+  </table>
+  </div>
+
+  `;
+}
+
+async function assignNumber(orderId,country){
+
+  const {data,error}=await db
+    .from("numbers")
+    .select("id,number,country,order_id")
+    .ilike("country",country)
+    .is("order_id",null)
+    .limit(50);
+
+  if(error){
+    toast(errorText(error));
+    return;
+  }
+
+  if(!data?.length){
+    toast("No available number for "+country);
+    return;
+  }
+
+  let message=
+    "Available numbers for "+country+":\n\n";
+
+  data.forEach((n,i)=>{
+    message+=
+      (i+1)+". "+n.number+"\n";
+  });
+
+  const choice=prompt(
+    message+
+    "\nEnter the number from the list (1-"+data.length+")."
+  );
+
+  const index=Number(choice)-1;
+
+  if(!Number.isInteger(index) || !data[index]){
+    toast("Invalid selection.");
+    return;
+  }
+
+  const selected=data[index];
+
+  if(!confirm(
+    "Assign "+selected.number+
+    " to this order?"
+  ))return;
+
+  const {error:rpcError}=await db.rpc(
+    "assign_number_to_order",
+    {
+      p_order_id:orderId,
+      p_number_id:selected.id
+    }
+  );
+
+  if(rpcError){
+    toast(errorText(rpcError));
+    return;
+  }
+
+  toast("Number assigned successfully.");
+
+  await loadOrders();
+  await loadNumbers();
+  await loadDashboard();
+}
+
+/* ---------------- NUMBERS ---------------- */
+
+async function addNumber(){
+
+  const country=
+    document.getElementById("numberCountry").value.trim();
+
+  const number=
+    document.getElementById("numberValue").value.trim();
+
+  if(!country || !number){
+    toast("Country and number are required.");
+    return;
+  }
+
+  const {error}=await db
+    .from("numbers")
+    .insert({
+      country,
+      number,
+      order_id:null,
+      assigned_at:null
+    });
+
+  if(error){
+    toast(errorText(error));
+    return;
+  }
+
+  document.getElementById("numberCountry").value="";
+  document.getElementById("numberValue").value="";
+
+  toast("Number added.");
+
+  await loadNumbers();
+  await loadDashboard();
+}
+
+async function loadNumbers(){
+
+  const {data,error}=await db
+    .from("numbers")
+    .select("id,country,number,order_id,assigned_at")
+    .order("country",{ascending:true})
+    .limit(500);
+
+  if(error){
+    document.getElementById("numbersList").innerHTML=
+      `<div class="empty">${esc(errorText(error))}</div>`;
+    return;
+  }
+
+  if(!data?.length){
+    document.getElementById("numbersList").innerHTML=
+      `<div class="empty">Inventory is empty.</div>`;
+    return;
+  }
+
+  document.getElementById("numbersList").innerHTML=`
+
+  <div class="tablewrap">
+  <table>
+
+  <thead>
+  <tr>
+  <th>Country</th>
+  <th>Number</th>
+  <th>Status</th>
+  <th>Assigned</th>
+  </tr>
+  </thead>
+
+  <tbody>
+
+  ${data.map(n=>`
+
+  <tr>
+
+  <td>${esc(n.country)}</td>
+  <td>${esc(n.number)}</td>
+
+  <td>
+  ${
+    n.order_id
+    ? '<span class="badge approved">ASSIGNED</span>'
+    : '<span class="badge pending">AVAILABLE</span>'
+  }
+  </td>
+
+  <td>
+  ${n.assigned_at?
+    new Date(n.assigned_at).toLocaleString("en-NG"):
+    "—"}
+  </td>
+
+  </tr>
+
+  `).join("")}
+
+  </tbody>
+  </table>
+  </div>
+
+  `;
+}
+
+/* ---------------- MESSAGES ---------------- */
+
+async function loadMessages(){
+
+  const {data,error}=await db
+    .from("messages")
+    .select("*")
+    .order("created_at",{ascending:false})
+    .limit(200);
+
+  if(error){
+    document.getElementById("messagesList").innerHTML=
+      `<div class="empty">${esc(errorText(error))}</div>`;
+    return;
+  }
+
+  if(!data?.length){
+    document.getElementById("messagesList").innerHTML=
+      `<div class="empty">No messages yet.</div>`;
+    return;
+  }
+
+  document.getElementById("messagesList").innerHTML=`
+
+  <div class="tablewrap">
+  <table>
+
+  <thead>
+  <tr>
+  <th>From</th>
+  <th>Message</th>
+  <th>User</th>
+  <th>Date</th>
+  </tr>
+  </thead>
+
+  <tbody>
+
+  ${data.map(m=>`
+
+  <tr>
+
+  <td>${esc(
+    m.from_number||
+    m.sender||
+    "—"
+  )}</td>
+
+  <td>${esc(
+    m.message||
+    m.body||
+    m.text||
+    m.code||
+    "—"
+  )}</td>
+
+  <td style="font-size:11px">
+  ${esc(m.user_id||"—")}
+  </td>
+
+  <td>
+  ${m.created_at?
+    new Date(m.created_at).toLocaleString("en-NG"):
+    "—"}
+  </td>
+
+  </tr>
+
+  `).join("")}
+
+  </tbody>
+
+  </table>
+  </div>
+
+  `;
+}
+
+/* ---------------- SETTINGS ---------------- */
+
+async function loadSettings(){
+
+  const {data,error}=await db
+    .from("site_settings")
+    .select("key,value")
+    .eq("key","transactions_enabled")
+    .maybeSingle();
+
+  if(error){
+    toast(errorText(error));
+    return;
+  }
+
+  transactionsEnabled=
+    data?.value!==false;
+
+  renderTransactionSwitch();
+}
+
+function renderTransactionSwitch(){
+
+  const sw=
+    document.getElementById("transactionSwitch");
+
+  if(!sw)return;
+
+  sw.classList.toggle(
+    "on",
+    transactionsEnabled
+  );
+
+  document.getElementById(
+    "transactionStatus"
+  ).innerHTML=
+    transactionsEnabled
+    ? '<span class="badge approved">ENABLED</span>'
+    : '<span class="badge declined">PAUSED</span>';
+}
+
+async function toggleTransactions(){
+
+  const next=!transactionsEnabled;
+
+  const {error}=await db.rpc(
+    "set_transactions_enabled",
+    {
+      p_enabled:next
+    }
+  );
+
+  if(error){
+    toast(errorText(error));
+    return;
+  }
+
+  transactionsEnabled=next;
+
+  renderTransactionSwitch();
+
+  toast(
+    next
+    ? "Transactions enabled."
+    : "Transactions paused."
+  );
+}
+
+/* ---------------- LOGOUT ---------------- */
+
+document.getElementById("logoutBtn")
+.addEventListener("click",async()=>{
+
+  await db.auth.signOut();
+
+  location.href="index.html";
+
+});
+
+/* ---------------- START ---------------- */
+
+async function start(){
+
+  const ok=await checkAdmin();
+
+  if(!ok)return;
+
+  await loadDashboard();
+  await loadSettings();
+
+  /*
+   * Refresh important admin data periodically.
+   */
+  setInterval(async()=>{
+    await loadDashboard();
+
+    const active=
+      document.querySelector(".section.active")?.id;
+
+    if(active==="payments")await loadPayments();
+    if(active==="orders")await loadOrders();
+    if(active==="inventory")await loadNumbers();
+    if(active==="messages")await loadMessages();
+
+  },15000);
+}
+
+start();
+
+</script>
+
+</body>
+</html>
