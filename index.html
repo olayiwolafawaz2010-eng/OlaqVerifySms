@@ -2005,67 +2005,72 @@ function closeOrderModal(){
 /* =========================================================
    CREATE ORDER
 ========================================================= */
-
 async function confirmOrder(){
 
   if(!selectedPrice){
-
     notify("Select a service first.");
     return;
   }
 
   if(!currentUser){
-
     notify("Please sign in.");
-    return;
-  }
-
-  const transactions =
-    await loadTransactionSetting();
-
-  if(!transactions){
-
-    notify("Transactions are temporarily paused.");
-    return;
-  }
-
-  const price =
-    Number(selectedPrice.customer_price || 0);
-
-  const balance =
-    Number(profile?.balance || 0);
-
-  if(balance < price){
-
-    notify("Insufficient balance. Please add funds.");
-
-    closeOrderModal();
-
-    setTimeout(openTopup,300);
-
     return;
   }
 
   try{
 
-    notify("Creating your order...");
+    notify("Checking transaction status...");
 
-    const {data,error} =
-      await db.rpc(
-        "place_order",
-        {
-          p_country:String(selectedPrice.country),
-          p_service:String(selectedPrice.service)
-        }
-      );
+    const transactions = await loadTransactionSetting();
 
-    if(error) throw error;
+    if(!transactions){
+      notify("Transactions are temporarily paused.");
+      return;
+    }
+
+    const price =
+      Number(selectedPrice.customer_price || 0);
+
+    const balance =
+      Number(profile?.balance || 0);
+
+    if(balance < price){
+
+      notify("Insufficient balance. Please add funds.");
+
+      closeOrderModal();
+
+      setTimeout(() => {
+        openTopup();
+      }, 300);
+
+      return;
+    }
+
+    notify("Processing purchase...");
+
+    const { data, error } = await db.rpc(
+      "place_order",
+      {
+        p_country: String(selectedPrice.country),
+        p_service: String(selectedPrice.service)
+      }
+    );
+
+    if(error){
+      console.error("place_order error:", error);
+      throw error;
+    }
+
+    if(!data){
+      throw new Error("Order was not created.");
+    }
+
+    console.log("Order created:", data);
 
     closeOrderModal();
 
-    notify(
-      "Order created. Waiting for number assignment."
-    );
+    notify("Purchase successful! Your number is ready.");
 
     await loadProfile();
     await loadOrders();
@@ -2075,12 +2080,34 @@ async function confirmOrder(){
 
   }catch(error){
 
-    console.error(error);
+    console.error("Purchase failed:", error);
 
-    notify(
-      error.message ||
-      "Could not create order."
-    );
+    let message =
+      error?.message ||
+      "Could not complete purchase.";
+
+    if(
+      message.toLowerCase().includes("no number")
+    ){
+      message =
+        "No number is currently available for this country.";
+    }
+
+    if(
+      message.toLowerCase().includes("insufficient balance")
+    ){
+      message =
+        "Insufficient balance. Please add funds.";
+    }
+
+    if(
+      message.toLowerCase().includes("transactions")
+    ){
+      message =
+        "Transactions are temporarily paused.";
+    }
+
+    notify(message);
   }
 }
 
