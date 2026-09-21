@@ -797,26 +797,33 @@ async function loadOrders(){
 
 async function addNumber(){
 
-  const country=
-    document.getElementById("numberCountry")
-    .value.trim();
+  const country =
+    document.getElementById("numberCountry").value.trim();
 
-  const phone=
-    document.getElementById("phoneNumber")
-    .value.trim();
+  const phone =
+    document.getElementById("phoneNumber").value.trim();
+
+  const price =
+    Number(document.getElementById("numberPrice").value);
 
   if(!country || !phone){
     alert("Enter country and phone number.");
     return;
   }
 
+  if(!Number.isFinite(price) || price < 0){
+    alert("Enter a valid number price.");
+    return;
+  }
+
   const {error}=await db
     .from("numbers")
     .insert({
-      country:country,
-      phone_number:phone,
-      order_id:null,
-      assigned_at:null
+      country: country,
+      phone_number: phone,
+      price: price,
+      order_id: null,
+      assigned_at: null
     });
 
   if(error){
@@ -826,76 +833,12 @@ async function addNumber(){
 
   document.getElementById("numberCountry").value="";
   document.getElementById("phoneNumber").value="";
+  document.getElementById("numberPrice").value="";
 
-  alert("Number added.");
+  alert("Number added successfully.");
+
   await refreshAll();
 }
-
-async function loadNumbers(){
-
-  const box=document.getElementById("numbersList");
-
-  const {data,error}=await db
-    .from("numbers")
-    .select("id,country,phone_number,order_id,assigned_at")
-    .order("country");
-
-  if(error){
-    box.innerHTML=
-      `<div class="empty bad">${esc(error.message)}</div>`;
-    return;
-  }
-
-  if(!data?.length){
-    box.innerHTML=
-      `<div class="empty">No numbers in inventory.</div>`;
-    return;
-  }
-
-  box.innerHTML=`
-
-    <h3>Inventory</h3>
-
-    <div class="tablewrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Country</th>
-            <th>Phone number</th>
-            <th>Status</th>
-            <th>Order</th>
-          </tr>
-        </thead>
-
-        <tbody>
-
-          ${data.map(n=>`
-
-            <tr>
-              <td>${esc(n.country)}</td>
-
-              <td>
-                <b>${esc(n.phone_number)}</b>
-              </td>
-
-              <td>
-                ${
-                  n.order_id
-                  ? `<span class="bad">Assigned</span>`
-                  : `<span class="good">Available</span>`
-                }
-              </td>
-
-              <td>
-                ${esc(n.order_id || "-")}
-              </td>
-            </tr>
-
-          `).join("")}
-
-        </tbody>
-      </table>
-    </div>
 
   `;
 }
