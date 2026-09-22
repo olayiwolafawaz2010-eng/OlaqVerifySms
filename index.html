@@ -1,0 +1,2872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>OlaqVerify</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
+:root{
+  --bg:#f4f6fb;
+  --surface:#ffffff;
+  --ink:#111827;
+  --muted:#788195;
+  --line:#e8ebf2;
+
+  --blue:#2563eb;
+  --blueDark:#1744b5;
+  --purple:#7147e8;
+  --purpleDark:#4c22ad;
+  --red:#ef4444;
+  --green:#16a36a;
+
+  --shadow:0 16px 45px rgba(28,36,64,.08);
+  --softShadow:0 7px 25px rgba(28,36,64,.06);
+}
+
+html,body{
+  margin:0;
+  padding:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:Inter,Arial,Helvetica,sans-serif;
+}
+
+body{
+  min-height:100vh;
+}
+
+button,
+input{
+  font:inherit;
+}
+
+button{
+  border:0;
+  cursor:pointer;
+}
+
+.hidden{
+  display:none!important;
+}
+
+/* =========================
+   AUTH
+========================= */
+
+#auth{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:22px;
+
+  background:
+    radial-gradient(circle at 10% 5%,rgba(37,99,235,.16),transparent 30%),
+    radial-gradient(circle at 90% 95%,rgba(113,71,232,.17),transparent 30%),
+    #f7f8fc;
+}
+
+.authBox{
+  width:100%;
+  max-width:420px;
+  padding:32px 24px;
+  background:#fff;
+  border:1px solid #edf0f5;
+  border-radius:30px;
+  box-shadow:0 30px 80px rgba(27,35,70,.12);
+}
+
+.logoMark{
+  width:62px;
+  height:62px;
+  border-radius:21px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:white;
+  font-size:27px;
+  font-weight:950;
+
+  background:
+    linear-gradient(145deg,var(--blue),var(--purple) 65%,var(--red));
+  box-shadow:0 15px 35px rgba(82,64,215,.25);
+}
+
+.authTitle{
+  font-size:29px;
+  font-weight:950;
+  margin-top:19px;
+  letter-spacing:-1px;
+}
+
+.authSub{
+  color:var(--muted);
+  line-height:1.5;
+  margin:7px 0 25px;
+}
+
+.input{
+  width:100%;
+  height:52px;
+  border:1px solid var(--line);
+  border-radius:15px;
+  outline:none;
+  background:#fafbfe;
+  padding:0 15px;
+  margin-bottom:11px;
+}
+
+.input:focus{
+  border-color:#8aa8ff;
+  box-shadow:0 0 0 4px rgba(37,99,235,.08);
+}
+
+.primaryBtn{
+  width:100%;
+  height:52px;
+  border-radius:15px;
+  color:#fff;
+  font-weight:900;
+
+  background:
+    linear-gradient(135deg,var(--blue),var(--purple));
+  box-shadow:0 12px 25px rgba(73,74,218,.20);
+}
+
+.switchText{
+  text-align:center;
+  margin-top:18px;
+  color:var(--muted);
+  font-size:14px;
+}
+
+.switchText span{
+  color:var(--blue);
+  font-weight:900;
+  cursor:pointer;
+}
+
+/* =========================
+   APP
+========================= */
+
+#app{
+  min-height:100vh;
+  padding-bottom:92px;
+}
+
+/* TOP */
+.topbar{
+  position:sticky;
+  top:0;
+  z-index:50;
+
+  height:70px;
+  padding:0 18px;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+
+  background:rgba(244,246,251,.88);
+  backdrop-filter:blur(20px);
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.brandLogo{
+  width:39px;
+  height:39px;
+  border-radius:13px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:white;
+  font-weight:950;
+
+  background:linear-gradient(145deg,var(--blue),var(--purple));
+}
+
+.brandText{
+  font-size:18px;
+  font-weight:950;
+  letter-spacing:-.5px;
+}
+
+.brandText span{
+  color:var(--purple);
+}
+
+.balancePill{
+  padding:10px 13px;
+  border-radius:14px;
+  background:#fff;
+  border:1px solid var(--line);
+  box-shadow:var(--softShadow);
+  font-weight:950;
+  color:#17213a;
+}
+
+/* PAGE */
+.page{
+  display:none;
+  max-width:850px;
+  margin:auto;
+  padding:8px 18px 20px;
+}
+
+.page.active{
+  display:block;
+}
+
+/* =========================
+   MAIN BALANCE
+========================= */
+
+.balanceHero{
+  position:relative;
+  overflow:hidden;
+
+  min-height:280px;
+  border-radius:31px;
+  padding:28px 23px;
+
+  color:white;
+
+  background:
+    radial-gradient(circle at 90% 10%,rgba(255,255,255,.20),transparent 27%),
+    radial-gradient(circle at 0% 100%,rgba(239,68,68,.17),transparent 30%),
+    linear-gradient(135deg,#1744b5 0%,#4931c7 50%,#713fdc 76%,#b72b55 125%);
+
+  box-shadow:0 22px 55px rgba(63,61,180,.22);
+}
+
+.balanceHero:before{
+  content:"";
+  position:absolute;
+  width:220px;
+  height:220px;
+  border:35px solid rgba(255,255,255,.045);
+  border-radius:50%;
+  right:-90px;
+  top:-80px;
+}
+
+.balanceHero:after{
+  content:"";
+  position:absolute;
+  width:150px;
+  height:150px;
+  border:25px solid rgba(255,255,255,.04);
+  border-radius:50%;
+  left:-85px;
+  bottom:-90px;
+}
+
+.balanceContent{
+  position:relative;
+  z-index:2;
+  text-align:center;
+}
+
+.balanceLabel{
+  font-size:12px;
+  font-weight:850;
+  letter-spacing:1.5px;
+  opacity:.78;
+}
+
+.bigBalance{
+  margin-top:16px;
+  font-size:48px;
+  line-height:1;
+  font-weight:950;
+  letter-spacing:-2px;
+}
+
+.bigBalance small{
+  font-size:25px;
+  vertical-align:middle;
+  margin-right:4px;
+  opacity:.85;
+}
+
+.balanceCaption{
+  margin-top:12px;
+  font-size:13px;
+  opacity:.72;
+}
+
+.balanceButtons{
+  display:flex;
+  gap:10px;
+  justify-content:center;
+  margin-top:25px;
+}
+
+.balanceButtons button{
+  min-width:125px;
+  padding:13px 16px;
+  border-radius:14px;
+  font-weight:900;
+}
+
+.addMoney{
+  color:#1d3b9d;
+  background:white;
+}
+
+.buyMoney{
+  color:white;
+  background:rgba(255,255,255,.13);
+  border:1px solid rgba(255,255,255,.22);
+}
+
+/* =========================
+   QUICK ACTIONS
+========================= */
+
+.quickGrid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin-top:14px;
+}
+
+.quickCard{
+  background:white;
+  border:1px solid var(--line);
+  border-radius:19px;
+  padding:16px 10px;
+  text-align:center;
+  box-shadow:var(--softShadow);
+}
+
+.quickIcon{
+  width:40px;
+  height:40px;
+  margin:auto;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:13px;
+  color:white;
+  font-size:18px;
+  font-weight:900;
+}
+
+.blueIcon{
+  background:linear-gradient(135deg,#2563eb,#4f46e5);
+}
+
+.purpleIcon{
+  background:linear-gradient(135deg,#7c3aed,#9333ea);
+}
+
+.redIcon{
+  background:linear-gradient(135deg,#ef4444,#db2777);
+}
+
+.quickCard strong{
+  display:block;
+  font-size:12px;
+  margin-top:9px;
+}
+
+/* =========================
+   SECTIONS
+========================= */
+
+.section{
+  margin-top:27px;
+}
+
+.sectionHead{
+  display:flex;
+  align-items:end;
+  justify-content:space-between;
+  margin-bottom:13px;
+}
+
+.sectionTitle{
+  font-size:20px;
+  font-weight:950;
+  letter-spacing:-.5px;
+}
+
+.sectionSub{
+  margin-top:4px;
+  color:var(--muted);
+  font-size:12px;
+}
+
+.sectionAction{
+  color:var(--blue);
+  font-size:12px;
+  font-weight:900;
+}
+
+/* =========================
+   ACTIVE COUNTRIES
+========================= */
+
+.priorityCard{
+  display:flex;
+  align-items:center;
+  gap:13px;
+  padding:16px;
+  border-radius:21px;
+
+  background:
+    linear-gradient(120deg,#eef4ff,#f6f0ff);
+
+  border:1px solid #dfe6ff;
+}
+
+.priorityIcon{
+  width:45px;
+  height:45px;
+  border-radius:15px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:white;
+  font-weight:950;
+  background:linear-gradient(135deg,var(--blue),var(--purple));
+}
+
+.priorityText strong{
+  display:block;
+}
+
+.priorityText span{
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.4;
+}
+
+.countryGrid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:11px;
+}
+
+.countryCard{
+  min-height:148px;
+  padding:17px;
+  border-radius:21px;
+  background:#fff;
+  border:1px solid var(--line);
+  box-shadow:var(--softShadow);
+  position:relative;
+  overflow:hidden;
+}
+
+.countryCard.active{
+  cursor:pointer;
+}
+
+.countryCard.active:before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:0;
+  bottom:0;
+  width:4px;
+  background:linear-gradient(var(--blue),var(--purple));
+}
+
+.countryCard.inactive{
+  background:#f9fafc;
+  opacity:.72;
+}
+
+.countryFlag{
+  font-size:29px;
+}
+
+.countryName{
+  margin-top:8px;
+  font-size:15px;
+  font-weight:950;
+}
+
+.countryInfo{
+  margin-top:5px;
+  color:var(--muted);
+  font-size:11px;
+}
+
+.countryStatus{
+  display:inline-flex;
+  margin-top:12px;
+  padding:6px 8px;
+  border-radius:8px;
+  font-size:9px;
+  font-weight:950;
+  letter-spacing:.4px;
+}
+
+.activeStatus{
+  background:#e8fff4;
+  color:#0c8a58;
+}
+
+.soonStatus{
+  background:#fff0f1;
+  color:#c92c42;
+}
+
+/* =========================
+   BUY PAGE
+========================= */
+
+.buyHero{
+  padding:24px;
+  border-radius:27px;
+  color:white;
+
+  background:
+    radial-gradient(circle at 100% 0%,rgba(255,255,255,.18),transparent 25%),
+    linear-gradient(135deg,#152e83,#5730c9 65%,#a32d62);
+}
+
+.buyHero h1{
+  margin:0;
+  font-size:28px;
+  font-weight:950;
+  letter-spacing:-1px;
+}
+
+.buyHero p{
+  margin:8px 0 0;
+  opacity:.78;
+  font-size:13px;
+  line-height:1.5;
+}
+
+.search{
+  position:relative;
+  margin-top:15px;
+}
+
+.search input{
+  width:100%;
+  height:53px;
+  border:1px solid var(--line);
+  border-radius:17px;
+  background:#fff;
+  outline:none;
+  padding:0 16px 0 43px;
+  box-shadow:var(--softShadow);
+}
+
+.search span{
+  position:absolute;
+  left:16px;
+  top:16px;
+  color:#929bad;
+}
+
+/* =========================
+   LIST CARDS
+========================= */
+
+.listCard{
+  padding:17px;
+  margin-bottom:10px;
+  border-radius:20px;
+  background:white;
+  border:1px solid var(--line);
+  box-shadow:var(--softShadow);
+}
+
+.row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.muted{
+  color:var(--muted);
+}
+
+.badge{
+  padding:6px 9px;
+  border-radius:8px;
+  font-size:10px;
+  font-weight:900;
+  background:#eef3ff;
+  color:var(--blueDark);
+}
+
+/* =========================
+   DEAL
+========================= */
+
+.dealCard{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  padding:17px;
+  border-radius:20px;
+  background:white;
+  border:1px solid var(--line);
+  box-shadow:var(--softShadow);
+  margin-bottom:10px;
+}
+
+.dealLeft strong{
+  display:block;
+  font-size:14px;
+}
+
+.dealLeft span{
+  display:block;
+  color:var(--muted);
+  font-size:11px;
+  margin-top:5px;
+}
+
+.dealPrice{
+  font-size:16px;
+  font-weight:950;
+  color:var(--purple);
+}
+
+/* =========================
+   PROFILE
+========================= */
+
+.profileCard{
+  background:white;
+  border:1px solid var(--line);
+  border-radius:27px;
+  padding:23px;
+  box-shadow:var(--softShadow);
+}
+
+.avatar{
+  width:67px;
+  height:67px;
+  border-radius:21px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:white;
+  font-size:26px;
+  font-weight:950;
+  background:linear-gradient(135deg,var(--blue),var(--purple),var(--red));
+}
+
+.profileName{
+  font-size:23px;
+  font-weight:950;
+  margin-top:14px;
+}
+
+.profileEmail{
+  color:var(--muted);
+  margin-top:4px;
+  font-size:13px;
+}
+
+.profileBtn{
+  width:100%;
+  padding:14px;
+  margin-top:11px;
+  border-radius:14px;
+  background:#f4f6fa;
+  text-align:left;
+  font-weight:850;
+}
+
+.profileBtn.logout{
+  color:#cf2940;
+  background:#fff1f2;
+}
+
+/* =========================
+   EMPTY
+========================= */
+
+.empty{
+  padding:30px 15px;
+  border-radius:20px;
+  text-align:center;
+  color:var(--muted);
+  background:white;
+  border:1px dashed #d8dce5;
+}
+
+/* =========================
+   BOTTOM NAV
+========================= */
+
+.bottomNav{
+  position:fixed;
+  left:0;
+  right:0;
+  bottom:0;
+  z-index:80;
+
+  height:82px;
+
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+
+  background:rgba(255,255,255,.94);
+  backdrop-filter:blur(20px);
+
+  border-top:1px solid rgba(224,227,235,.9);
+}
+
+.navBtn{
+  background:none;
+  color:#9299aa;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  gap:5px;
+  font-size:10px;
+  font-weight:850;
+}
+
+.navIcon{
+  width:36px;
+  height:29px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:11px;
+  font-size:18px;
+}
+
+.navBtn.active{
+  color:var(--purple);
+}
+
+.navBtn.active .navIcon{
+  color:white;
+  background:linear-gradient(135deg,var(--blue),var(--purple));
+}
+
+/* =========================
+   MODALS
+========================= */
+
+.modalBg{
+  position:fixed;
+  inset:0;
+  z-index:200;
+  display:none;
+  align-items:flex-end;
+  justify-content:center;
+  background:rgba(10,15,30,.55);
+  backdrop-filter:blur(7px);
+}
+
+.modalBg.show{
+  display:flex;
+}
+
+.modal{
+  width:100%;
+  max-width:520px;
+  max-height:88vh;
+  overflow:auto;
+  padding:23px;
+  border-radius:28px 28px 0 0;
+  background:#fff;
+}
+
+.modalHead{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:18px;
+}
+
+.modalTitle{
+  font-size:20px;
+  font-weight:950;
+}
+
+.close{
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  background:#f1f3f7;
+  font-size:18px;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media(min-width:700px){
+
+  .page{
+    padding:16px 25px 25px;
+  }
+
+  .countryGrid{
+    grid-template-columns:repeat(4,1fr);
+  }
+
+  .balanceHero{
+    min-height:310px;
+    padding-top:42px;
+  }
+
+  .bigBalance{
+    font-size:60px;
+  }
+
+  .modalBg{
+    align-items:center;
+  }
+
+  .modal{
+    border-radius:27px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+
+<!-- =========================
+     AUTH
+========================= -->
+
+<section id="auth">
+
+  <div class="authBox">
+
+    <div class="logoMark">O</div>
+
+    <div class="authTitle" id="authTitle">
+      Welcome to OlaqVerify
+    </div>
+
+    <div class="authSub" id="authSub">
+      Your simple home for SMS verification numbers.
+    </div>
+
+    <input
+      id="email"
+      class="input"
+      type="email"
+      placeholder="Email address"
+    >
+
+    <input
+      id="password"
+      class="input"
+      type="password"
+      placeholder="Password"
+    >
+
+    <button
+      class="primaryBtn"
+      id="authBtn"
+      onclick="handleAuth()"
+    >
+      Login
+    </button>
+
+    <div class="switchText">
+      <span id="authSwitchText">Don't have an account?</span>
+      &nbsp;
+      <span id="authSwitchBtn" onclick="toggleAuth()">Sign up</span>
+    </div>
+
+    <div
+      id="authMsg"
+      style="text-align:center;margin-top:12px;font-size:13px"
+    ></div>
+
+  </div>
+
+</section>
+
+
+<!-- =========================
+     APP
+========================= -->
+
+<section id="app" class="hidden">
+
+  <header class="topbar">
+
+    <div class="brand">
+
+      <div class="brandLogo">O</div>
+
+      <div class="brandText">
+        Olaq<span>Verify</span>
+      </div>
+
+    </div>
+
+    <div class="balancePill">
+      ₦<span id="topBalance">0</span>
+    </div>
+
+  </header>
+
+
+  <!-- =========================
+       HOME
+  ========================= -->
+
+  <main id="homePage" class="page active">
+
+    <section class="balanceHero">
+
+      <div class="balanceContent">
+
+        <div class="balanceLabel">
+          TOTAL AVAILABLE BALANCE
+        </div>
+
+        <div class="bigBalance">
+          <small>₦</small><span id="balance">0</span>
+        </div>
+
+        <div class="balanceCaption">
+          Available for numbers and services
+        </div>
+
+        <div class="balanceButtons">
+
+          <button
+            class="addMoney"
+            onclick="openTopup()"
+          >
+            + Add Money
+          </button>
+
+          <button
+            class="buyMoney"
+            onclick="openPage('buyPage')"
+          >
+            Buy Number
+          </button>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <section class="quickGrid">
+
+      <div
+        class="quickCard"
+        onclick="openPage('buyPage')"
+      >
+        <div class="quickIcon blueIcon">+</div>
+        <strong>Buy Number</strong>
+      </div>
+
+      <div
+        class="quickCard"
+        onclick="openPage('ordersPage')"
+      >
+        <div class="quickIcon purpleIcon">▣</div>
+        <strong>My Orders</strong>
+      </div>
+
+      <div
+        class="quickCard"
+        onclick="openTopup()"
+      >
+        <div class="quickIcon redIcon">₦</div>
+        <strong>Add Money</strong>
+      </div>
+
+    </section>
+
+
+    <section class="section">
+
+      <div class="sectionHead">
+
+        <div>
+          <div class="sectionTitle">
+            Mainly Active
+          </div>
+
+          <div class="sectionSub">
+            Our currently active number markets
+          </div>
+        </div>
+
+      </div>
+
+
+      <div class="priorityCard">
+
+        <div class="priorityIcon">
+          ✓
+        </div>
+
+        <div class="priorityText">
+
+          <strong>
+            United States & Canada
+          </strong>
+
+          <span>
+            These countries are currently prioritized for OlaqVerify.
+          </span>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <section class="section">
+
+      <div class="sectionHead">
+
+        <div>
+          <div class="sectionTitle">
+            Active Countries
+          </div>
+
+          <div class="sectionSub">
+            Select a country to view available services
+          </div>
+        </div>
+
+        <div class="sectionAction">
+          BUY
+        </div>
+
+      </div>
+
+      <div
+        id="homeActiveCountries"
+        class="countryGrid"
+      ></div>
+
+    </section>
+
+
+    <section class="section">
+
+      <div class="sectionHead">
+
+        <div>
+          <div class="sectionTitle">
+            Special Offers
+          </div>
+
+          <div class="sectionSub">
+            Current deals on OlaqVerify
+          </div>
+        </div>
+
+      </div>
+
+      <div id="deals"></div>
+
+    </section>
+
+
+    <section class="section">
+
+      <div class="sectionHead">
+
+        <div>
+          <div class="sectionTitle">
+            Recent Activity
+          </div>
+
+          <div class="sectionSub">
+            Your latest orders
+          </div>
+
+        </div>
+
+        <div
+          class="sectionAction"
+          onclick="openPage('ordersPage')"
+        >
+          VIEW ALL
+        </div>
+
+      </div>
+
+      <div id="recentOrders"></div>
+
+    </section>
+
+  </main>
+
+
+  <!-- =========================
+       BUY
+  ========================= -->
+
+  <main id="buyPage" class="page">
+
+    <section class="buyHero">
+
+      <h1>
+        Buy a Number
+      </h1>
+
+      <p>
+        Choose an active country and select the service you need.
+        More countries will be introduced over time.
+      </p>
+
+    </section>
+
+
+    <div class="search">
+
+      <span>⌕</span>
+
+      <input
+        id="countrySearch"
+        type="text"
+        placeholder="Search countries..."
+        oninput="filterCountries()"
+      >
+
+    </div>
+
+
+    <section class="section">
+
+      <div class="sectionHead">
+
+        <div>
+          <div class="sectionTitle">
+            Mainly Active
+          </div>
+
+          <div class="sectionSub">
+            Available now
+          </div>
+        </div>
+
+        <div class="countryStatus activeStatus">
+          ACTIVE
+        </div>
+
+      </div>
+
+      <div
+        id="activeBuyCountries"
+        class="countryGrid"
+      ></div>
+
+    </section>
+
+
+    <section class="section">
+
+      <div class="sectionHead">
+
+        <div>
+          <div class="sectionTitle">
+            More Countries
+          </div>
+
+          <div class="sectionSub">
+            Being prepared for launch
+          </div>
+        </div>
+
+        <div class="countryStatus soonStatus">
+          SOON
+        </div>
+
+      </div>
+
+      <div
+        id="inactiveCountries"
+        class="countryGrid"
+      ></div>
+
+    </section>
+
+  </main>
+
+
+  <!-- =========================
+       ORDERS
+  ========================= -->
+
+  <main id="ordersPage" class="page">
+
+    <section class="buyHero">
+
+      <h1>My Orders</h1>
+
+      <p>
+        Keep track of your numbers and order status.
+      </p>
+
+    </section>
+
+    <section class="section">
+
+      <div id="ordersList"></div>
+
+    </section>
+
+  </main>
+
+
+  <!-- =========================
+       SMS
+  ========================= -->
+
+  <main id="smsPage" class="page">
+
+    <section class="buyHero">
+
+      <h1>Messages</h1>
+
+      <p>
+        SMS received on your OlaqVerify numbers.
+      </p>
+
+    </section>
+
+    <section class="section">
+
+      <div id="smsList"></div>
+
+    </section>
+
+  </main>
+
+
+  <!-- =========================
+       PROFILE
+  ========================= -->
+
+  <main id="profilePage" class="page">
+
+    <section class="profileCard">
+
+      <div
+        class="avatar"
+        id="avatar"
+      >
+        O
+      </div>
+
+      <div
+        class="profileName"
+        id="profileName"
+      >
+        Olaq User
+      </div>
+
+      <div
+        class="profileEmail"
+        id="profileEmail"
+      >
+        Loading...
+      </div>
+
+      <button
+        class="profileBtn"
+        onclick="openTopup()"
+      >
+        ₦ &nbsp; Add Money
+      </button>
+
+      <button
+        class="profileBtn"
+        onclick="openSupport()"
+      >
+        ? &nbsp; Contact Support
+      </button>
+
+      <button
+        class="profileBtn logout"
+        onclick="logout()"
+      >
+        ↪ &nbsp; Logout
+      </button>
+
+    </section>
+
+  </main>
+
+
+  <!-- =========================
+       NAVIGATION
+  ========================= -->
+
+  <nav class="bottomNav">
+
+    <button
+      class="navBtn active"
+      onclick="openPage('homePage',this)"
+    >
+      <span class="navIcon">⌂</span>
+      Home
+    </button>
+
+    <button
+      class="navBtn"
+      onclick="openPage('buyPage',this)"
+    >
+      <span class="navIcon">+</span>
+      Buy
+    </button>
+
+    <button
+      class="navBtn"
+      onclick="openPage('ordersPage',this)"
+    >
+      <span class="navIcon">▣</span>
+      Orders
+    </button>
+
+    <button
+      class="navBtn"
+      onclick="openPage('smsPage',this)"
+    >
+      <span class="navIcon">✉</span>
+      SMS
+    </button>
+
+    <button
+      class="navBtn"
+      onclick="openPage('profilePage',this)"
+    >
+      <span class="navIcon">●</span>
+      Profile
+    </button>
+
+  </nav>
+
+</section>
+
+
+<!-- =========================
+     SERVICE MODAL
+========================= -->
+
+<div
+  id="orderModal"
+  class="modalBg"
+>
+
+  <div class="modal">
+
+    <div class="modalHead">
+
+      <div class="modalTitle">
+        Choose Service
+      </div>
+
+      <button
+        class="close"
+        onclick="closeModal('orderModal')"
+      >
+        ×
+      </button>
+
+    </div>
+
+    <div id="serviceOptions"></div>
+
+  </div>
+
+</div>
+
+
+<!-- =========================
+     CONFIRM MODAL
+========================= -->
+
+<div
+  id="confirmModal"
+  class="modalBg"
+>
+
+  <div class="modal">
+
+    <div class="modalHead">
+
+      <div class="modalTitle">
+        Confirm Purchase
+      </div>
+
+      <button
+        class="close"
+        onclick="closeModal('confirmModal')"
+      >
+        ×
+      </button>
+
+    </div>
+
+    <div id="selectedDetails"></div>
+
+    <button
+      class="primaryBtn"
+      onclick="confirmOrder()"
+    >
+      Confirm & Buy
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- =========================
+     TOPUP MODAL
+========================= -->
+
+<div
+  id="topupModal"
+  class="modalBg"
+>
+
+  <div class="modal">
+
+    <div class="modalHead">
+
+      <div class="modalTitle">
+        Add Money
+      </div>
+
+      <button
+        class="close"
+        onclick="closeModal('topupModal')"
+      >
+        ×
+      </button>
+
+    </div>
+
+    <p class="muted">
+      Transfer your desired amount to the account below,
+      then submit the payment request.
+    </p>
+
+    <div class="listCard">
+
+      <strong>PalmPay</strong>
+
+      <div style="margin-top:10px">
+        Account Name:
+        <strong>Adekunle</strong>
+      </div>
+
+      <div style="margin-top:6px">
+        Account Number:
+        <strong>8164886717</strong>
+      </div>
+
+    </div>
+
+    <input
+      id="topupAmount"
+      class="input"
+      type="number"
+      placeholder="Enter amount"
+    >
+
+    <button
+      class="primaryBtn"
+      onclick="submitTopup()"
+    >
+      Submit Payment
+    </button>
+
+    <div
+      id="topupMsg"
+      style="text-align:center;margin-top:12px;font-size:13px"
+    ></div>
+
+  </div>
+
+</div>
+
+
+<!-- =========================
+     SUPPORT MODAL
+========================= -->
+
+<div
+  id="supportModal"
+  class="modalBg"
+>
+
+  <div class="modal">
+
+    <div class="modalHead">
+
+      <div class="modalTitle">
+        Olaq Support
+      </div>
+
+      <button
+        class="close"
+        onclick="closeModal('supportModal')"
+      >
+        ×
+      </button>
+
+    </div>
+
+    <p class="muted">
+      Need help with an order or payment?
+    </p>
+
+    <button
+      class="primaryBtn"
+      onclick="window.open('https://wa.me/2348164886717','_blank')"
+    >
+      Chat on WhatsApp
+    </button>
+
+  </div>
+
+</div>
+
+
+<script>
+
+/* =========================
+   SUPABASE
+========================= */
+
+const SUPABASE_URL =
+  "https://alemtvfchysptzgzhaap.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_UEnF6pfZ2ORRcuIQUzgbRw_6bWNDnKm";
+
+const db =
+  supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+
+let currentUser=null;
+let profile=null;
+let prices=[];
+let selectedPrice=null;
+let deals=[];
+let purchaseBusy=false;
+let loginMode=true;
+
+
+/* =========================
+   ACTIVE COUNTRIES
+========================= */
+
+const ACTIVE_COUNTRIES=[
+  "united states",
+  "usa",
+  "us",
+  "canada",
+  "ca"
+];
+
+
+function isActiveCountry(country){
+
+  if(!country) return false;
+
+  return ACTIVE_COUNTRIES.includes(
+    String(country).trim().toLowerCase()
+  );
+
+}
+
+
+/* =========================
+   AUTH
+========================= */
+
+function toggleAuth(){
+
+  loginMode=!loginMode;
+
+  document.getElementById("authTitle").textContent=
+    loginMode
+      ? "Welcome to OlaqVerify"
+      : "Create your OlaqVerify account";
+
+  document.getElementById("authSub").textContent=
+    loginMode
+      ? "Your simple home for SMS verification numbers."
+      : "Create an account and start using OlaqVerify.";
+
+  document.getElementById("authBtn").textContent=
+    loginMode
+      ? "Login"
+      : "Create Account";
+
+  document.getElementById("authSwitchText").textContent=
+    loginMode
+      ? "Don't have an account?"
+      : "Already have an account?";
+
+  document.getElementById("authSwitchBtn").textContent=
+    loginMode
+      ? "Sign up"
+      : "Login";
+
+}
+
+
+async function handleAuth(){
+
+  const email=
+    document.getElementById("email").value.trim();
+
+  const password=
+    document.getElementById("password").value;
+
+  const msg=
+    document.getElementById("authMsg");
+
+  msg.textContent="";
+  msg.style.color="#dc2626";
+
+  if(!email || !password){
+
+    msg.textContent=
+      "Enter your email and password.";
+
+    return;
+  }
+
+  try{
+
+    let result;
+
+    if(loginMode){
+
+      result=
+        await db.auth.signInWithPassword({
+          email,
+          password
+        });
+
+    }else{
+
+      result=
+        await db.auth.signUp({
+          email,
+          password
+        });
+
+    }
+
+    if(result.error){
+      throw result.error;
+    }
+
+    if(!loginMode){
+
+      msg.style.color="#16a36a";
+
+      msg.textContent=
+        "Account created. Check your email if confirmation is required.";
+
+      return;
+    }
+
+    await startApp();
+
+  }catch(error){
+
+    msg.textContent=
+      error.message || String(error);
+
+  }
+
+}
+
+
+/* =========================
+   START
+========================= */
+
+async function startApp(){
+
+  const {data,error}=
+    await db.auth.getUser();
+
+  if(error || !data.user){
+    return;
+  }
+
+  currentUser=data.user;
+
+  document
+    .getElementById("auth")
+    .classList.add("hidden");
+
+  document
+    .getElementById("app")
+    .classList.remove("hidden");
+
+  await loadProfile();
+  await loadPrices();
+  await loadOrders();
+  await loadSMS();
+  await loadDeals();
+
+  openPage("homePage");
+
+}
+
+
+/* =========================
+   PROFILE
+========================= */
+
+async function loadProfile(){
+
+  try{
+
+    const {data,error}=
+      await db
+        .from("profiles")
+        .select("*")
+        .eq("id",currentUser.id)
+        .maybeSingle();
+
+    if(error) throw error;
+
+    profile=data;
+
+    const name=
+      data?.full_name ||
+      data?.name ||
+      currentUser.email?.split("@")[0] ||
+      "Olaq User";
+
+    document.getElementById("profileName")
+      .textContent=name;
+
+    document.getElementById("profileEmail")
+      .textContent=currentUser.email || "";
+
+    document.getElementById("avatar")
+      .textContent=
+        name.charAt(0).toUpperCase();
+
+    const balance=
+      Number(data?.balance || 0);
+
+    document.getElementById("balance")
+      .textContent=
+        balance.toLocaleString();
+
+    document.getElementById("topBalance")
+      .textContent=
+        balance.toLocaleString();
+
+  }catch(error){
+
+    console.log("Profile error:",error);
+
+  }
+
+}
+
+
+/* =========================
+   PRICES
+========================= */
+
+async function loadPrices(){
+
+  try{
+
+    const {data,error}=
+      await db
+        .from("prices")
+        .select("*")
+        .eq("active",true)
+        .order("country");
+
+    if(error) throw error;
+
+    prices=data || [];
+
+    renderAllCountries(prices);
+
+  }catch(error){
+
+    console.log("Prices error:",error);
+
+    prices=[];
+
+    renderAllCountries([]);
+
+  }
+
+}
+
+
+/* =========================
+   COUNTRY LIST
+========================= */
+
+function getCountryList(list){
+
+  const map=new Map();
+
+  (list || []).forEach(item=>{
+
+    const country=
+      item.country || "Unknown";
+
+    const key=
+      country.trim().toLowerCase();
+
+    if(!map.has(key)){
+      map.set(key,item);
+    }
+
+  });
+
+  return Array.from(map.values());
+
+}
+
+
+function escapeAttr(value){
+
+  return String(value)
+    .replace(/\\/g,"\\\\")
+    .replace(/'/g,"\\'");
+
+}
+
+
+/* =========================
+   COUNTRY CARD
+========================= */
+
+function getCountryCard(price,active=true){
+
+  const country=
+    price.country || "Unknown";
+
+  const flag=
+    price.flag || "🌐";
+
+  const countryPrices=
+    prices.filter(p=>
+      String(p.country || "").toLowerCase()===
+      String(country).toLowerCase()
+    );
+
+  const lowest=
+    countryPrices.length
+      ? Math.min(
+          ...countryPrices.map(
+            p=>Number(p.price || 0)
+          )
+        )
+      : null;
+
+
+  if(!active){
+
+    return `
+
+      <div class="countryCard inactive">
+
+        <div class="countryFlag">
+          ${flag}
+        </div>
+
+        <div class="countryName">
+          ${country}
+        </div>
+
+        <div class="countryInfo">
+          Availability is being prepared
+        </div>
+
+        <div class="countryStatus soonStatus">
+          COMING SOON
+        </div>
+
+      </div>
+
+    `;
+
+  }
+
+
+  return `
+
+    <div
+      class="countryCard active"
+      onclick="chooseCountry('${escapeAttr(country)}')"
+    >
+
+      <div class="countryFlag">
+        ${flag}
+      </div>
+
+      <div class="countryName">
+        ${country}
+      </div>
+
+      <div class="countryInfo">
+        ${countryPrices.length}
+        service${countryPrices.length===1?"":"s"}
+        ${lowest!==null
+          ? " • From ₦"+lowest.toLocaleString()
+          : ""}
+      </div>
+
+      <div class="countryStatus activeStatus">
+        ● ACTIVE NOW
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+
+/* =========================
+   RENDER COUNTRIES
+========================= */
+
+function renderAllCountries(list=prices){
+
+  const unique=getCountryList(list);
+
+  const active=
+    unique.filter(
+      x=>isActiveCountry(x.country)
+    );
+
+  const inactive=
+    unique.filter(
+      x=>!isActiveCountry(x.country)
+    );
+
+
+  active.sort((a,b)=>{
+
+    const order={
+      "united states":0,
+      "usa":0,
+      "us":0,
+      "canada":1,
+      "ca":1
+    };
+
+    return(
+      (order[String(a.country).toLowerCase()]??10)-
+      (order[String(b.country).toLowerCase()]??10)
+    );
+
+  });
+
+
+  const activeHTML=
+    active.length
+      ? active.map(
+          x=>getCountryCard(x,true)
+        ).join("")
+      : `
+        <div
+          class="empty"
+          style="grid-column:1/-1"
+        >
+          No active countries are configured yet.
+        </div>
+      `;
+
+
+  const inactiveHTML=
+    inactive.length
+      ? inactive.map(
+          x=>getCountryCard(x,false)
+        ).join("")
+      : `
+        <div
+          class="empty"
+          style="grid-column:1/-1"
+        >
+          More countries will appear here as they are added.
+        </div>
+      `;
+
+
+  document.getElementById(
+    "homeActiveCountries"
+  ).innerHTML=activeHTML;
+
+  document.getElementById(
+    "activeBuyCountries"
+  ).innerHTML=activeHTML;
+
+  document.getElementById(
+    "inactiveCountries"
+  ).innerHTML=inactiveHTML;
+
+}
+
+
+/* =========================
+   SEARCH
+========================= */
+
+function filterCountries(){
+
+  const query=
+    document.getElementById(
+      "countrySearch"
+    ).value.trim().toLowerCase();
+
+  if(!query){
+
+    renderAllCountries(prices);
+    return;
+
+  }
+
+  const filtered=
+    prices.filter(item=>
+      String(item.country || "")
+        .toLowerCase()
+        .includes(query)
+    );
+
+  renderAllCountries(filtered);
+
+}
+
+
+/* =========================
+   CHOOSE COUNTRY
+========================= */
+
+function chooseCountry(country){
+
+  const options=
+    prices.filter(p=>
+      String(p.country || "").toLowerCase()===
+      String(country || "").toLowerCase()
+    );
+
+  const container=
+    document.getElementById(
+      "serviceOptions"
+    );
+
+
+  if(!options.length){
+
+    container.innerHTML=`
+      <div class="empty">
+        No service is configured for this country yet.
+      </div>
+    `;
+
+  }else{
+
+    container.innerHTML=
+      options.map(item=>`
+
+        <div
+          class="listCard"
+          style="cursor:pointer"
+          onclick="selectPrice('${escapeAttr(item.id)}')"
+        >
+
+          <div class="row">
+
+            <div>
+
+              <strong>
+                ${item.service || "SMS Service"}
+              </strong>
+
+              <div
+                class="muted"
+                style="margin-top:5px;font-size:12px"
+              >
+                ${item.country}
+              </div>
+
+            </div>
+
+            <strong>
+              ₦${Number(item.price || 0).toLocaleString()}
+            </strong>
+
+          </div>
+
+        </div>
+
+      `).join("");
+
+  }
+
+  document
+    .getElementById("orderModal")
+    .classList.add("show");
+
+}
+
+
+/* =========================
+   SELECT PRICE
+========================= */
+
+function selectPrice(id){
+
+  selectedPrice=
+    prices.find(
+      p=>String(p.id)===String(id)
+    );
+
+  if(!selectedPrice) return;
+
+  closeModal("orderModal");
+
+
+  document.getElementById(
+    "selectedDetails"
+  ).innerHTML=`
+
+    <div class="listCard">
+
+      <div class="row">
+        <span class="muted">Country</span>
+        <strong>${selectedPrice.country}</strong>
+      </div>
+
+      <div
+        class="row"
+        style="margin-top:13px"
+      >
+        <span class="muted">Service</span>
+        <strong>
+          ${selectedPrice.service || "SMS"}
+        </strong>
+      </div>
+
+      <div
+        class="row"
+        style="margin-top:13px"
+      >
+        <span class="muted">Amount</span>
+        <strong style="font-size:20px">
+          ₦${Number(
+            selectedPrice.price || 0
+          ).toLocaleString()}
+        </strong>
+      </div>
+
+    </div>
+
+  `;
+
+
+  document
+    .getElementById("confirmModal")
+    .classList.add("show");
+
+}
+
+
+/* =========================
+   CONFIRM ORDER
+========================= */
+
+async function confirmOrder(){
+
+  if(
+    purchaseBusy ||
+    !selectedPrice ||
+    !currentUser
+  ){
+    return;
+  }
+
+  purchaseBusy=true;
+
+  const button=
+    document.querySelector(
+      "#confirmModal .primaryBtn"
+    );
+
+  button.disabled=true;
+  button.textContent="Processing...";
+
+
+  try{
+
+    const {data,error}=
+      await db.rpc(
+        "place_order",
+        {
+          p_price_id:selectedPrice.id
+        }
+      );
+
+    if(error) throw error;
+
+    alert("Order placed successfully.");
+
+    closeModal("confirmModal");
+
+    await loadProfile();
+    await loadOrders();
+
+    openPage("ordersPage");
+
+  }catch(error){
+
+    alert(
+      error.message ||
+      "Could not place order."
+    );
+
+  }finally{
+
+    purchaseBusy=false;
+
+    button.disabled=false;
+    button.textContent="Confirm & Buy";
+
+  }
+
+}
+
+
+/* =========================
+   ORDERS
+========================= */
+
+async function loadOrders(){
+
+  const container=
+    document.getElementById("ordersList");
+
+  const recent=
+    document.getElementById("recentOrders");
+
+  if(!currentUser) return;
+
+
+  try{
+
+    const {data,error}=
+      await db
+        .from("orders")
+        .select("*")
+        .eq("user_id",currentUser.id)
+        .order(
+          "created_at",
+          {ascending:false}
+        );
+
+    if(error) throw error;
+
+    const rows=data || [];
+
+
+    if(!rows.length){
+
+      container.innerHTML=`
+        <div class="empty">
+          You don't have any orders yet.
+        </div>
+      `;
+
+      recent.innerHTML=`
+        <div class="empty">
+          No recent orders.
+        </div>
+      `;
+
+      return;
+    }
+
+
+    const html=
+      rows.map(order=>`
+
+        <div class="listCard">
+
+          <div class="row">
+
+            <div>
+
+              <strong>
+                ${order.phone_number ||
+                  order.service ||
+                  "SMS Order"}
+              </strong>
+
+              <div
+                class="muted"
+                style="margin-top:5px;font-size:12px"
+              >
+                ${order.country || "Country"}
+              </div>
+
+            </div>
+
+            <span class="badge">
+              ${order.status || "pending"}
+            </span>
+
+          </div>
+
+          <div
+            class="muted"
+            style="margin-top:12px;font-size:11px"
+          >
+            ${
+              order.created_at
+              ? new Date(
+                  order.created_at
+                ).toLocaleString()
+              : ""
+            }
+          </div>
+
+        </div>
+
+      `).join("");
+
+
+    container.innerHTML=html;
+
+
+    recent.innerHTML=
+      rows.slice(0,3)
+        .map(order=>`
+
+          <div class="listCard">
+
+            <div class="row">
+
+              <strong>
+                ${order.phone_number ||
+                  order.service ||
+                  "SMS Order"}
+              </strong>
+
+              <span class="badge">
+                ${order.status || "pending"}
+              </span>
+
+            </div>
+
+          </div>
+
+        `)
+        .join("");
+
+
+  }catch(error){
+
+    console.log(
+      "Orders error:",
+      error
+    );
+
+    container.innerHTML=`
+      <div class="empty">
+        Unable to load orders right now.
+      </div>
+    `;
+
+  }
+
+}
+
+
+/* =========================
+   SMS
+========================= */
+
+async function loadSMS(){
+
+  const container=
+    document.getElementById(
+      "smsList"
+    );
+
+  if(!currentUser) return;
+
+
+  try{
+
+    const {data,error}=
+      await db
+        .from("messages")
+        .select("*")
+        .eq("user_id",currentUser.id)
+        .order(
+          "created_at",
+          {ascending:false}
+        );
+
+    if(error) throw error;
+
+    const rows=data || [];
+
+
+    if(!rows.length){
+
+      container.innerHTML=`
+        <div class="empty">
+          No SMS messages yet.
+        </div>
+      `;
+
+      return;
+    }
+
+
+    container.innerHTML=
+      rows.map(message=>`
+
+        <div class="listCard">
+
+          <div class="row">
+
+            <strong>
+              ${message.sender || "SMS"}
+            </strong>
+
+            <span
+              class="muted"
+              style="font-size:10px"
+            >
+              ${
+                message.created_at
+                ? new Date(
+                    message.created_at
+                  ).toLocaleString()
+                : ""
+              }
+            </span>
+
+          </div>
+
+          <div
+            style="
+              margin-top:12px;
+              line-height:1.5;
+              font-size:14px;
+            "
+          >
+            ${
+              message.message ||
+              message.body ||
+              "No message text"
+            }
+          </div>
+
+        </div>
+
+      `).join("");
+
+
+  }catch(error){
+
+    console.log(
+      "SMS error:",
+      error
+    );
+
+    container.innerHTML=`
+      <div class="empty">
+        Unable to load messages.
+      </div>
+    `;
+
+  }
+
+}
+
+
+/* =========================
+   DEALS
+========================= */
+
+async function loadDeals(){
+
+  const container=
+    document.getElementById(
+      "deals"
+    );
+
+
+  try{
+
+    const {data,error}=
+      await db
+        .from("deals")
+        .select("*")
+        .order(
+          "created_at",
+          {ascending:false}
+        );
+
+    if(error) throw error;
+
+    deals=data || [];
+
+
+    if(!deals.length){
+
+      container.innerHTML=`
+        <div class="empty">
+          No special offers right now.
+        </div>
+      `;
+
+      return;
+    }
+
+
+    container.innerHTML=
+      deals.slice(0,5)
+        .map(deal=>`
+
+          <div class="dealCard">
+
+            <div class="dealLeft">
+
+              <strong>
+                ${deal.title ||
+                  deal.name ||
+                  "Special Offer"}
+              </strong>
+
+              <span>
+                ${deal.description ||
+                  "Limited offer available"}
+              </span>
+
+            </div>
+
+            <div class="dealPrice">
+              ${deal.price
+                ? "₦"+Number(
+                    deal.price
+                  ).toLocaleString()
+                : "OFFER"}
+            </div>
+
+          </div>
+
+        `).join("");
+
+
+  }catch(error){
+
+    console.log(
+      "Deals error:",
+      error
+    );
+
+    container.innerHTML=`
+      <div class="empty">
+        No special offers available.
+      </div>
+    `;
+
+  }
+
+}
+
+
+/* =========================
+   NAVIGATION
+========================= */
+
+function openPage(pageId,button){
+
+  document
+    .querySelectorAll(".page")
+    .forEach(page=>
+      page.classList.remove("active")
+    );
+
+
+  const page=
+    document.getElementById(pageId);
+
+  if(page){
+    page.classList.add("active");
+  }
+
+
+  document
+    .querySelectorAll(".navBtn")
+    .forEach(btn=>
+      btn.classList.remove("active")
+    );
+
+
+  if(button){
+
+    button.classList.add("active");
+
+  }else{
+
+    const map={
+      homePage:0,
+      buyPage:1,
+      ordersPage:2,
+      smsPage:3,
+      profilePage:4
+    };
+
+    const index=map[pageId];
+
+    if(index!==undefined){
+
+      document
+        .querySelectorAll(".navBtn")[index]
+        ?.classList.add("active");
+
+    }
+
+  }
+
+
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
+
+}
+
+
+/* =========================
+   MODALS
+========================= */
+
+function closeModal(id){
+
+  document
+    .getElementById(id)
+    ?.classList.remove("show");
+
+}
+
+
+function openTopup(){
+
+  document
+    .getElementById("topupModal")
+    .classList.add("show");
+
+}
+
+
+function openSupport(){
+
+  document
+    .getElementById("supportModal")
+    .classList.add("show");
+
+}
+
+
+/* =========================
+   TOPUP
+========================= */
+
+async function submitTopup(){
+
+  const amount=
+    Number(
+      document.getElementById(
+        "topupAmount"
+      ).value
+    );
+
+  const msg=
+    document.getElementById(
+      "topupMsg"
+    );
+
+
+  if(!amount || amount<=0){
+
+    msg.style.color="#dc2626";
+
+    msg.textContent=
+      "Enter a valid amount.";
+
+    return;
+  }
+
+
+  try{
+
+    const {error}=
+      await db
+        .from("payment_requests")
+        .insert({
+          user_id:currentUser.id,
+          amount:amount,
+          status:"pending"
+        });
+
+    if(error) throw error;
+
+
+    msg.style.color="#16a36a";
+
+    msg.textContent=
+      "Payment submitted and is pending approval.";
+
+    document.getElementById(
+      "topupAmount"
+    ).value="";
+
+
+  }catch(error){
+
+    msg.style.color="#dc2626";
+
+    msg.textContent=
+      error.message ||
+      "Could not submit payment.";
+
+  }
+
+}
+
+
+/* =========================
+   LOGOUT
+========================= */
+
+async function logout(){
+
+  await db.auth.signOut();
+
+  currentUser=null;
+
+  document
+    .getElementById("app")
+    .classList.add("hidden");
+
+  document
+    .getElementById("auth")
+    .classList.remove("hidden");
+
+}
+
+
+/* =========================
+   CLOSE MODAL OUTSIDE
+========================= */
+
+document
+  .querySelectorAll(".modalBg")
+  .forEach(bg=>{
+
+    bg.addEventListener(
+      "click",
+      function(e){
+
+        if(e.target===bg){
+          bg.classList.remove("show");
+        }
+
+      }
+    );
+
+  });
+
+
+/* =========================
+   INITIALIZE
+========================= */
+
+async function init(){
+
+  const {data}=
+    await db.auth.getSession();
+
+  if(data?.session){
+
+    await startApp();
+
+  }
+
+}
+
+init();
+
+
+/* =========================
+   AUTO REFRESH
+========================= */
+
+setInterval(
+  async()=>{
+
+    if(currentUser){
+
+      await loadProfile();
+      await loadOrders();
+      await loadSMS();
+
+    }
+
+  },
+  15000
+);
+
+</script>
+
+</body>
+</html>
