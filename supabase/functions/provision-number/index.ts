@@ -7,6 +7,7 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
+    
     return new Response(
       JSON.stringify({
         success: true,
